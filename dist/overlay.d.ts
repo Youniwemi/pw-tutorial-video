@@ -1,5 +1,5 @@
 import type { Page, Locator } from '@playwright/test';
-import type { ContextStyle } from './types';
+import type { ContextStyle } from './types.js';
 export interface OverlayOptions {
     title: string;
     lang: string;

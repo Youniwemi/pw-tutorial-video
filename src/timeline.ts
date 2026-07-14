@@ -1,6 +1,6 @@
 import { writeFileSync, mkdirSync, existsSync } from 'fs';
 import { join } from 'path';
-import { buildMergeCommand } from './merge';
+import { buildMergeCommand } from './merge.js';
 
 export interface TimelineStep {
 	step: number;

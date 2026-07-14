@@ -1,6 +1,6 @@
 import { writeFileSync, mkdirSync, existsSync } from 'fs';
 import { join } from 'path';
-import { buildMergeCommand } from './merge';
+import { buildMergeCommand } from './merge.js';
 /**
  * Tracks timing of tutorial steps for post-processing audio merge.
  */

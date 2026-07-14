@@ -1,11 +1,11 @@
 import type { Page, Locator } from '@playwright/test';
-import type { ContextStyle } from './types';
+import type { ContextStyle } from './types.js';
 import {
 	renderStepOverlay,
 	renderContextOverlay,
 	renderCompleteOverlay,
 	renderEmailPreview
-} from './overlay-html';
+} from './overlay-html.js';
 
 export interface OverlayOptions {
 	title: string;

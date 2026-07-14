@@ -2,12 +2,12 @@ import type { Page, Locator } from '@playwright/test';
 import { readFileSync, unlinkSync, existsSync, mkdirSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
-import type { TutorialOptions, StepOptions, ContextOptions, ContextStyle } from './types';
-import { TutorialVoice } from './voice';
-import { TutorialMusic } from './music';
-import { TutorialCursor } from './cursor';
-import { TutorialOverlay } from './overlay';
-import { TutorialTimeline } from './timeline';
+import type { TutorialOptions, StepOptions, ContextOptions, ContextStyle } from './types.js';
+import { TutorialVoice } from './voice.js';
+import { TutorialMusic } from './music.js';
+import { TutorialCursor } from './cursor.js';
+import { TutorialOverlay } from './overlay.js';
+import { TutorialTimeline } from './timeline.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

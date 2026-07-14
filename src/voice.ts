@@ -2,7 +2,7 @@ import type { Page } from '@playwright/test';
 import { createHash } from 'crypto';
 import { existsSync, mkdirSync } from 'fs';
 import { join, basename } from 'path';
-import { createTTSProvider, type TTSProvider } from './tts-provider';
+import { createTTSProvider, type TTSProvider } from './tts-provider.js';
 
 const TUTORIAL_MODE = process.env.TUTORIAL_MODE === 'true';
 

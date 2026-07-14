@@ -1,6 +1,6 @@
 import type { Page, Locator } from '@playwright/test';
-import type { TutorialOptions, StepOptions, ContextOptions } from './types';
-import { TutorialTimeline } from './timeline';
+import type { TutorialOptions, StepOptions, ContextOptions } from './types.js';
+import { TutorialTimeline } from './timeline.js';
 export declare class Tutorial {
     private page;
     private options;

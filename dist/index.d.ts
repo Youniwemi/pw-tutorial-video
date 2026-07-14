@@ -1,13 +1,13 @@
-export { Tutorial } from './Tutorial';
-export type { TutorialOptions, StepOptions, ContextOptions, ContextStyle } from './types';
-export { buildMergeCommand } from './merge';
-export type { MergeOptions } from './merge';
-export { slugify } from './slugify';
-export { createTTSProvider, CommandTTSProvider, EdgeTTSProvider } from './tts-provider';
-export type { TTSProvider, TTSProviderOptions, TTSResult } from './tts-provider';
-export { TutorialVoice } from './voice';
-export { TutorialMusic } from './music';
-export { TutorialCursor } from './cursor';
-export { TutorialOverlay } from './overlay';
-export { TutorialTimeline } from './timeline';
+export { Tutorial } from './Tutorial.js';
+export type { TutorialOptions, StepOptions, ContextOptions, ContextStyle } from './types.js';
+export { buildMergeCommand } from './merge.js';
+export type { MergeOptions } from './merge.js';
+export { slugify } from './slugify.js';
+export { createTTSProvider, CommandTTSProvider, EdgeTTSProvider } from './tts-provider.js';
+export type { TTSProvider, TTSProviderOptions, TTSResult } from './tts-provider.js';
+export { TutorialVoice } from './voice.js';
+export { TutorialMusic } from './music.js';
+export { TutorialCursor } from './cursor.js';
+export { TutorialOverlay } from './overlay.js';
+export { TutorialTimeline } from './timeline.js';
 //# sourceMappingURL=index.d.ts.map

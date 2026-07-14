@@ -1,5 +1,5 @@
 import type { Page, Locator } from '@playwright/test';
-import { CURSOR_SVG } from './overlay-html';
+import { CURSOR_SVG } from './overlay-html.js';
 
 export interface CursorOptions {
 	mouseSteps: number;

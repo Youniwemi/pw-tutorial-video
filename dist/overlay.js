@@ -1,4 +1,4 @@
-import { renderStepOverlay, renderContextOverlay, renderCompleteOverlay, renderEmailPreview } from './overlay-html';
+import { renderStepOverlay, renderContextOverlay, renderCompleteOverlay, renderEmailPreview } from './overlay-html.js';
 export class TutorialOverlay {
     page;
     options;

@@ -1,7 +1,7 @@
 import { createHash } from 'crypto';
 import { existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
-import { createTTSProvider } from './tts-provider';
+import { createTTSProvider } from './tts-provider.js';
 const TUTORIAL_MODE = process.env.TUTORIAL_MODE === 'true';
 // Audio files stored in static folder to be served by dev server
 const AUDIO_STATIC_DIR = join(process.cwd(), 'static', 'audio', 'tutorial-voice');
