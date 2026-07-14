@@ -1,0 +1,381 @@
+/* Tutorial overlay styles - injected in tutorial mode */
+/* Uses scoped CSS variables for easy customization */
+
+:root {
+	/* Colors */
+	--tutorial-primary: #0066fd;
+	--tutorial-primary-light: rgba(59, 130, 246, 0.5);
+	--tutorial-primary-lighter: rgba(59, 130, 246, 0.3);
+	--tutorial-secondary: #8b5cf6;
+	--tutorial-bg-start: #1e293b;
+	--tutorial-bg-end: #0f172a;
+	--tutorial-border: rgb(231, 234, 239.5);
+	--tutorial-text: #000000;
+	--tutorial-text-muted: #1b1b1b;
+	--tutorial-text-bright: #000000;
+	--tutorial-shadow: rgba(0, 0, 0, 0.5);
+	--tutorial-cursor-stroke: #1e293b;
+
+	/* Sizing */
+	--tutorial-overlay-width: 320px;
+	--tutorial-overlay-top: 20px;
+	--tutorial-overlay-right: 20px;
+	--tutorial-border-radius: 12px;
+	--tutorial-padding: 20px;
+	--tutorial-z-index: 999999;
+
+	/* Animation */
+	--tutorial-animation-duration: 0.3s;
+	--tutorial-pulse-duration: 1.5s;
+
+	/* Typography */
+	--tutorial-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+	--tutorial-title-size: 14px;
+	--tutorial-step-title-size: 18px;
+	--tutorial-description-size: 14px;
+	--tutorial-badge-size: 12px;
+}
+
+@keyframes tutorial-pulse {
+	0%, 100% {
+		box-shadow: 0 0 0 4px var(--tutorial-primary-light);
+	}
+	50% {
+		box-shadow: 0 0 0 8px var(--tutorial-primary-lighter), 0 0 20px var(--tutorial-primary-light);
+	}
+}
+
+@keyframes tutorial-fade-in {
+	from {
+		opacity: 0;
+		transform: translateY(-10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes tutorial-fade-in-center {
+	from {
+		opacity: 0;
+		transform: translate(-50%, calc(-50% - 10px));
+	}
+	to {
+		opacity: 1;
+		transform: translate(-50%, -50%);
+	}
+}
+
+@keyframes cursor-click {
+	0%, 100% {
+		transform: translate(-50%, -50%) scale(1);
+	}
+	50% {
+		transform: translate(-50%, -50%) scale(0.8);
+	}
+}
+
+.tutorial-overlay {
+	position: fixed;
+	top: var(--tutorial-overlay-top);
+	right: var(--tutorial-overlay-right);
+	width: var(--tutorial-overlay-width);
+	background: #fff;
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	border-radius: var(--tutorial-border-radius);
+	padding: var(--tutorial-padding);
+	z-index: var(--tutorial-z-index);
+	font-family: var(--tutorial-font-family);
+	color: var(--tutorial-text);
+	box-shadow: 0 25px 50px -12px var(--tutorial-shadow), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+	animation: tutorial-fade-in var(--tutorial-animation-duration) ease-out;
+	/* Never swallow clicks on app elements behind the overlay — the tutorial
+	 * is read-only and narrating, not interactive. Without this, fixed-position
+	 * UI that overlaps the overlay (e.g. the top-right scan-fab) becomes
+	 * un-clickable and tutorial.click() times out. */
+	pointer-events: none;
+}
+
+.tutorial-overlay-rtl {
+	right: auto;
+	left: var(--tutorial-overlay-right);
+	direction: rtl;
+}
+
+.tutorial-overlay-context {
+	/* Context overlay: centered, larger, more prominent */
+	top: 50%;
+	left: 50%;
+	right: auto;
+	transform: translate(-50%, -50%);
+	width: auto;
+	min-width: var(--tutorial-overlay-width);
+	max-width: 500px;
+	text-align: center;
+	padding: calc(var(--tutorial-padding) * 1.5);
+	background: #ffffff;
+	border: 1px solid var(--tutorial-border);
+	box-shadow: 0 25px 80px -12px var(--tutorial-shadow), 0 0 40px var(--tutorial-primary-lighter);
+	animation: tutorial-fade-in-center var(--tutorial-animation-duration) ease-out;
+}
+
+.tutorial-overlay-context .tutorial-header {
+	justify-content: center;
+	border-bottom: none;
+	margin-bottom: 12px;
+	padding-bottom: 0;
+}
+
+.tutorial-overlay-context .tutorial-icon {
+	font-size: 32px;
+}
+
+.tutorial-overlay-context .tutorial-title {
+	font-size: calc(var(--tutorial-title-size) + 2px);
+	color: var(--tutorial-text);
+	flex: none;
+}
+
+.tutorial-overlay-context .tutorial-step-title {
+	font-size: calc(var(--tutorial-step-title-size) + 2px);
+	color: var(--tutorial-text-bright);
+}
+
+.tutorial-context-text {
+	font-size: var(--tutorial-description-size);
+	color: var(--tutorial-text-muted);
+	margin: 8px 0 0 0;
+	line-height: 1.5;
+}
+
+/* Context style variations */
+.tutorial-context-goal {
+	box-shadow: 0 25px 80px -12px var(--tutorial-shadow), 0 0 40px rgba(59, 130, 246, 0.3);
+}
+
+.tutorial-context-clarification {
+	box-shadow: 0 25px 80px -12px var(--tutorial-shadow), 0 0 40px rgba(250, 204, 21, 0.2);
+}
+
+.tutorial-context-clarification .tutorial-icon {
+	filter: drop-shadow(0 0 8px rgba(250, 204, 21, 0.5));
+}
+
+.tutorial-context-attention {
+	box-shadow: 0 25px 80px -12px var(--tutorial-shadow), 0 0 40px rgba(239, 68, 68, 0.2);
+	border-color: rgba(239, 68, 68, 0.3);
+}
+
+.tutorial-context-attention .tutorial-icon {
+	filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.5));
+}
+
+.tutorial-header {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-bottom: 16px;
+	padding-bottom: 12px;
+	border-bottom: 1px solid var(--tutorial-border);
+}
+
+.tutorial-icon {
+	font-size: 24px;
+}
+
+.tutorial-title {
+	font-size: var(--tutorial-title-size);
+	font-weight: 600;
+	color: var(--tutorial-text-muted);
+	margin: 0;
+	flex: 1;
+}
+
+.tutorial-step-badge {
+	background: var(--tutorial-primary);
+	color: white;
+	font-size: var(--tutorial-badge-size);
+	font-weight: 700;
+	padding: 4px 10px;
+	border-radius: 20px;
+}
+
+.tutorial-step-title {
+	font-size: var(--tutorial-step-title-size);
+	font-weight: 600;
+	color: var(--tutorial-text-bright);
+	margin: 0 0 8px 0;
+	line-height: 1.3;
+}
+
+.tutorial-step-description {
+	font-size: var(--tutorial-description-size);
+	color: var(--tutorial-text-muted);
+	margin: 0;
+	line-height: 1.5;
+}
+
+.tutorial-progress {
+	margin-top: 16px;
+	height: 4px;
+	background: var(--tutorial-border);
+	border-radius: 2px;
+	overflow: hidden;
+}
+
+.tutorial-progress-bar {
+	height: 100%;
+	background: linear-gradient(90deg, var(--tutorial-primary), var(--tutorial-secondary));
+	border-radius: 2px;
+	transition: width var(--tutorial-animation-duration) ease;
+}
+
+.tutorial-highlight {
+	position: relative;
+	z-index: calc(var(--tutorial-z-index) - 1);
+	animation: tutorial-pulse var(--tutorial-pulse-duration) ease-in-out infinite;
+	border-radius: 4px;
+}
+
+.tutorial-cursor {
+	position: fixed;
+	width: 24px;
+	height: 24px;
+	pointer-events: none;
+	z-index: var(--tutorial-z-index);
+	transform: translate(-50%, -50%);
+	transition: none;
+}
+
+.tutorial-cursor-clicking {
+	animation: cursor-click 0.15s ease-out;
+}
+
+.tutorial-cursor svg {
+	width: 100%;
+	height: 100%;
+	filter: drop-shadow(2px 2px 2px var(--tutorial-shadow));
+}
+
+.tutorial-spotlight {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background: var(--tutorial-shadow);
+	z-index: calc(var(--tutorial-z-index) - 2);
+	pointer-events: none;
+	opacity: 0;
+	transition: opacity var(--tutorial-animation-duration) ease;
+}
+
+.tutorial-spotlight.active {
+	opacity: 1;
+}
+
+/* Email preview popup - simulates receiving an email */
+.tutorial-email-preview {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	z-index: calc(var(--tutorial-z-index) + 1);
+	font-family: var(--tutorial-font-family);
+	animation: tutorial-fade-in-center var(--tutorial-animation-duration) ease-out;
+}
+
+.tutorial-email-window {
+	width: 900px;
+	max-width: 90vw;
+	background: #ffffff;
+	border-radius: 12px;
+	box-shadow: 0 25px 80px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 0, 0, 0.1);
+	overflow: hidden;
+}
+
+.tutorial-email-titlebar {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 12px 16px;
+	background: linear-gradient(180deg, #f7f7f7 0%, #e8e8e8 100%);
+	border-bottom: 1px solid #d1d1d1;
+}
+
+.tutorial-email-dot {
+	width: 12px;
+	height: 12px;
+	border-radius: 50%;
+}
+
+.tutorial-email-dot.red { background: #ff5f57; }
+.tutorial-email-dot.yellow { background: #ffbd2e; }
+.tutorial-email-dot.green { background: #28c840; }
+
+.tutorial-email-app {
+	margin-left: auto;
+	font-size: 13px;
+	color: #666;
+	font-weight: 500;
+}
+
+.tutorial-email-header {
+	padding: 16px;
+	background: #fafafa;
+	border-bottom: 1px solid #e5e5e5;
+	font-size: 13px;
+	color: #333;
+}
+
+.tutorial-email-field {
+	margin-bottom: 4px;
+}
+
+.tutorial-email-field:last-child {
+	margin-bottom: 0;
+}
+
+.tutorial-email-field strong {
+	color: #666;
+	font-weight: 500;
+	margin-right: 8px;
+}
+
+.tutorial-email-body-container {
+	background: #fff;
+	max-height: 350px;
+	overflow: hidden;
+}
+
+/* The email body is an isolated iframe — sizing the outer iframe gives the
+ * preview a fixed viewport; the inner document scrolls via requestAnimationFrame. */
+.tutorial-email-iframe {
+	width: 100%;
+	height: 350px;
+	border: none;
+	display: block;
+	background: #fff;
+}
+
+.tutorial-email-code {
+	background: #fff3cd;
+	color: #856404;
+	padding: 4px 12px;
+	border-radius: 4px;
+	font-weight: 700;
+	font-size: 18px;
+	letter-spacing: 2px;
+	display: inline-block;
+	margin: 8px 0;
+	border: 2px solid #ffc107;
+	animation: tutorial-pulse 1.5s ease-in-out infinite;
+}
+
+.tutorial-email-preview.tutorial-overlay-rtl .tutorial-email-field strong {
+	margin-right: 0;
+	margin-left: 8px;
+}
