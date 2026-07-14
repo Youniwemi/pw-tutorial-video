@@ -1,0 +1,67 @@
+{
+  "name": "pw-tutorial-video",
+  "version": "0.1.0",
+  "description": "Turn Playwright end-to-end tests into professional narrated tutorial videos with TTS voice, animated cursor, step overlays, and ffmpeg post-processing.",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./reporter": {
+      "types": "./dist/reporter.d.ts",
+      "default": "./dist/reporter.js"
+    },
+    "./slugify": {
+      "types": "./dist/slugify.d.ts",
+      "default": "./dist/slugify.js"
+    },
+    "./styles.css": "./src/styles.css"
+  },
+  "bin": {
+    "tutorial-transcript": "./dist/bin/export-transcript.js"
+  },
+  "files": [
+    "dist",
+    "src/styles.css",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc && cp src/styles.css dist/styles.css",
+    "test": "vitest run",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "playwright",
+    "tutorial",
+    "video",
+    "e2e",
+    "testing",
+    "narration",
+    "tts",
+    "text-to-speech",
+    "screen-recording",
+    "documentation",
+    "automated-docs",
+    "how-to",
+    "demo",
+    "walkthrough"
+  ],
+  "author": "",
+  "license": "MIT",
+  "peerDependencies": {
+    "@playwright/test": ">=1.40.0"
+  },
+  "peerDependenciesMeta": {
+    "sharp": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.52.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.1.0"
+  }
+}
