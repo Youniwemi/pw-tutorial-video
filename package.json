@@ -21,11 +21,13 @@
     "./styles.css": "./src/styles.css"
   },
   "bin": {
+    "pw-tutorial-video": "./dist/init.js",
     "tutorial-transcript": "./dist/bin/export-transcript.js"
   },
   "files": [
     "dist",
     "src/styles.css",
+    "skills",
     "README.md"
   ],
   "scripts": {

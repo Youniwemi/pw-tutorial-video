@@ -310,6 +310,26 @@ tutorials/
     └── {test-name}-step-{n}.webp    # Step screenshots
 ```
 
+## Claude Code Skill
+
+This package ships a `/tutorialize` skill for [Claude Code](https://claude.ai/code) in `skills/tutorialize/`. It teaches Claude how to convert a Playwright test into a professional tutorial — covering persona analysis, storytelling, narration voice, and the full `pw-tutorial-video` API.
+
+### Setup
+
+```bash
+npx pw-tutorial-video init
+```
+
+This interactively copies the `/tutorialize` skill and `tutorial-crafter` agent into your `.claude/` directory. Re-run to update after a package upgrade.
+
+### What the skill covers
+
+| File | Content |
+|---|---|
+| `SKILL.md` | Process overview: understand → design → implement → verify |
+| `references/storytelling.md` | Persona dimensions, emotional arc, narration voice, grouping heuristics |
+| `references/api.md` | Tutorial class API, timing model, critical rules, checklist |
+
 ## How It Works
 
 1. **Test registration** — `tutorial.step()` / `tutorial.context()` queue actions and start preloading TTS audio in background
