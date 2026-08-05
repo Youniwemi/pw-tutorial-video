@@ -6,6 +6,9 @@ export interface TimelineStep {
     audioFile: string;
     startMs: number;
     durationMs: number;
+    /** Scene(s) on stage for this step — tells a transcript reader who was on
+     *  screen. An array means two scenes shared the stage. */
+    scene?: string | string[];
 }
 export interface TimelineData {
     testName: string;
@@ -58,7 +61,7 @@ export declare class TutorialTimeline {
     /**
      * Record a step at a specific timestamp (for accurate voice timing)
      */
-    addStep(step: number, title: string, audioFile: string, durationMs: number, timestamp: number, text?: string, key?: string): void;
+    addStep(step: number, title: string, audioFile: string, durationMs: number, timestamp: number, text?: string, key?: string, scene?: string | string[]): void;
     /**
      * Get the timeline data with merge command
      */

@@ -289,7 +289,66 @@ tutorials/
     └── {name}-step-{n}.webp      # Per-step screenshots
 ```
 
-## 10. Checklist
+## 10. Multiple user profiles (scenes)
+
+When the story needs two people — one acts, the other reacts — declare each as a
+**scene**. The stage becomes a browser-like tab bar with one `<iframe>` per scene.
+
+```typescript
+const tutorial = new Tutorial(page, {
+  title: t('tutorial.invoice.title'),
+  scenes: {
+    accountant: { label: 'Sara — Accountant', baseUrl: 'http://localhost:5173' },
+    client:     { label: 'ACME — Client',     baseUrl: 'http://localhost:5174' },
+  },
+  focus: 'accountant',
+});
+
+const accountant = tutorial.scene('accountant');   // a Playwright FrameLocator
+const client     = tutorial.scene('client');
+
+await tutorial.stage();                       // mount tab bar + iframes
+await tutorial.goto('accountant', '/invoices/new');
+
+tutorial.step('issue_invoice', () => tutorial.click(accountant.getByRole('button')),
+  { scene: 'accountant' });
+
+tutorial.step('client_pays', () => tutorial.click(client.getByRole('button')),
+  { scene: 'client' });                       // tab switches automatically
+```
+
+### Scene methods
+
+| Method | Effect |
+|---|---|
+| `tutorial.stage()` | Mount the stage — call once, before any `goto` |
+| `tutorial.scene(name)` | The scene as a `FrameLocator` (full locator API) |
+| `tutorial.goto(name, url)` | Navigate a scene; relative to its `baseUrl`, or absolute |
+| `tutorial.focus(name \| names[])` | Bring scene(s) on stage (rarely needed — use `{ scene }`) |
+
+### Rules
+
+**10.1 Scenes must be different origins.** Same-origin iframes share cookies and
+`localStorage`, so the second login overwrites the first. Two users of the same
+app need a second hostname (`app.localhost` / `app2.localhost`).
+
+**10.2 Tag every step with its scene.** A hidden scene is not interactive —
+acting on an off-stage scene times out. `{ scene }` switches the stage first.
+
+**10.3 Side by side is an exception, not a layout.** `{ scene: ['a', 'b'] }`
+splits the stage in half for one step: use it only for the moment cause and
+effect must share a frame. Each pane gets ~640px, so app text shrinks. In the
+array, the first scene is the one acting.
+
+**10.4 Alternation is free.** Changing `scene` between steps switches tabs — you
+never write the switch. Narration should acknowledge it ("meanwhile, the client…"),
+otherwise the cut feels abrupt.
+
+**10.5 The target app must allow framing.** `X-Frame-Options` or a strict
+`frame-ancestors` blocks the scene and leaves an empty pane. Relax it in tutorial
+mode only.
+
+## 11. Checklist
 
 Before submitting a tutorialized test:
 
@@ -305,3 +364,10 @@ Before submitting a tutorialized test:
 - [ ] Test passes without `TUTORIAL_MODE` (plain E2E)
 - [ ] Test passes with `TUTORIAL_MODE=true` (video generation)
 - [ ] Video watched — does it feel human?
+
+Multi-scene tutorials, additionally:
+
+- [ ] Every step touching a scene carries `{ scene }`
+- [ ] Scenes are on distinct origins (or aliased hostnames)
+- [ ] Side-by-side used only where simultaneity carries meaning
+- [ ] Narration acknowledges each tab switch

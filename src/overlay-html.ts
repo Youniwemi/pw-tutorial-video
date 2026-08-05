@@ -1,4 +1,46 @@
-import type { ContextStyle } from './types.js';
+import type { ContextStyle, SceneOptions } from './types.js';
+
+const escapeHtml = (s: string): string =>
+	s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+
+/**
+ * The multi-scene stage: a browser-like tab bar over a row of iframes.
+ *
+ * Every scene stays mounted for the whole tutorial — hidden, never unloaded —
+ * so a profile logged in behind one tab is still logged in when we come back
+ * to it. Tabs are always all visible: that is how a viewer knows who else is
+ * in the story and who is speaking now.
+ */
+export function renderStage(scenes: Record<string, SceneOptions>, active: string[]): string {
+	const isActive = (name: string) => active.includes(name);
+
+	const tabs = Object.entries(scenes)
+		.map(
+			([name, scene]) =>
+				`<div class="tutorial-tab" data-tutorial-tab="${name}" data-active="${isActive(name)}">
+			<span class="tutorial-tab-dot"></span>${escapeHtml(scene.label)}
+		</div>`
+		)
+		.join('\n\t\t');
+
+	const panes = Object.keys(scenes)
+		.map(
+			(name) =>
+				`<div class="tutorial-scene" data-tutorial-scene="${name}" data-active="${isActive(name)}">
+			<iframe data-tutorial-frame="${name}" src="about:blank"></iframe>
+		</div>`
+		)
+		.join('\n\t\t');
+
+	return `<div class="tutorial-stage" id="tutorial-stage">
+	<div class="tutorial-tabbar">
+		${tabs}
+	</div>
+	<div class="tutorial-scenes">
+		${panes}
+	</div>
+</div>`;
+}
 
 export const CURSOR_SVG = `
 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

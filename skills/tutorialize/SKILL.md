@@ -19,6 +19,9 @@ Two reference files support this skill:
 - **Who** is watching? (role, expertise, emotional state)
 - **What** are they trying to accomplish? (goal, not feature)
 - **What** do they already know? (skip the obvious, explain the surprising)
+- **How many profiles** does the story need? One is the default. Reach for a
+  second scene only when the lesson is the handoff between two people —
+  see `storytelling.md` §8 and `api.md` §10.
 
 ### 2. Design the arc
 ```

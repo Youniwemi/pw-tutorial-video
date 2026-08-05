@@ -28,6 +28,22 @@
 	--tutorial-animation-duration: 0.3s;
 	--tutorial-pulse-duration: 1.5s;
 
+	/* Multi-scene stage (tab bar + scene panes) */
+	--tutorial-stage-bg: #1e293b;
+	--tutorial-stage-gap: 2px;
+	--tutorial-scene-bg: #ffffff;
+	--tutorial-tabbar-padding: 8px 8px 0;
+	--tutorial-tab-bg: #334155;
+	--tutorial-tab-text: #94a3b8;
+	--tutorial-tab-bg-active: #f8fafc;
+	--tutorial-tab-text-active: #0f172a;
+	--tutorial-tab-dot: #64748b;
+	--tutorial-tab-dot-active: #22c55e;
+	--tutorial-tab-padding: 10px 20px;
+	--tutorial-tab-radius: 10px 10px 0 0;
+	--tutorial-tab-size: 15px;
+	--tutorial-tab-transition: 250ms;
+
 	/* Typography */
 	--tutorial-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 	--tutorial-title-size: 14px;
@@ -378,4 +394,89 @@
 .tutorial-email-preview.tutorial-overlay-rtl .tutorial-email-field strong {
 	margin-right: 0;
 	margin-left: 8px;
+}
+
+/* ── Multi-scene stage ──────────────────────────────────────
+   A browser-like tab bar over a row of iframes. Every value is a
+   --tutorial-* variable, like the rest of this file: override them in
+   `customStyles` to match the product being demonstrated. */
+
+.tutorial-stage {
+	position: fixed;
+	inset: 0;
+	display: flex;
+	flex-direction: column;
+	background: var(--tutorial-stage-bg);
+	z-index: 0;
+}
+
+.tutorial-tabbar {
+	display: flex;
+	gap: var(--tutorial-stage-gap);
+	padding: var(--tutorial-tabbar-padding);
+	flex: 0 0 auto;
+	font-family: var(--tutorial-font-family);
+}
+
+.tutorial-tab {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: var(--tutorial-tab-padding);
+	border-radius: var(--tutorial-tab-radius);
+	background: var(--tutorial-tab-bg);
+	color: var(--tutorial-tab-text);
+	font-size: var(--tutorial-tab-size);
+	font-weight: 500;
+	white-space: nowrap;
+	transition: background var(--tutorial-tab-transition) ease,
+		color var(--tutorial-tab-transition) ease;
+}
+
+.tutorial-tab[data-active='true'] {
+	background: var(--tutorial-tab-bg-active);
+	color: var(--tutorial-tab-text-active);
+	font-weight: 600;
+}
+
+.tutorial-tab-dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: var(--tutorial-tab-dot);
+	transition: background var(--tutorial-tab-transition) ease;
+}
+
+.tutorial-tab[data-active='true'] .tutorial-tab-dot {
+	background: var(--tutorial-tab-dot-active);
+}
+
+.tutorial-scenes {
+	flex: 1 1 auto;
+	display: flex;
+	gap: var(--tutorial-stage-gap);
+	background: var(--tutorial-tab-bg-active);
+	min-height: 0;
+}
+
+/* No transition on flex-grow: styles are injected after setContent, so the
+ * pane would animate up from its unstyled value and Playwright would treat
+ * the frame as never stable — every click inside it times out. Panes toggle
+ * via display anyway, so there is nothing to interpolate. */
+.tutorial-scene {
+	flex: 1 1 0;
+	min-width: 0;
+	display: flex;
+}
+
+.tutorial-scene[data-active='false'] {
+	display: none;
+}
+
+.tutorial-scene iframe {
+	flex: 1 1 auto;
+	width: 100%;
+	height: 100%;
+	border: 0;
+	background: var(--tutorial-scene-bg);
 }

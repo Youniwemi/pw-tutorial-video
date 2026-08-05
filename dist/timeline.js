@@ -42,13 +42,14 @@ export class TutorialTimeline {
     /**
      * Record a step at a specific timestamp (for accurate voice timing)
      */
-    addStep(step, title, audioFile, durationMs, timestamp, text, key) {
+    addStep(step, title, audioFile, durationMs, timestamp, text, key, scene) {
         const startMs = timestamp - this.startTime;
         this.steps.push({
             step,
             title,
             ...(text ? { text } : {}),
             ...(key ? { key } : {}),
+            ...(scene ? { scene } : {}),
             audioFile,
             startMs,
             durationMs

@@ -1,8 +1,16 @@
-import type { Page, Locator } from '@playwright/test';
+import type { Page, Locator, FrameLocator } from '@playwright/test';
 import { readFileSync, unlinkSync, existsSync, mkdirSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
-import type { TutorialOptions, StepOptions, ContextOptions, ContextStyle } from './types.js';
+import type {
+	TutorialOptions,
+	StepOptions,
+	ContextOptions,
+	ContextStyle,
+	SceneOptions,
+	SceneFocus
+} from './types.js';
+import { renderStage } from './overlay-html.js';
 import { TutorialVoice } from './voice.js';
 import { TutorialMusic } from './music.js';
 import { TutorialCursor } from './cursor.js';
@@ -57,13 +65,19 @@ interface PendingStep {
 	delay?: number;
 	voicePreload: Promise<void>;
 	key?: string;
+	scene?: SceneFocus;
 }
 
 type PendingItem = PendingContext | PendingStep;
 
+const asList = (focus: SceneFocus): string[] => (Array.isArray(focus) ? focus : [focus]);
+
 export class Tutorial {
 	private page: Page;
-	private options: Required<Omit<TutorialOptions, 'testTitle' | 'feature' | 'translate'>> & { testTitle?: string; feature?: string };
+	// Scene options are kept in their own fields below, not in this bag.
+	private options: Required<
+		Omit<TutorialOptions, 'testTitle' | 'feature' | 'translate' | 'scenes' | 'focus' | 'sceneTransition'>
+	> & { testTitle?: string; feature?: string };
 	private initialized = false;
 	private testName: string;
 	private translateFn: (key: string) => string;
@@ -77,6 +91,10 @@ export class Tutorial {
 	private pendingItems: PendingItem[] = [];
 	private stepCounter = 0;
 	private videoStartTime = 0;
+
+	private scenes: Record<string, SceneOptions>;
+	private activeScenes: string[] = [];
+	private sceneTransitionMs: number;
 
 	constructor(page: Page, options: TutorialOptions) {
 		this.page = page;
@@ -151,7 +169,111 @@ export class Tutorial {
 			}
 		);
 
+		this.scenes = options.scenes ?? {};
+		this.sceneTransitionMs = options.sceneTransition?.duration ?? 600;
+		const sceneNames = Object.keys(this.scenes);
+		if (sceneNames.length > 0) {
+			this.activeScenes = asList(options.focus ?? sceneNames[0]);
+			this.activeScenes.forEach((name) => this.requireScene(name));
+		}
+
 		this.videoStartTime = Date.now();
+	}
+
+	// ── Scenes ──────────────────────────────────────────────────────────
+	// Scene plumbing runs in both modes: it is the stage, not the decoration.
+
+	private requireScene(name: string): SceneOptions {
+		const scene = this.scenes[name];
+		if (!scene) {
+			const known = Object.keys(this.scenes).join(', ') || 'none declared';
+			throw new Error(`[Tutorial] Unknown scene "${name}" (known: ${known})`);
+		}
+		return scene;
+	}
+
+	/**
+	 * Mount the stage: a tab bar plus one iframe per scene.
+	 *
+	 * The parent page is loaded from `audioBaseUrl` first, because setContent
+	 * keeps the current origin — that is what lets narration audio load without
+	 * cross-origin friction, with no stage file to deploy.
+	 */
+	async stage(): Promise<void> {
+		if (Object.keys(this.scenes).length === 0) {
+			throw new Error('[Tutorial] stage() requires `scenes` in the constructor options');
+		}
+
+		await this.page.goto(this.options.audioBaseUrl);
+		await this.page.setContent(renderStage(this.scenes, this.activeScenes));
+		await this.ensureStyles();
+		await this.initialize();
+	}
+
+	/** A scene is a plain FrameLocator — the whole Playwright locator API. */
+	scene(name: string): FrameLocator {
+		this.requireScene(name);
+		return this.page.frameLocator(`[data-tutorial-frame="${name}"]`);
+	}
+
+	/** Navigate a scene. Relative paths resolve against its baseUrl; an absolute
+	 *  URL is honoured as-is, so a scene may change origin mid-tutorial. */
+	async goto(name: string, url: string): Promise<void> {
+		const scene = this.requireScene(name);
+		const target = scene.baseUrl ? new URL(url, scene.baseUrl).toString() : url;
+
+		await this.page.evaluate(
+			({ frame, href }) => {
+				const el = document.querySelector(`[data-tutorial-frame="${frame}"]`) as HTMLIFrameElement;
+				el.src = href;
+			},
+			{ frame: name, href: target }
+		);
+
+		// Cross-origin: contentDocument is unreadable, so wait through the frame.
+		await this.scene(name).locator('body').waitFor({ state: 'attached' });
+	}
+
+	/**
+	 * Bring scene(s) to the stage. One fills it; two share it side by side.
+	 * The cursor is hidden across the switch so it never streaks between panes.
+	 */
+	async focus(target: SceneFocus): Promise<void> {
+		const names = asList(target);
+		names.forEach((name) => this.requireScene(name));
+
+		if (TUTORIAL_MODE && this.initialized) await this.cursor.hide();
+
+		await this.page.evaluate((active) => {
+			document.querySelectorAll('[data-tutorial-tab]').forEach((el) => {
+				const name = el.getAttribute('data-tutorial-tab')!;
+				el.setAttribute('data-active', String(active.includes(name)));
+			});
+			document.querySelectorAll('[data-tutorial-scene]').forEach((el) => {
+				const name = el.getAttribute('data-tutorial-scene')!;
+				el.setAttribute('data-active', String(active.includes(name)));
+			});
+		}, names);
+
+		this.activeScenes = names;
+		await this.page.waitForTimeout(TUTORIAL_MODE ? this.sceneTransitionMs : 0);
+
+		if (TUTORIAL_MODE && this.initialized) await this.cursor.ensureVisible();
+	}
+
+	/** What to stamp on a timeline entry: a bare name, or a pair when two
+	 *  scenes shared the stage. Undefined for single-scene tutorials. */
+	private get stagedScene(): string | string[] | undefined {
+		if (this.activeScenes.length === 0) return undefined;
+		return this.activeScenes.length === 1 ? this.activeScenes[0] : [...this.activeScenes];
+	}
+
+	private sameFocus(target: SceneFocus): boolean {
+		const names = asList(target);
+		return (
+			names.length === this.activeScenes.length &&
+			names.every((name, i) => name === this.activeScenes[i])
+		);
 	}
 
 	static get isEnabled(): boolean {
@@ -263,7 +385,8 @@ export class Tutorial {
 				action,
 				overlayText: title,
 				voiceText: title,
-				voicePreload: Promise.resolve()
+				voicePreload: Promise.resolve(),
+				scene: options?.scene
 			});
 			return;
 		}
@@ -297,7 +420,8 @@ export class Tutorial {
 			skipVoice: options?.skipVoice,
 			delay: options?.delay,
 			voicePreload,
-			key
+			key,
+			scene: options?.scene
 		});
 	}
 
@@ -446,6 +570,8 @@ export class Tutorial {
 		if (!TUTORIAL_MODE) {
 			for (const item of this.pendingItems) {
 				if (item.type === 'step') {
+					// Even without narration, a hidden scene is not interactive.
+					if (item.scene && !this.sameFocus(item.scene)) await this.focus(item.scene);
 					await item.action();
 				}
 			}
@@ -482,7 +608,7 @@ export class Tutorial {
 					const audioFilename = this.voice.getFilename(item.voiceText);
 					const voiceStartTime = Date.now();
 					const duration = await this.voice.play(item.voiceText);
-					this.timeline.addStep(0, 'Context', audioFilename, duration, voiceStartTime, item.voiceText, item.key);
+					this.timeline.addStep(0, 'Context', audioFilename, duration, voiceStartTime, item.voiceText, item.key, this.stagedScene);
 				}
 
 				await this.page.waitForTimeout(this.options.stepDelay);
@@ -490,6 +616,10 @@ export class Tutorial {
 			} else if (item.type === 'step') {
 				currentStep++;
 				this.overlay.setCurrentStep(currentStep);
+
+				// Switch before narrating: the viewer should already be looking at
+				// the right tab when the sentence about it starts.
+				if (item.scene && !this.sameFocus(item.scene)) await this.focus(item.scene);
 
 				await this.cursor.ensureVisible();
 
@@ -503,7 +633,7 @@ export class Tutorial {
 					const audioFilename = this.voice.getFilename(item.voiceText);
 					const voiceStartTime = Date.now();
 					const duration = await this.voice.play(item.voiceText);
-					this.timeline.addStep(currentStep, item.title, audioFilename, duration, voiceStartTime, item.voiceText, item.key);
+					this.timeline.addStep(currentStep, item.title, audioFilename, duration, voiceStartTime, item.voiceText, item.key, this.stagedScene);
 				}
 
 				await this.page.waitForTimeout(this.options.stepDelay);
@@ -520,7 +650,7 @@ export class Tutorial {
 			const audioFilename = this.voice.getFilename(completionMessage);
 			const voiceStartTime = Date.now();
 			const duration = await this.voice.play(completionMessage);
-			this.timeline.addStep(this.stepCounter + 1, 'Complete', audioFilename, duration, voiceStartTime, completionMessage);
+			this.timeline.addStep(this.stepCounter + 1, 'Complete', audioFilename, duration, voiceStartTime, completionMessage, undefined, this.stagedScene);
 		}
 
 		if (this.music.isInitialized) {

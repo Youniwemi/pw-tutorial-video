@@ -21,6 +21,9 @@ Read the original test file. Identify:
 - **Persona**: who is this tutorial for? (role, expertise, emotional state)
 - **Goal**: what will the viewer accomplish?
 - **Key actions**: what needs explanation vs what is obvious?
+- **Profiles**: does the lesson depend on a handoff between two people? If so,
+  the test becomes multi-scene (`storytelling.md` §8, `api.md` §10). Default to
+  a single profile — a second scene doubles the length and must earn it.
 
 ### 2. Structure the tutorial
 Follow the arc from `storytelling.md`:
@@ -41,6 +44,8 @@ Follow all rules from `api.md`:
 - Dual-mode (test works with and without TUTORIAL_MODE)
 - `@tutorial` tag on the test
 - Acronyms have `voiceText` where TTS mispronounces
+- Multi-scene only: every step touching a scene carries `{ scene }`, scenes sit
+  on distinct origins, and each tab switch is acknowledged in the narration
 
 ### 5. Show and explain
 - Present the diff or full transformed code

@@ -1,3 +1,33 @@
+const escapeHtml = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+/**
+ * The multi-scene stage: a browser-like tab bar over a row of iframes.
+ *
+ * Every scene stays mounted for the whole tutorial — hidden, never unloaded —
+ * so a profile logged in behind one tab is still logged in when we come back
+ * to it. Tabs are always all visible: that is how a viewer knows who else is
+ * in the story and who is speaking now.
+ */
+export function renderStage(scenes, active) {
+    const isActive = (name) => active.includes(name);
+    const tabs = Object.entries(scenes)
+        .map(([name, scene]) => `<div class="tutorial-tab" data-tutorial-tab="${name}" data-active="${isActive(name)}">
+			<span class="tutorial-tab-dot"></span>${escapeHtml(scene.label)}
+		</div>`)
+        .join('\n\t\t');
+    const panes = Object.keys(scenes)
+        .map((name) => `<div class="tutorial-scene" data-tutorial-scene="${name}" data-active="${isActive(name)}">
+			<iframe data-tutorial-frame="${name}" src="about:blank"></iframe>
+		</div>`)
+        .join('\n\t\t');
+    return `<div class="tutorial-stage" id="tutorial-stage">
+	<div class="tutorial-tabbar">
+		${tabs}
+	</div>
+	<div class="tutorial-scenes">
+		${panes}
+	</div>
+</div>`;
+}
 export const CURSOR_SVG = `
 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 	<path d="M4 4L10.5 20.5L13 13L20.5 10.5L4 4Z" fill="white" stroke="var(--tutorial-cursor-stroke, #1e293b)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>

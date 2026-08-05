@@ -140,3 +140,50 @@ If the viewer would think of multiple fields as "one thing", they're one step.
 | `attention` ⚠️ | Irreversible action, legal requirement, gotcha | Only when genuinely important |
 
 **Overusing context cards breaks immersion.** If you have more than 3 total in a tutorial, cut the weakest ones.
+
+## 8. Two-Profile Stories
+
+Some workflows only make sense from two sides: an accountant issues an invoice,
+a client pays it. Multi-scene tutorials put both profiles in one video as
+browser-like tabs. The mechanics are in `api.md` §10 — what follows is the
+storytelling.
+
+### Is it really a two-profile story?
+
+Ask what the viewer must *believe* at the end. If it is "I can do this", one
+profile is enough — showing the other side is decoration that doubles the
+length. Use two profiles only when the lesson is about the **handoff**: what the
+other person receives, sees, or has to do next.
+
+A single-profile tutorial with one sentence of narration ("your client now gets
+an email") often teaches more than a second tab nobody asked for.
+
+### Narrate the switch, always
+
+The tab moves on its own when a step changes scene, but a silent cut reads as a
+glitch. Hand the viewer over explicitly:
+
+> "That's Sara done. Now let's see what lands on ACME's side."
+
+Name the person, not the mechanism. Never say "switching to the client tab" —
+the viewer sees the tab; they need to know *why* they are being moved.
+
+### Side by side earns its place once
+
+`{ scene: [a, b] }` halves the stage, so app text shrinks. Spend it on the one
+moment where cause and effect must be seen together — the payment landing while
+the accountant watches. Two side-by-side moments in a tutorial is usually one
+too many.
+
+Everywhere else, tabs give each profile the full screen, which is what makes
+dense app UI readable at video resolution.
+
+### Give each scene a person, not a role
+
+Labels are on screen the whole tutorial, so they carry the cast:
+
+- Good: `Sara — Accountant`, `ACME — Client`
+- Weak: `App`, `Portal`, `Tab 2`
+
+A named person makes the handoff feel like a story rather than a demo of two
+browser windows.

@@ -21,6 +21,7 @@ Most software teams maintain **tests** and **documentation** separately. Tests v
 - **Context screens** — Goal / clarification / attention cards between steps to explain what's happening
 - **Background music** — Looping audio with fade-out on completion
 - **Email previews** — Simulated email popups for verification flow demos
+- **Multiple user profiles** — Two signed-in personas as browser-like tabs in one video, with an optional side-by-side moment
 - **ffmpeg post-processing** — Automatic video + audio merge with timeline-accurate voice placement
 - **Screenshot capture** — WebP screenshots at each step, poster image from step 1
 - **Transcript generation** — Markdown transcripts auto-generated from timeline data
@@ -168,6 +169,9 @@ const tutorial = new Tutorial(page, options);
 | `stepDelay` | `number` | `500` | Delay between steps (ms) |
 | `mouseSteps` | `number` | `25` | Cursor animation smoothness |
 | `customStyles` | `string` | built-in | Custom CSS for overlays |
+| `scenes` | `Record<string, SceneOptions>` | — | Named scenes for multi-profile tutorials — see [Multiple user profiles](#multiple-user-profiles) |
+| `focus` | `string \| string[]` | first scene | Scene(s) active when the stage mounts |
+| `sceneTransition` | `{ duration?: number }` | `{ duration: 600 }` | Pause on a scene switch (ms) |
 
 #### Methods
 
@@ -185,6 +189,10 @@ const tutorial = new Tutorial(page, options);
 | `showEmailPreview(options)` | Show simulated email popup |
 | `switchPage(page)` | Switch recording to another tab/window |
 | `clearFields()` | Clear form fields on next page load |
+| `stage()` | Mount the multi-scene stage (tab bar + one iframe per scene) |
+| `scene(name)` | Get a scene as a Playwright `FrameLocator` |
+| `goto(name, url)` | Navigate a scene (relative to its `baseUrl`, or absolute) |
+| `focus(name \| names[])` | Bring scene(s) on stage — one fills it, two share it |
 
 ### `StepOptions`
 
@@ -196,6 +204,7 @@ const tutorial = new Tutorial(page, options);
 | `skipVoice` | `boolean` | Skip voice for this step |
 | `description` | `string` | Description shown below step title |
 | `delay` | `number` | Custom delay after this step (ms) |
+| `scene` | `string \| string[]` | Scene(s) this step plays on — the stage switches before the action runs |
 
 ### `ContextOptions`
 
@@ -204,6 +213,74 @@ const tutorial = new Tutorial(page, options);
 | `text` | `string` | Description shown below title |
 | `style` | `'goal' \| 'clarification' \| 'attention'` | Visual style |
 | `voiceText` | `string` | Custom TTS text |
+
+## Multiple user profiles
+
+Some stories need two people: an accountant issues an invoice, a client pays it.
+Declare each one as a **scene** and the stage becomes a browser-like tab bar,
+with one `<iframe>` per scene.
+
+```typescript
+const tutorial = new Tutorial(page, {
+  title: 'Invoice, end to end',
+  testTitle: 'invoice issued then paid',
+  audioBaseUrl: 'http://localhost:5173',
+  scenes: {
+    accountant: { label: 'Sara — Accountant', baseUrl: 'http://localhost:5173' },
+    client:     { label: 'ACME — Client',     baseUrl: 'http://localhost:5174' },
+  },
+  focus: 'accountant',
+});
+
+const accountant = tutorial.scene('accountant'); // a Playwright FrameLocator
+const client     = tutorial.scene('client');
+
+await tutorial.stage();
+await tutorial.goto('accountant', '/invoices/new');
+await tutorial.goto('client', '/login');
+
+tutorial.step('The accountant issues the invoice',
+  () => tutorial.click(accountant.getByRole('button', { name: 'Issue' })),
+  { scene: 'accountant' });
+
+tutorial.step('The client pays it',
+  () => tutorial.click(client.getByRole('button', { name: 'Pay now' })),
+  { scene: 'client' });          // the stage switches tabs on its own
+
+tutorial.step('Both sides, at once',
+  () => expect(accountant.getByText('Paid')).toBeVisible(),
+  { scene: ['accountant', 'client'] });   // side by side, just for this step
+
+await tutorial.complete();
+```
+
+### How it behaves
+
+- **Sessions are independent** because each scene is a separate **origin**. Two
+  iframes on the same origin share cookies and `localStorage`, so the second
+  login overwrites the first. For two users of the *same* app, serve it under a
+  second hostname (`app.localhost` / `app2.localhost`) to get a second origin.
+- **Inactive scenes stay mounted**, hidden but never unloaded — a profile logged
+  in behind another tab is still logged in when you come back to it.
+- **A hidden scene is not interactive.** Pass `scene` on every step that touches
+  one; the stage switches before the action runs. Acting on an off-stage scene
+  will simply time out.
+- **`scene: [a, b]` puts two scenes side by side**, each taking half the stage.
+  Treat it as an exception for the moment cause and effect must share one frame:
+  at 1280px wide, each pane only gets ~640px. In an array, the first scene is
+  the one acting.
+- **Tabs are always all visible**, so the viewer knows who else is in the story
+  and who is speaking now.
+- Each timeline step records its `scene`, so transcripts say who was on screen.
+
+### Requirements
+
+- Target pages must allow framing. Sites sending `X-Frame-Options: SAMEORIGIN`
+  or `DENY` (Google, Bing, many SaaS apps) **cannot** be used as scenes. For
+  your own app, relax `frame-ancestors` in tutorial mode only.
+- `stage()` navigates the parent page to `audioBaseUrl` before injecting the
+  stage, so narration audio loads same-origin. Point `audioBaseUrl` at the app
+  serving `static/audio/tutorial-voice/`.
 
 ### Playwright Reporter
 
@@ -291,8 +368,28 @@ CSS variables for theming:
   --tutorial-text: #f8fafc;
   --tutorial-z-index: 10000;
   --tutorial-animation-duration: 0.3s;
+
+  /* Multi-scene stage */
+  --tutorial-stage-bg: #1e293b;
+  --tutorial-scene-bg: #ffffff;
+  --tutorial-tab-bg: #334155;
+  --tutorial-tab-text: #94a3b8;
+  --tutorial-tab-bg-active: #f8fafc;
+  --tutorial-tab-text-active: #0f172a;
+  --tutorial-tab-dot: #64748b;
+  --tutorial-tab-dot-active: #22c55e;
+  --tutorial-tab-padding: 10px 20px;
+  --tutorial-tab-radius: 10px 10px 0 0;
+  --tutorial-tab-size: 15px;
+  --tutorial-tab-transition: 250ms;
+  --tutorial-stage-gap: 2px;
+  --tutorial-tabbar-padding: 8px 8px 0;
 }
 ```
+
+Scene panes deliberately expose no size variables: they share the stage evenly
+via flexbox, and animating that sizing makes Playwright treat the frame as never
+stable, which times out every click inside it.
 
 ## Output Files
 

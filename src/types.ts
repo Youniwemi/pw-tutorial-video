@@ -44,7 +44,25 @@ export interface TutorialOptions {
 	playAudioInBrowser?: boolean;
 	/** Feature tag (e.g., 'payroll') — sourced from @feature:* test tag */
 	feature?: string;
+	/** Named scenes, each an iframe of its own origin, shown as browser-like tabs.
+	 *  Distinct origins are what let two user profiles stay logged in at once. */
+	scenes?: Record<string, SceneOptions>;
+	/** Scene(s) active when the stage is mounted (default: the first one) */
+	focus?: SceneFocus;
+	/** Scene switch animation */
+	sceneTransition?: { duration?: number };
 }
+
+export interface SceneOptions {
+	/** Label shown on the scene's tab — keep it a person, not a URL */
+	label: string;
+	/** Origin that relative `goto` paths resolve against */
+	baseUrl?: string;
+}
+
+/** One scene fills the stage; two share it side by side.
+ *  In an array, the first scene is the one acting — it carries the cursor. */
+export type SceneFocus = string | string[];
 
 export interface StepOptions {
 	/** Optional description shown below step title */
@@ -61,6 +79,9 @@ export interface StepOptions {
 	do?: string;
 	/** Explanation that plays during action (two-phase timing) */
 	explain?: string;
+	/** Scene(s) this step plays on. The stage switches before the action runs,
+	 *  because a hidden scene cannot be interacted with. */
+	scene?: SceneFocus;
 }
 
 export type ContextStyle = 'goal' | 'clarification' | 'attention';

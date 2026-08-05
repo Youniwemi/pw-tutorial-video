@@ -1,0 +1,73 @@
+name: test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+env:
+  # macOS `say` is the default TTS engine and does not exist on Linux. Rather
+  # than pull in a network-bound engine for audio nobody will listen to, the CI
+  # synthesises two seconds of silence per clip with ffmpeg. The pipeline is
+  # still fully exercised — files are written, timings recorded, ffmpeg merges,
+  # and ffprobe verifies the video comes out with an audio track.
+  TUTORIAL_TTS_CMD: ffmpeg -loglevel error -f lavfi -i anullsrc=r=44100:cl=mono -t 2 -y {output}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Build
+        run: npm run build
+
+      - name: Fail if dist/ is out of date
+        # dist/ is committed so the package installs straight from git.
+        # A stale dist ships code that does not match src.
+        run: git diff --exit-code dist/
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: E2E (plain mode)
+        run: npm run test:e2e
+
+      # The only run that exercises the real recording path: TTS, ffmpeg merge,
+      # and the ffprobe checks in the global teardown.
+      - name: E2E (video mode)
+        run: npm run test:e2e:video
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tutorial-output
+          path: |
+            tutorials/videos/
+            tutorials/output/
+            tutorials/transcripts/
+          retention-days: 14
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
