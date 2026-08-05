@@ -3,6 +3,7 @@ import { existsSync, mkdirSync, cpSync } from 'fs';
 import { join, dirname } from 'path';
 import { createInterface } from 'readline';
 import { fileURLToPath } from 'url';
+import { packageVersion, readStamp, writeStamp } from './skill-stamp.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const projectRoot = process.cwd();
@@ -25,14 +26,31 @@ function yes(answer) {
 }
 function usage() {
     console.log(`
-Usage: pw-tutorial-video <command>
+Usage: pw-tutorial-video <command> [options]
 
 Commands:
   init    Install /tutorialize skill and tutorial-crafter agent into .claude/
+
+Options:
+  -y, --yes   Answer yes to everything (for scripted updates)
 `);
 }
+const AUTO_YES = process.argv.includes('-y') || process.argv.includes('--yes');
+/** In --yes mode, take the default without blocking on stdin. */
+async function confirm(question) {
+    if (AUTO_YES) {
+        console.log(`${question}y`);
+        return true;
+    }
+    return yes(await ask(question));
+}
+/** "0.1.0 → 0.2.0" or "not installed → 0.2.0", for the prompt. */
+function transition(from, to) {
+    return `${from ?? 'unversioned'} \u2192 ${to}`;
+}
 async function init() {
-    console.log('\n  pw-tutorial-video — Claude Code Setup\n');
+    const version = packageVersion(packageRoot);
+    console.log(`\n  pw-tutorial-video ${version} — Claude Code Setup\n`);
     if (!existsSync(skillsSrc)) {
         console.error('Could not find skills/ directory in the package. Ensure the package is installed correctly.');
         process.exit(1);
@@ -45,46 +63,49 @@ async function init() {
         }
         mkdirSync(claudeDir, { recursive: true });
     }
+    const stamp = readStamp(claudeDir);
     // Skill
-    const skillExists = existsSync(skillDest);
-    if (skillExists) {
-        const answer = await ask('Skill already exists at .claude/skills/tutorialize/. Overwrite? [Y/n] ');
-        if (!yes(answer)) {
-            console.log('  Skipping skill.');
+    if (existsSync(skillDest)) {
+        if (stamp.skill === version) {
+            console.log(`  Skill already up to date (${version}).`);
+        }
+        else if (await confirm(`Update skill in .claude/skills/tutorialize/ (${transition(stamp.skill, version)})? [Y/n] `)) {
+            copySkill();
+            stamp.skill = version;
         }
         else {
-            copySkill();
+            console.log('  Skipping skill.');
         }
     }
+    else if (await confirm('Install /tutorialize skill into .claude/skills/? [Y/n] ')) {
+        copySkill();
+        stamp.skill = version;
+    }
     else {
-        const answer = await ask('Install /tutorialize skill into .claude/skills/? [Y/n] ');
-        if (yes(answer)) {
-            copySkill();
-        }
-        else {
-            console.log('  Skipping skill.');
-        }
+        console.log('  Skipping skill.');
     }
     // Agent
-    const agentExists = existsSync(agentDest);
-    if (agentExists) {
-        const answer = await ask('Agent already exists at .claude/agents/tutorial-crafter.md. Overwrite? [Y/n] ');
-        if (!yes(answer)) {
-            console.log('  Skipping agent.');
+    if (existsSync(agentDest)) {
+        if (stamp.agent === version) {
+            console.log(`  Agent already up to date (${version}).`);
+        }
+        else if (await confirm(`Update agent in .claude/agents/tutorial-crafter.md (${transition(stamp.agent, version)})? [Y/n] `)) {
+            copyAgent();
+            stamp.agent = version;
         }
         else {
-            copyAgent();
+            console.log('  Skipping agent.');
         }
+    }
+    else if (await confirm('Install tutorial-crafter agent into .claude/agents/? [Y/n] ')) {
+        copyAgent();
+        stamp.agent = version;
     }
     else {
-        const answer = await ask('Install tutorial-crafter agent into .claude/agents/? [Y/n] ');
-        if (yes(answer)) {
-            copyAgent();
-        }
-        else {
-            console.log('  Skipping agent.');
-        }
+        console.log('  Skipping agent.');
     }
+    if (stamp.skill || stamp.agent)
+        writeStamp(claudeDir, stamp);
     console.log('\n  Done! You can now use /tutorialize in Claude Code.\n');
 }
 function copySkill() {
@@ -99,7 +120,8 @@ function copyAgent() {
     cpSync(agentSrc, agentDest);
     console.log('  + Agent copied to .claude/agents/tutorial-crafter.md');
 }
-const command = process.argv[2];
+// Flags may appear before the command: `pw-tutorial-video --yes` means init.
+const command = process.argv.slice(2).find((arg) => !arg.startsWith('-'));
 if (!command || command === 'init') {
     init().catch((err) => {
         console.error(err);

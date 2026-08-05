@@ -417,7 +417,23 @@ This package ships a `/tutorialize` skill for [Claude Code](https://claude.ai/co
 npx pw-tutorial-video init
 ```
 
-This interactively copies the `/tutorialize` skill and `tutorial-crafter` agent into your `.claude/` directory. Re-run to update after a package upgrade.
+This interactively copies the `/tutorialize` skill and `tutorial-crafter` agent into your `.claude/` directory.
+
+### Keeping them up to date
+
+The skill and agent are **copies**, so upgrading the package does not update them.
+`init` stamps the version it installed in `.claude/.pw-tutorial-video.json`, and:
+
+- after an upgrade, a post-install message names what went stale and tells you to
+  re-run `init` — it only speaks when there is something to say, and never writes
+  to `.claude/` on its own;
+- re-running `init` shows the transition (`0.1.0 → 0.2.0`) and skips anything
+  already current;
+- `npx pw-tutorial-video init --yes` answers yes to everything, for scripted
+  updates.
+
+If you customise the copied skill, keep your additions in a separate file next to
+it — `init` overwrites, it does not merge.
 
 ### What the skill covers
 
