@@ -64,7 +64,19 @@ export declare class Tutorial {
     click(selector: string | Locator): Promise<void>;
     fill(selector: string | Locator, value: string): Promise<void>;
     typeSlowly(selector: string | Locator, value: string, delay?: number): Promise<void>;
-    typeBlurred(selector: string | Locator, value: string, delay?: number): Promise<void>;
+    /**
+     * Type a secret into a field that stays blurred. The blur is applied before
+     * the first keystroke and is NOT removed afterwards — the finished value must
+     * never become readable, or the whole point is lost. Call `unblur()` if a
+     * later step really needs the field legible again.
+     */
+    typeBlurred(selector: string | Locator, value: string, options?: {
+        delay?: number;
+        blur?: number;
+        reveal?: boolean;
+    } | number): Promise<void>;
+    /** Remove the blur left by `typeBlurred`. */
+    unblur(selector: string | Locator): Promise<void>;
     selectOption(selector: string | Locator, value: string): Promise<void>;
     hideOverlay(): Promise<void>;
     showEmailPreview(options: {

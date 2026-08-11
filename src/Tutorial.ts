@@ -491,24 +491,43 @@ export class Tutorial {
 		}
 	}
 
-	async typeBlurred(selector: string | Locator, value: string, delay = 50): Promise<void> {
+	/**
+	 * Type a secret into a field that stays blurred. The blur is applied before
+	 * the first keystroke and is NOT removed afterwards — the finished value must
+	 * never become readable, or the whole point is lost. Call `unblur()` if a
+	 * later step really needs the field legible again.
+	 */
+	async typeBlurred(
+		selector: string | Locator,
+		value: string,
+		options: { delay?: number; blur?: number; reveal?: boolean } | number = {}
+	): Promise<void> {
+		const opts = typeof options === 'number' ? { delay: options } : options;
+		const { delay = 50, blur = 4, reveal = false } = opts;
 		const locator = typeof selector === 'string' ? this.page.locator(selector) : selector;
 		if (TUTORIAL_MODE) {
 			await locator.scrollIntoViewIfNeeded();
 			await this.highlight(locator);
 			await this.animateClick();
 			await locator.click({ clickCount: 3 });
-			await locator.evaluate((el: HTMLElement) => {
-				el.style.filter = 'blur(4px)';
-			});
+			await locator.evaluate((el: HTMLElement, px: number) => {
+				el.style.filter = `blur(${px}px)`;
+			}, blur);
 			await locator.pressSequentially(value, { delay });
-			await locator.evaluate((el: HTMLElement) => {
-				el.style.filter = '';
-			});
+			if (reveal) await this.unblur(locator);
 			await this.unhighlight(locator);
 		} else {
 			await locator.fill(value);
 		}
+	}
+
+	/** Remove the blur left by `typeBlurred`. */
+	async unblur(selector: string | Locator): Promise<void> {
+		if (!TUTORIAL_MODE) return;
+		const locator = typeof selector === 'string' ? this.page.locator(selector) : selector;
+		await locator.evaluate((el: HTMLElement) => {
+			el.style.filter = '';
+		});
 	}
 
 	async selectOption(selector: string | Locator, value: string): Promise<void> {
