@@ -116,7 +116,7 @@ export class Tutorial {
         }
         this.videoStartTime = Date.now();
     }
-    // ── Scenes ──────────────────────────────────────────────────────────────────
+    // ── Scenes ──────────────────────────────────────────────────────────
     // Scene plumbing runs in both modes: it is the stage, not the decoration.
     requireScene(name) {
         const scene = this.scenes[name];
