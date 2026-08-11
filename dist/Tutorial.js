@@ -393,6 +393,26 @@ export class Tutorial {
             await locator.fill(value);
         }
     }
+    async typeBlurred(selector, value, delay = 50) {
+        const locator = typeof selector === 'string' ? this.page.locator(selector) : selector;
+        if (TUTORIAL_MODE) {
+            await locator.scrollIntoViewIfNeeded();
+            await this.highlight(locator);
+            await this.animateClick();
+            await locator.click({ clickCount: 3 });
+            await locator.evaluate((el) => {
+                el.style.filter = 'blur(4px)';
+            });
+            await locator.pressSequentially(value, { delay });
+            await locator.evaluate((el) => {
+                el.style.filter = '';
+            });
+            await this.unhighlight(locator);
+        }
+        else {
+            await locator.fill(value);
+        }
+    }
     async selectOption(selector, value) {
         const locator = typeof selector === 'string' ? this.page.locator(selector) : selector;
         if (TUTORIAL_MODE) {
