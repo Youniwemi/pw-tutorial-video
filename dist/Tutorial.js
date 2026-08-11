@@ -116,7 +116,7 @@ export class Tutorial {
         }
         this.videoStartTime = Date.now();
     }
-    // ── Scenes ──────────────────────────────────────────────────────────
+    // ── Scenes ──────────────────────────────────────────────────────────────────
     // Scene plumbing runs in both modes: it is the stage, not the decoration.
     requireScene(name) {
         const scene = this.scenes[name];
@@ -387,6 +387,26 @@ export class Tutorial {
             await this.animateClick();
             await locator.click({ clickCount: 3 });
             await locator.pressSequentially(value, { delay });
+            await this.unhighlight(locator);
+        }
+        else {
+            await locator.fill(value);
+        }
+    }
+    async typeBlurred(selector, value, delay = 50) {
+        const locator = typeof selector === 'string' ? this.page.locator(selector) : selector;
+        if (TUTORIAL_MODE) {
+            await locator.scrollIntoViewIfNeeded();
+            await this.highlight(locator);
+            await this.animateClick();
+            await locator.click({ clickCount: 3 });
+            await locator.evaluate((el) => {
+                el.style.filter = 'blur(4px)';
+            });
+            await locator.pressSequentially(value, { delay });
+            await locator.evaluate((el) => {
+                el.style.filter = '';
+            });
             await this.unhighlight(locator);
         }
         else {
