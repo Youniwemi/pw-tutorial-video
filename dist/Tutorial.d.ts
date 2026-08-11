@@ -64,6 +64,7 @@ export declare class Tutorial {
     click(selector: string | Locator): Promise<void>;
     fill(selector: string | Locator, value: string): Promise<void>;
     typeSlowly(selector: string | Locator, value: string, delay?: number): Promise<void>;
+    typeBlurred(selector: string | Locator, value: string, delay?: number): Promise<void>;
     selectOption(selector: string | Locator, value: string): Promise<void>;
     hideOverlay(): Promise<void>;
     showEmailPreview(options: {
