@@ -8,6 +8,7 @@ interface Props {
 }
 
 const config = siteConfig as any;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const { title, description = config.title } = Astro.props;
 
 const cssVars = [
@@ -29,7 +30,7 @@ const cssVars = [
 	<body style={cssVars || undefined}>
 		<header>
 			<div class="header-content">
-				<a href="/" class="logo">
+				<a href={`${base}/`} class="logo">
 					{
 						config.logo ? (
 							<img src={config.logo} alt={config.title} class="logo-img" />

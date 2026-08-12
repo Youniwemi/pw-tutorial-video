@@ -46,13 +46,26 @@ export function scaffold(config: SiteConfig, manifest: VideoManifest, tempDir: s
 		cpSync(videosDir, publicVideos, { recursive: true });
 	}
 
+	let siteDirective = '';
+	let baseDirective = '';
+	if (config.baseUrl && config.baseUrl.startsWith('http')) {
+		siteDirective = `site: ${JSON.stringify(config.baseUrl)},`;
+		try {
+			const basePath = new URL(config.baseUrl).pathname;
+			if (basePath && basePath !== '/') {
+				baseDirective = `base: ${JSON.stringify(basePath)},`;
+			}
+		} catch { /* invalid URL, skip */ }
+	}
+
 	const astroConfig = `import { defineConfig } from 'astro/config';
 
 export default defineConfig({
   srcDir: './src',
   publicDir: './public',
   outDir: './dist',
-  ${config.baseUrl && config.baseUrl.startsWith('http') ? `site: ${JSON.stringify(config.baseUrl)},` : ''}
+  ${siteDirective}
+  ${baseDirective}
   build: { assets: 'assets' },
 });
 `;

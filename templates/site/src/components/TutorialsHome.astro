@@ -7,6 +7,7 @@ import VideoModal from './VideoModal.astro';
 import tutorials from '../data/tutorials.json';
 
 const { categories, videos, ui } = tutorials as any;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 // Scan for step screenshots at build time
 const videosDir = join(process.cwd(), 'public/videos');
@@ -18,7 +19,7 @@ if (existsSync(videosDir)) {
 		const m = file.match(/^(.+)-step-(\d+)\.(png|jpe?g|webp|avif)$/);
 		if (!m) continue;
 		const [, id, n] = m;
-		(staging[id] ??= []).push({ n: parseInt(n), url: `/videos/${file}` });
+		(staging[id] ??= []).push({ n: parseInt(n), url: `${base}/videos/${file}` });
 	}
 	for (const [id, entries] of Object.entries(staging)) {
 		stepsByVideo[id] = entries.sort((a, b) => a.n - b.n).map(s => s.url);
@@ -58,9 +59,9 @@ const videosByCategory = videos.reduce((acc: Record<string, any[]>, video: any) 
 							id={video.id}
 							title={video.title}
 							duration={video.duration}
-							videoUrl={`/videos/${video.file}`}
+							videoUrl={`${base}/videos/${video.file}`}
 							steps={getSteps(video.file)}
-							href={`/${video.id}`}
+							href={`${base}/${video.id}`}
 						/>
 					))}
 				</div>
