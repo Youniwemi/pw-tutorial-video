@@ -64,6 +64,11 @@ export interface SceneOptions {
  *  In an array, the first scene is the one acting — it carries the cursor. */
 export type SceneFocus = string | string[];
 
+export interface FocusOptions {
+	/** Flex ratio for each active scene, e.g. [30, 70]. Must match the number of scenes. */
+	ratio?: number[];
+}
+
 export interface StepOptions {
 	/** Optional description shown below step title */
 	description?: string;

@@ -45,7 +45,9 @@ Follow all rules from `api.md`:
 - `@tutorial` tag on the test
 - Acronyms have `voiceText` where TTS mispronounces
 - Multi-scene only: every step touching a scene carries `{ scene }`, scenes sit
-  on distinct origins, and each tab switch is acknowledged in the narration
+  on distinct origins, each tab switch is acknowledged in the narration, and
+  split ratios (`focus(['a','b'], { ratio: [30, 70] })`) are used to keep the
+  acting pane readable
 
 ### 5. Show and explain
 - Present the diff or full transformed code

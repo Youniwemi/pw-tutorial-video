@@ -186,8 +186,8 @@ test.describe('multi-scene tutorial', () => {
 		// Both tabs stay visible and labelled — that is how the viewer knows
 		// who else is in the story and which profile is speaking.
 		await expect(page.locator('[data-tutorial-tab]')).toHaveCount(2);
-		await expect(page.getByText('Sara — Accountant')).toBeVisible();
-		await expect(page.getByText('ACME — Client')).toBeVisible();
+		await expect(page.locator('.tutorial-tabbar').getByText('Sara — Accountant')).toBeVisible();
+		await expect(page.locator('.tutorial-tabbar').getByText('ACME — Client')).toBeVisible();
 
 		await expect(tab('accountant')).toHaveAttribute('data-active', 'true');
 		await expect(tab('client')).toHaveAttribute('data-active', 'false');

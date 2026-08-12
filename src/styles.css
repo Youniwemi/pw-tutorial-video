@@ -30,7 +30,7 @@
 
 	/* Multi-scene stage (tab bar + scene panes) */
 	--tutorial-stage-bg: #1e293b;
-	--tutorial-stage-gap: 2px;
+	--tutorial-stage-gap: 4px;
 	--tutorial-scene-bg: #ffffff;
 	--tutorial-tabbar-padding: 8px 8px 0;
 	--tutorial-tab-bg: #334155;
@@ -418,6 +418,11 @@
 	font-family: var(--tutorial-font-family);
 }
 
+/* Hide the shared tab bar in split mode — per-scene labels take over */
+.tutorial-stage[data-split='true'] .tutorial-tabbar {
+	display: none;
+}
+
 .tutorial-tab {
 	display: flex;
 	align-items: center;
@@ -454,23 +459,48 @@
 .tutorial-scenes {
 	flex: 1 1 auto;
 	display: flex;
-	gap: var(--tutorial-stage-gap);
-	background: var(--tutorial-tab-bg-active);
+	gap: 0;
 	min-height: 0;
 }
 
-/* No transition on flex-grow: styles are injected after setContent, so the
- * pane would animate up from its unstyled value and Playwright would treat
- * the frame as never stable — every click inside it times out. Panes toggle
- * via display anyway, so there is nothing to interpolate. */
+.tutorial-stage[data-split='true'] .tutorial-scenes {
+	gap: var(--tutorial-stage-gap);
+	background: var(--tutorial-stage-bg);
+}
+
 .tutorial-scene {
 	flex: 1 1 0;
 	min-width: 0;
 	display: flex;
+	flex-direction: column;
 }
 
 .tutorial-scene[data-active='false'] {
 	display: none;
+}
+
+/* Per-scene label: hidden in single mode, visible in split mode */
+.tutorial-scene-label {
+	display: none;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	padding: 8px 16px;
+	background: var(--tutorial-tab-bg-active);
+	color: var(--tutorial-tab-text-active);
+	font-size: var(--tutorial-tab-size);
+	font-weight: 600;
+	font-family: var(--tutorial-font-family);
+	white-space: nowrap;
+	flex: 0 0 auto;
+}
+
+.tutorial-stage[data-split='true'] .tutorial-scene-label {
+	display: flex;
+}
+
+.tutorial-scene-label .tutorial-tab-dot {
+	background: var(--tutorial-tab-dot-active);
 }
 
 .tutorial-scene iframe {

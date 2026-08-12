@@ -170,10 +170,14 @@ the viewer sees the tab; they need to know *why* they are being moved.
 
 ### Side by side earns its place once
 
-`{ scene: [a, b] }` halves the stage, so app text shrinks. Spend it on the one
-moment where cause and effect must be seen together — the payment landing while
-the accountant watches. Two side-by-side moments in a tutorial is usually one
-too many.
+`{ scene: [a, b] }` splits the stage so app text shrinks. Use ratios to
+control emphasis — `[30, 70]` keeps the acting pane readable while the other
+stays visible for context. Each pane gets its own label header and a clear
+separator divides them.
+
+Spend the split on the moment where cause and effect must be seen together —
+the payment landing while the accountant watches. Two side-by-side moments in
+a tutorial is usually one too many.
 
 Everywhere else, tabs give each profile the full screen, which is what makes
 dense app UI readable at video resolution.

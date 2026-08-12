@@ -163,21 +163,28 @@ export class Tutorial {
      * Bring scene(s) to the stage. One fills it; two share it side by side.
      * The cursor is hidden across the switch so it never streaks between panes.
      */
-    async focus(target) {
+    async focus(target, options) {
         const names = asList(target);
         names.forEach((name) => this.requireScene(name));
         if (TUTORIAL_MODE && this.initialized)
             await this.cursor.hide();
-        await this.page.evaluate((active) => {
+        const ratios = options?.ratio ?? names.map(() => 1);
+        await this.page.evaluate(({ active, ratios }) => {
+            const stage = document.getElementById('tutorial-stage');
+            if (stage)
+                stage.setAttribute('data-split', String(active.length > 1));
             document.querySelectorAll('[data-tutorial-tab]').forEach((el) => {
                 const name = el.getAttribute('data-tutorial-tab');
                 el.setAttribute('data-active', String(active.includes(name)));
             });
             document.querySelectorAll('[data-tutorial-scene]').forEach((el) => {
                 const name = el.getAttribute('data-tutorial-scene');
-                el.setAttribute('data-active', String(active.includes(name)));
+                const idx = active.indexOf(name);
+                const isActive = idx !== -1;
+                el.setAttribute('data-active', String(isActive));
+                el.style.flex = isActive ? `${ratios[idx]} 1 0` : '';
             });
-        }, names);
+        }, { active: names, ratios });
         this.activeScenes = names;
         await this.page.waitForTimeout(TUTORIAL_MODE ? this.sceneTransitionMs : 0);
         if (TUTORIAL_MODE && this.initialized)

@@ -58,6 +58,7 @@ Three entry points: `pw-tutorial-video` (main), `pw-tutorial-video/reporter`, `p
 - **`backgroundMusic` defaults to empty string** for external consumers. Pass `backgroundMusic: ''` explicitly if you have no music asset.
 - **Voice playback errors are silent** (`audio.onerror = () => resolve()`) — a wrong `audioBaseUrl` produces no narration without any error.
 - All overlay HTML is built as string templates in `overlay-html.ts` and injected via `page.evaluate()`.
+- **Split mode** (`data-split` on the stage): when multiple scenes are active, the shared tab bar hides and each scene pane gets its own label header + a visible separator. `focus()` accepts `{ ratio: [30, 70] }` for asymmetric splits. In single mode the regular tab bar shows all tabs.
 
 ## Environment variables
 

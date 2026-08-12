@@ -14,12 +14,16 @@ export function renderStage(scenes, active) {
 			<span class="tutorial-tab-dot"></span>${escapeHtml(scene.label)}
 		</div>`)
         .join('\n\t\t');
-    const panes = Object.keys(scenes)
-        .map((name) => `<div class="tutorial-scene" data-tutorial-scene="${name}" data-active="${isActive(name)}">
+    const panes = Object.entries(scenes)
+        .map(([name, scene]) => `<div class="tutorial-scene" data-tutorial-scene="${name}" data-active="${isActive(name)}">
+			<div class="tutorial-scene-label" data-tutorial-scene-label="${name}">
+				<span class="tutorial-tab-dot"></span>${escapeHtml(scene.label)}
+			</div>
 			<iframe data-tutorial-frame="${name}" src="about:blank"></iframe>
 		</div>`)
         .join('\n\t\t');
-    return `<div class="tutorial-stage" id="tutorial-stage">
+    const isSplit = active.length > 1;
+    return `<div class="tutorial-stage" id="tutorial-stage" data-split="${isSplit}">
 	<div class="tutorial-tabbar">
 		${tabs}
 	</div>

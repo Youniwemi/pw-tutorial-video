@@ -324,7 +324,7 @@ tutorial.step('client_pays', () => tutorial.click(client.getByRole('button')),
 | `tutorial.stage()` | Mount the stage — call once, before any `goto` |
 | `tutorial.scene(name)` | The scene as a `FrameLocator` (full locator API) |
 | `tutorial.goto(name, url)` | Navigate a scene; relative to its `baseUrl`, or absolute |
-| `tutorial.focus(name \| names[])` | Bring scene(s) on stage (rarely needed — use `{ scene }`) |
+| `tutorial.focus(name \| names[], options?)` | Bring scene(s) on stage with optional `{ ratio: [30, 70] }` |
 
 ### Rules
 
@@ -335,10 +335,28 @@ app need a second hostname (`app.localhost` / `app2.localhost`).
 **10.2 Tag every step with its scene.** A hidden scene is not interactive —
 acting on an off-stage scene times out. `{ scene }` switches the stage first.
 
-**10.3 Side by side is an exception, not a layout.** `{ scene: ['a', 'b'] }`
-splits the stage in half for one step: use it only for the moment cause and
-effect must share a frame. Each pane gets ~640px, so app text shrinks. In the
-array, the first scene is the one acting.
+**10.3 Split layout with ratios.** `{ scene: ['a', 'b'] }` splits the stage
+for one step. By default panes share equally; pass `ratio` to `focus()` for
+asymmetric splits:
+
+```typescript
+// 30/70 — focus on the right pane
+await tutorial.focus(['accountant', 'client'], { ratio: [30, 70] });
+
+// 50/50 — equal split
+await tutorial.focus(['accountant', 'client'], { ratio: [50, 50] });
+
+// 70/30 — focus on the left pane
+await tutorial.focus(['accountant', 'client'], { ratio: [70, 30] });
+
+// Back to single tab
+await tutorial.focus('client');
+```
+
+In split mode the shared tab bar hides; each pane gets its own label header
+above its iframe, and a visible separator divides the two sides. In single
+mode the regular tab bar shows all tabs (so the viewer knows who else is in
+the story). In the array, the first scene is the one acting.
 
 **10.4 Alternation is free.** Changing `scene` between steps switches tabs — you
 never write the switch. Narration should acknowledge it ("meanwhile, the client…"),

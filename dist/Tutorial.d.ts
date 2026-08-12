@@ -1,5 +1,5 @@
 import type { Page, Locator, FrameLocator } from '@playwright/test';
-import type { TutorialOptions, StepOptions, ContextOptions, SceneFocus } from './types.js';
+import type { TutorialOptions, StepOptions, ContextOptions, SceneFocus, FocusOptions } from './types.js';
 import { TutorialTimeline } from './timeline.js';
 export declare class Tutorial {
     private page;
@@ -37,7 +37,7 @@ export declare class Tutorial {
      * Bring scene(s) to the stage. One fills it; two share it side by side.
      * The cursor is hidden across the switch so it never streaks between panes.
      */
-    focus(target: SceneFocus): Promise<void>;
+    focus(target: SceneFocus, options?: FocusOptions): Promise<void>;
     /** What to stamp on a timeline entry: a bare name, or a pair when two
      *  scenes shared the stage. Undefined for single-scene tutorials. */
     private get stagedScene();
