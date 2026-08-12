@@ -89,7 +89,7 @@ export function buildMergeCommand(
 
 	// Trim dead time from video start (preload period)
 	const trimSs = timeline.videoTrimMs ? `-ss ${(timeline.videoTrimMs / 1000).toFixed(3)}` : '';
-	const command = `ffmpeg -y ${trimSs} ${inputArgs} -filter_complex "${filter}" -map 0:v -map "[aout]" -c:v copy -c:a libopus -t ${videoDuration} "${outputPath}"`;
+	const command = `ffmpeg -y ${trimSs} ${inputArgs} -filter_complex "${filter}" -map 0:v -map "[aout]" -c:v libvpx-vp9 -b:v 330k -crf 40 -row-mt 1 -cpu-used 4 -c:a libopus -b:a 64k -t ${videoDuration} "${outputPath}"`;
 
 	return { command, inputs, filter };
 }

@@ -20,7 +20,7 @@ describe('buildMergeCommand', () => {
 
 		expect(result.command).toContain('ffmpeg -y');
 		expect(result.command).toContain('-i "/path/to/video.webm"');
-		expect(result.command).toContain('-c:v copy');
+		expect(result.command).toContain('-c:v libvpx-vp9');
 		expect(result.command).toContain('-c:a libopus');
 		expect(result.command).toContain('-t 66.849');
 	});
