@@ -20,6 +20,8 @@ export interface TimelineData {
 	/** Raw test title passed to Playwright's `test(...)` — the i18n key.
 	 *  Lets the reporter match a timeline to its testCase without re-deriving testName. */
 	testTitle: string;
+	/** Display title from the Tutorial options — what the gallery site shows on the card. */
+	title?: string;
 	testFile: string;
 	projectName: string;
 	lang: string;
@@ -47,6 +49,7 @@ export interface TimelineMusicOptions {
 export class TutorialTimeline {
 	private testName: string;
 	private testTitle: string;
+	private title: string = '';
 	private testFile: string;
 	private projectName: string;
 	private lang: string;
@@ -64,10 +67,12 @@ export class TutorialTimeline {
 		lang: string = 'fr',
 		testTitle: string = '',
 		feature: string = '',
-		musicOptions: TimelineMusicOptions = {}
+		musicOptions: TimelineMusicOptions = {},
+		title: string = ''
 	) {
 		this.testName = testName;
 		this.testTitle = testTitle;
+		this.title = title;
 		this.testFile = testFile;
 		this.projectName = projectName;
 		this.lang = lang;
@@ -116,6 +121,7 @@ export class TutorialTimeline {
 		const data = {
 			testName: this.testName,
 			testTitle: this.testTitle,
+			title: this.title || undefined,
 			testFile: this.testFile,
 			projectName: this.projectName,
 			lang: this.lang,

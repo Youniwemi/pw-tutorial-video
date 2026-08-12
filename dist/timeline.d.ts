@@ -15,6 +15,8 @@ export interface TimelineData {
     /** Raw test title passed to Playwright's `test(...)` — the i18n key.
      *  Lets the reporter match a timeline to its testCase without re-deriving testName. */
     testTitle: string;
+    /** Display title from the Tutorial options — what the gallery site shows on the card. */
+    title?: string;
     testFile: string;
     projectName: string;
     lang: string;
@@ -40,6 +42,7 @@ export interface TimelineMusicOptions {
 export declare class TutorialTimeline {
     private testName;
     private testTitle;
+    private title;
     private testFile;
     private projectName;
     private lang;
@@ -49,7 +52,7 @@ export declare class TutorialTimeline {
     private videoTrimMs;
     private steps;
     private videoPath;
-    constructor(testName: string, testFile?: string, projectName?: string, lang?: string, testTitle?: string, feature?: string, musicOptions?: TimelineMusicOptions);
+    constructor(testName: string, testFile?: string, projectName?: string, lang?: string, testTitle?: string, feature?: string, musicOptions?: TimelineMusicOptions, title?: string);
     /**
      * Mark the start of the tutorial (second 0 for video)
      */

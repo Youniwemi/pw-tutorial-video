@@ -167,7 +167,8 @@ export class Tutorial {
 					: this.options.backgroundMusic,
 				musicVolume: this.options.musicVolume,
 				voiceVolume: this.options.voiceVolume
-			}
+			},
+			this.options.title
 		);
 
 		this.scenes = options.scenes ?? {};

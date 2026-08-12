@@ -33,7 +33,9 @@ export function generateManifest(tutorials, config) {
         return {
             id: t.timeline.testName,
             category: t.timeline.feature || 'general',
-            title: t.timeline.steps[0]?.title || humanize(t.timeline.testName),
+            // Older timelines don't carry `title` (the Tutorial display title) —
+            // fall back to the Playwright test title, then the slug.
+            title: t.timeline.title || t.timeline.testTitle || humanize(t.timeline.testName),
             duration: durationSec > 0 ? `${minutes}:${seconds.toString().padStart(2, '0')}` : '',
             premium: false,
             file: t.videoFile,

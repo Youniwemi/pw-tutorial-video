@@ -106,7 +106,7 @@ export class Tutorial {
                 : this.options.backgroundMusic,
             musicVolume: this.options.musicVolume,
             voiceVolume: this.options.voiceVolume
-        });
+        }, this.options.title);
         this.scenes = options.scenes ?? {};
         this.sceneTransitionMs = options.sceneTransition?.duration ?? 600;
         const sceneNames = Object.keys(this.scenes);

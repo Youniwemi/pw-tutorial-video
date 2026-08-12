@@ -7,6 +7,7 @@ import { buildMergeCommand } from './merge.js';
 export class TutorialTimeline {
     testName;
     testTitle;
+    title = '';
     testFile;
     projectName;
     lang;
@@ -16,9 +17,10 @@ export class TutorialTimeline {
     videoTrimMs = 0;
     steps = [];
     videoPath = '';
-    constructor(testName, testFile = '', projectName = '', lang = 'fr', testTitle = '', feature = '', musicOptions = {}) {
+    constructor(testName, testFile = '', projectName = '', lang = 'fr', testTitle = '', feature = '', musicOptions = {}, title = '') {
         this.testName = testName;
         this.testTitle = testTitle;
+        this.title = title;
         this.testFile = testFile;
         this.projectName = projectName;
         this.lang = lang;
@@ -63,6 +65,7 @@ export class TutorialTimeline {
         const data = {
             testName: this.testName,
             testTitle: this.testTitle,
+            title: this.title || undefined,
             testFile: this.testFile,
             projectName: this.projectName,
             lang: this.lang,
