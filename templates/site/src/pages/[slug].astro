@@ -20,15 +20,20 @@ const videosDir = join(process.cwd(), 'public/videos');
 type StepEntry = { n: number; url: string };
 const steps: string[] = [];
 if (existsSync(videosDir)) {
-	const base = video.file.replace(/\.[^.]+$/, '');
-	const escaped = base.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+	const stem = video.file.replace(/\.[^.]+$/, '');
+	const escaped = stem.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 	const pattern = new RegExp(`^${escaped}-step-(\\d+)\\.(png|jpe?g|webp|avif)$`);
-	const staging: StepEntry[] = [];
+	const seen = new Map<number, { url: string; ext: string }>();
 	for (const file of readdirSync(videosDir)) {
 		const m = file.match(pattern);
-		if (m) staging.push({ n: parseInt(m[1]), url: `${base}/videos/${file}` });
+		if (!m) continue;
+		const n = parseInt(m[1]);
+		const cur = seen.get(n);
+		if (!cur || (m[2] === 'webp' && cur.ext !== 'webp')) {
+			seen.set(n, { url: `${base}/videos/${file}`, ext: m[2] });
+		}
 	}
-	steps.push(...staging.sort((a, b) => a.n - b.n).map(s => s.url));
+	steps.push(...[...seen.entries()].sort((a, b) => a[0] - b[0]).map(([, s]) => s.url));
 }
 
 const poster = steps[0];
