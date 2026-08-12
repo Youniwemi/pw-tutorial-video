@@ -35,10 +35,12 @@ function usage() {
 Usage: pw-tutorial-video <command> [options]
 
 Commands:
-  init    Install /tutorialize skill and tutorial-crafter agent into .claude/
+  init         Install /tutorialize skill and tutorial-crafter agent into .claude/
+  build-site   Generate a static tutorial video gallery site
 
 Options:
-  -y, --yes   Answer yes to everything (for scripted updates)
+  -y, --yes              Answer yes to everything (for scripted updates)
+  --config=<path>        Path to tutorial-site.config.js (build-site only)
 `);
 }
 
@@ -143,6 +145,15 @@ if (!command || command === 'init') {
 		console.error(err);
 		process.exit(1);
 	});
+} else if (command === 'build-site') {
+	const configFlag = process.argv.find((a) => a.startsWith('--config='));
+	const configPath = configFlag ? configFlag.split('=')[1] : undefined;
+	import('./site/build-site.js')
+		.then(({ buildSite }) => buildSite(configPath))
+		.catch((err) => {
+			console.error(err);
+			process.exit(1);
+		});
 } else {
 	console.error(`Unknown command: ${command}`);
 	usage();

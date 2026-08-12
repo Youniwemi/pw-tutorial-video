@@ -1,0 +1,72 @@
+---
+import { readdirSync, existsSync } from 'fs';
+import { join } from 'path';
+import Base from '../layouts/Base.astro';
+import VideoCard from './VideoCard.astro';
+import VideoModal from './VideoModal.astro';
+import tutorials from '../data/tutorials.json';
+
+const { categories, videos, ui } = tutorials as any;
+
+// Scan for step screenshots at build time
+const videosDir = join(process.cwd(), 'public/videos');
+type StepEntry = { n: number; url: string };
+const stepsByVideo: Record<string, string[]> = {};
+if (existsSync(videosDir)) {
+	const staging: Record<string, StepEntry[]> = {};
+	for (const file of readdirSync(videosDir)) {
+		const m = file.match(/^(.+)-step-(\d+)\.(png|jpe?g|webp|avif)$/);
+		if (!m) continue;
+		const [, id, n] = m;
+		(staging[id] ??= []).push({ n: parseInt(n), url: `/videos/${file}` });
+	}
+	for (const [id, entries] of Object.entries(staging)) {
+		stepsByVideo[id] = entries.sort((a, b) => a.n - b.n).map(s => s.url);
+	}
+}
+
+const getSteps = (file: string): string[] => {
+	const base = file.replace(/\.[^.]+$/, '');
+	return stepsByVideo[base] ?? [];
+};
+
+const videosByCategory = videos.reduce((acc: Record<string, any[]>, video: any) => {
+	if (!acc[video.category]) acc[video.category] = [];
+	acc[video.category].push(video);
+	return acc;
+}, {} as Record<string, any[]>);
+---
+
+<Base title={ui.heroTitle}>
+	<section class="hero">
+		<h1>{ui.heroTitle}</h1>
+		<p>{ui.heroSubtitle}</p>
+	</section>
+
+	{Object.entries(categories).map(([catId, cat]: [string, any]) => {
+		const catVideos = videosByCategory[catId];
+		if (!catVideos?.length) return null;
+		return (
+			<section class="category">
+				<div class="category-header">
+					<span class="category-icon">{cat.icon}</span>
+					<h2>{cat.label}</h2>
+				</div>
+				<div class="video-grid">
+					{catVideos.map((video: any) => (
+						<VideoCard
+							id={video.id}
+							title={video.title}
+							duration={video.duration}
+							videoUrl={`/videos/${video.file}`}
+							steps={getSteps(video.file)}
+							href={`/${video.id}`}
+						/>
+					))}
+				</div>
+			</section>
+		);
+	})}
+
+	<VideoModal />
+</Base>

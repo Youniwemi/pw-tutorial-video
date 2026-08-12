@@ -1,0 +1,180 @@
+---
+interface Props {
+	id: string;
+	title: string;
+	duration: string;
+	videoUrl: string;
+	steps?: string[];
+	href?: string;
+}
+
+const { id, title, duration, videoUrl, steps = [], href } = Astro.props;
+---
+
+<div class="video-card" data-video-url={videoUrl} data-video-id={id}>
+	<div class="video-thumbnail">
+		{steps.length > 0 ? (
+			<div class="step-carousel">
+				{steps.map((src, i) => (
+					<img
+						src={src}
+						alt={`Step ${i + 1}`}
+						loading={i === 0 ? 'eager' : 'lazy'}
+						class:list={['step-img', { active: i === 0 }]}
+					/>
+				))}
+				{steps.length > 1 && (
+					<>
+						<button class="step-prev" aria-label="Previous step">‹</button>
+						<button class="step-next" aria-label="Next step">›</button>
+						<div class="step-dots">
+							{steps.map((_, i) => (
+								<span class:list={['step-dot', { active: i === 0 }]}></span>
+							))}
+						</div>
+					</>
+				)}
+			</div>
+		) : (
+			<div class="placeholder-thumb"></div>
+		)}
+		<div class="play-button">▶</div>
+	</div>
+	<div class="video-info">
+		<div class="video-title">{title}</div>
+		<div class="video-meta">
+			<span class="video-duration">&#x1F550; {duration}</span>
+			{href && (
+				<a href={href} class="card-page-link" onclick="event.stopPropagation()">→</a>
+			)}
+		</div>
+	</div>
+</div>
+
+<style>
+	.card-page-link {
+		margin-left: auto;
+		font-size: 0.9rem;
+		color: var(--color-text-muted);
+		text-decoration: none;
+		transition: color 0.2s;
+		flex-shrink: 0;
+	}
+
+	.card-page-link:hover {
+		color: var(--color-primary);
+	}
+
+	.placeholder-thumb {
+		width: 100%;
+		height: 100%;
+		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	}
+
+	.step-carousel {
+		position: absolute;
+		inset: 0;
+	}
+
+	.step-img {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		opacity: 0;
+		transition: opacity 0.3s;
+	}
+
+	.step-img.active {
+		opacity: 1;
+	}
+
+	.step-prev,
+	.step-next {
+		position: absolute;
+		top: 50%;
+		transform: translateY(-50%);
+		background: rgba(0, 0, 0, 0.5);
+		color: white;
+		border: none;
+		width: 28px;
+		height: 28px;
+		border-radius: 50%;
+		font-size: 1.2rem;
+		line-height: 1;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		opacity: 0;
+		transition: opacity 0.2s;
+		z-index: 2;
+	}
+
+	.step-prev { left: 6px; }
+	.step-next { right: 6px; }
+
+	.video-card:hover .step-prev,
+	.video-card:hover .step-next {
+		opacity: 1;
+	}
+
+	.step-dots {
+		position: absolute;
+		bottom: 6px;
+		left: 50%;
+		transform: translateX(-50%);
+		display: flex;
+		gap: 4px;
+		z-index: 2;
+	}
+
+	.step-dot {
+		width: 5px;
+		height: 5px;
+		border-radius: 50%;
+		background: rgba(255, 255, 255, 0.4);
+		cursor: pointer;
+		transition: background 0.2s;
+	}
+
+	.step-dot.active {
+		background: white;
+	}
+</style>
+
+<script>
+	document.querySelectorAll<HTMLElement>('.step-carousel').forEach(carousel => {
+		const imgs = carousel.querySelectorAll<HTMLElement>('.step-img');
+		const dots = carousel.querySelectorAll<HTMLElement>('.step-dot');
+		const prev = carousel.querySelector('.step-prev');
+		const next = carousel.querySelector('.step-next');
+		const card = carousel.closest('.video-card') as HTMLElement;
+		let current = 0;
+		let autoMoved = false;
+		let timer: ReturnType<typeof setInterval> | null = null;
+
+		const show = (n: number) => {
+			imgs[current].classList.remove('active');
+			dots[current]?.classList.remove('active');
+			current = ((n % imgs.length) + imgs.length) % imgs.length;
+			imgs[current].classList.add('active');
+			dots[current]?.classList.add('active');
+		};
+
+		prev?.addEventListener('click', e => { e.stopPropagation(); show(current - 1); });
+		next?.addEventListener('click', e => { e.stopPropagation(); show(current + 1); });
+		dots.forEach((dot, i) => dot.addEventListener('click', e => { e.stopPropagation(); show(i); }));
+
+		card?.addEventListener('mouseenter', () => {
+			if (imgs.length < 2) return;
+			autoMoved = false;
+			timer = setInterval(() => { autoMoved = true; show(current + 1); }, 800);
+		});
+		card?.addEventListener('mouseleave', () => {
+			if (timer) { clearInterval(timer); timer = null; }
+			if (autoMoved) show(0);
+		});
+	});
+</script>

@@ -407,9 +407,26 @@ tutorials/
     └── {test-name}-step-{n}.webp    # Step screenshots
 ```
 
-## Claude Code Skill
+## Claude Code Integration
 
-This package ships a `/tutorialize` skill for [Claude Code](https://claude.ai/code) in `skills/tutorialize/`. It teaches Claude how to convert a Playwright test into a professional tutorial — covering persona analysis, storytelling, narration voice, and the full `pw-tutorial-video` API.
+This package ships **two assets for Claude Code** that teach AI agents how to convert your Playwright tests into professional tutorials:
+
+### What you get
+
+| Asset | Installed to | Purpose |
+|---|---|---|
+| `/tutorialize` skill | `.claude/skills/tutorialize/` | Slash command that loads tutorial design methodology — persona analysis, storytelling arc, choreography rules, and the full `pw-tutorial-video` API. Invoke with `/tutorialize` in Claude Code. |
+| `tutorial-crafter` agent | `.claude/agents/tutorial-crafter.md` | Specialized agent (Sonnet) that reads your test, designs the tutorial arc, and writes the tutorial code. Dispatched automatically or manually. |
+
+### Skill reference files
+
+The skill bundles two reference documents that Claude reads before tutorializing:
+
+| File | Content |
+|---|---|
+| `SKILL.md` | 4-phase process: understand the viewer → design the arc → implement with `pw-tutorial-video` → verify |
+| `references/storytelling.md` | Who is watching (role, expertise, emotional state), narration voice rules, pacing decisions, when to use context screens vs steps, multi-profile scene heuristics |
+| `references/api.md` | Complete `Tutorial` class API with timing model, critical rules (e.g., navigate before any tutorial call, never override `--reporter`), and a pre-commit checklist |
 
 ### Setup
 
@@ -417,11 +434,38 @@ This package ships a `/tutorialize` skill for [Claude Code](https://claude.ai/co
 npx pw-tutorial-video init
 ```
 
-This interactively copies the `/tutorialize` skill and `tutorial-crafter` agent into your `.claude/` directory.
+This interactively copies the skill and agent into your `.claude/` directory. Example session:
+
+```
+  pw-tutorial-video 0.2.0 — Claude Code Setup
+
+  Install /tutorialize skill into .claude/skills/? [Y/n] y
+  + Skill copied to .claude/skills/tutorialize/
+  Install tutorial-crafter agent into .claude/agents/? [Y/n] y
+  + Agent copied to .claude/agents/tutorial-crafter.md
+
+  Done! You can now use /tutorialize in Claude Code.
+```
+
+### Usage in Claude Code
+
+```
+# Ask Claude to convert a test into a tutorial
+> Tutorialize tests/free/01_company.init.ts
+
+# Or invoke the skill directly
+> /tutorialize tests/premium/10_expense-scan.test.ts
+```
+
+Claude will:
+1. Read the test and identify the viewer persona
+2. Design a storytelling arc (goal → steps → completion)
+3. Write the tutorial code with `tutorial.context()`, `tutorial.step()`, voice narration text, and `tutorial.complete()`
+4. Verify the test still passes in both normal and tutorial mode
 
 ### Keeping them up to date
 
-The skill and agent are **copies**, so upgrading the package does not update them.
+The skill and agent are **copies**, so upgrading the package does not auto-update them.
 `init` stamps the version it installed in `.claude/.pw-tutorial-video.json`, and:
 
 - after an upgrade, a post-install message names what went stale and tells you to
@@ -432,16 +476,90 @@ The skill and agent are **copies**, so upgrading the package does not update the
 - `npx pw-tutorial-video init --yes` answers yes to everything, for scripted
   updates.
 
-If you customise the copied skill, keep your additions in a separate file next to
+If you customize the copied skill, keep your additions in a separate file next to
 it — `init` overwrites, it does not merge.
 
-### What the skill covers
+## Tutorial Gallery Site
 
-| File | Content |
-|---|---|
-| `SKILL.md` | Process overview: understand → design → implement → verify |
-| `references/storytelling.md` | Persona dimensions, emotional arc, narration voice, grouping heuristics |
-| `references/api.md` | Tutorial class API, timing model, critical rules, checklist |
+Generate a static video gallery website from your tutorials — one command, zero config.
+
+### Quick start
+
+```bash
+npx pw-tutorial-video build-site
+```
+
+On the first run, a `tutorial-site.config.js` file is created with sensible defaults. Edit it to customize branding, then re-run `build-site` — the config is reused automatically.
+
+The command scans your `tutorials/` directory for videos, screenshots, and timeline metadata, then builds a static site ready to deploy (e.g., to Cloudflare Pages, Netlify, or any static host).
+
+### What gets generated
+
+```
+tutorial-site-dist/          # Static site output (configurable)
+├── index.html               # Gallery home — videos grouped by category
+├── {video-slug}/index.html  # Dedicated page per video with player + step screenshots
+└── videos/                  # Copied from tutorials/videos/
+    ├── *.webm               # Video files
+    └── *-step-*.webp        # Step screenshots (carousel on cards)
+```
+
+### Configuration
+
+```js
+// tutorial-site.config.js
+export default {
+  // Branding
+  title: "My App Tutorials",       // Site title (header + page titles)
+  logo: "./assets/logo.svg",       // Path to logo image (optional)
+  primaryColor: "#6366f1",         // Primary color (CSS)
+  font: "system-ui, sans-serif",   // Font family (CSS)
+
+  // Paths
+  input: "tutorials/",             // Where videos + timelines live
+  output: "tutorial-site-dist/",   // Where the static site is built
+
+  // Site
+  baseUrl: "https://tutorials.myapp.com",  // For SEO (optional)
+  lang: "fr",                              // Site language
+
+  // Content overrides (optional)
+  tutorials: {
+    categories: {
+      "getting-started": { icon: "⭐", label: "Getting Started" },
+      "advanced":        { icon: "🚀", label: "Advanced" },
+    },
+    ui: {
+      heroTitle: "Learn My App",
+      heroSubtitle: "Step-by-step video tutorials",
+    },
+  },
+};
+```
+
+### How videos are discovered
+
+The scanner looks for `.webm` files in `<input>/videos/`. For each video:
+
+- If a matching `_timeline.json` exists in `<input>/output/`, its metadata is used (title from narration steps, duration, category from `@feature:*` tag)
+- Otherwise, a human-readable title is derived from the filename and duration is left blank
+
+Step screenshots (`{video}-step-{n}.{png,webp}`) are auto-detected and displayed as a carousel on each video card.
+
+### Previewing locally
+
+The generated site uses relative paths, but browsers block `<video>` elements on `file://`. Use any static server:
+
+```bash
+npx serve tutorial-site-dist
+```
+
+### CLI options
+
+```bash
+pw-tutorial-video build-site                      # Uses ./tutorial-site.config.js
+pw-tutorial-video build-site --config=path/to.js   # Custom config path
+```
 
 ## How It Works
 
