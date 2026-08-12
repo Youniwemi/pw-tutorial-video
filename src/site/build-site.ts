@@ -82,8 +82,7 @@ export default ${JSON.stringify(DEFAULT_CONFIG, null, 2)};
 
 	console.log('  Building static site...');
 	try {
-		const astroBin = join(__dirname, '..', '..', 'node_modules', '.bin', 'astro');
-		execSync(`${astroBin} build`, {
+		execSync('npx astro build', {
 			cwd: tempDir,
 			stdio: 'inherit',
 			env: { ...process.env, NODE_ENV: 'production' }
