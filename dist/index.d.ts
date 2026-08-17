@@ -1,5 +1,5 @@
 export { Tutorial } from './Tutorial.js';
-export type { TutorialOptions, StepOptions, ContextOptions, ContextStyle, FocusOptions, SceneFocus, SceneOptions } from './types.js';
+export type { TutorialOptions, StepOptions, ContextOptions, ContextStyle, OverlayPosition, FocusOptions, SceneFocus, SceneOptions } from './types.js';
 export { buildMergeCommand } from './merge.js';
 export type { MergeOptions } from './merge.js';
 export { slugify } from './slugify.js';

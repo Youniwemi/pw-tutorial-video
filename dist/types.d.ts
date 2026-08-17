@@ -53,6 +53,8 @@ export interface TutorialOptions {
     sceneTransition?: {
         duration?: number;
     };
+    /** Overlay position: TL (top-left, default), TR (top-right), BL (bottom-left), BR (bottom-right) */
+    overlayPosition?: OverlayPosition;
 }
 export interface SceneOptions {
     /** Label shown on the scene's tab — keep it a person, not a URL */
@@ -85,7 +87,10 @@ export interface StepOptions {
     /** Scene(s) this step plays on. The stage switches before the action runs,
      *  because a hidden scene cannot be interacted with. */
     scene?: SceneFocus;
+    /** Override overlay position for this step */
+    overlayPosition?: OverlayPosition;
 }
+export type OverlayPosition = 'TL' | 'TR' | 'BL' | 'BR';
 export type ContextStyle = 'goal' | 'clarification' | 'attention';
 export interface ContextOptions {
     /** Description shown below title */

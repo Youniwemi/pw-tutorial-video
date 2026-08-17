@@ -1,9 +1,10 @@
 import type { Page, Locator } from '@playwright/test';
-import type { ContextStyle } from './types.js';
+import type { ContextStyle, OverlayPosition } from './types.js';
 export interface OverlayOptions {
     title: string;
     lang: string;
     highlightDuration: number;
+    position: OverlayPosition;
 }
 export declare class TutorialOverlay {
     private page;
@@ -16,7 +17,7 @@ export declare class TutorialOverlay {
     setCurrentStep(step: number): void;
     incrementStep(): number;
     get step(): number;
-    showStep(title: string, description?: string): Promise<void>;
+    showStep(title: string, description?: string, position?: OverlayPosition): Promise<void>;
     showContext(contextTitle: string, text?: string, style?: ContextStyle): Promise<void>;
     showComplete(message: string): Promise<void>;
     /**

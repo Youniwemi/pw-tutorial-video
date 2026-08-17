@@ -1,4 +1,4 @@
-import type { ContextStyle, SceneOptions } from './types.js';
+import type { ContextStyle, OverlayPosition, SceneOptions } from './types.js';
 /**
  * The multi-scene stage: a browser-like tab bar over a row of iframes.
  *
@@ -16,6 +16,7 @@ export interface StepOverlayParams {
     description?: string;
     isRtl?: boolean;
     progressPercent?: number;
+    position?: OverlayPosition;
 }
 export declare function renderStepOverlay(params: StepOverlayParams): string;
 export interface ContextOverlayParams {

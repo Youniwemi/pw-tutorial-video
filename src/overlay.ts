@@ -1,5 +1,5 @@
 import type { Page, Locator } from '@playwright/test';
-import type { ContextStyle } from './types.js';
+import type { ContextStyle, OverlayPosition } from './types.js';
 import {
 	renderStepOverlay,
 	renderContextOverlay,
@@ -11,6 +11,7 @@ export interface OverlayOptions {
 	title: string;
 	lang: string;
 	highlightDuration: number;
+	position: OverlayPosition;
 }
 
 export class TutorialOverlay {
@@ -44,7 +45,7 @@ export class TutorialOverlay {
 		return this.currentStep;
 	}
 
-	async showStep(title: string, description?: string): Promise<void> {
+	async showStep(title: string, description?: string, position?: OverlayPosition): Promise<void> {
 		const isRtl = this.options.lang === 'ar';
 		const progressPercent = this.totalSteps > 0 ? (this.currentStep / this.totalSteps) * 100 : 0;
 
@@ -54,7 +55,8 @@ export class TutorialOverlay {
 			title,
 			description,
 			isRtl,
-			progressPercent
+			progressPercent,
+			position: position ?? this.options.position
 		});
 
 		await this.page.evaluate((html) => {

@@ -23,7 +23,7 @@ export class TutorialOverlay {
     get step() {
         return this.currentStep;
     }
-    async showStep(title, description) {
+    async showStep(title, description, position) {
         const isRtl = this.options.lang === 'ar';
         const progressPercent = this.totalSteps > 0 ? (this.currentStep / this.totalSteps) * 100 : 0;
         const html = renderStepOverlay({
@@ -32,7 +32,8 @@ export class TutorialOverlay {
             title,
             description,
             isRtl,
-            progressPercent
+            progressPercent,
+            position: position ?? this.options.position
         });
         await this.page.evaluate((html) => {
             const existing = document.getElementById('tutorial-overlay');

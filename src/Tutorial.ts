@@ -7,6 +7,7 @@ import type {
 	StepOptions,
 	ContextOptions,
 	ContextStyle,
+	OverlayPosition,
 	SceneOptions,
 	SceneFocus,
 	FocusOptions
@@ -67,6 +68,7 @@ interface PendingStep {
 	voicePreload: Promise<void>;
 	key?: string;
 	scene?: SceneFocus;
+	overlayPosition?: OverlayPosition;
 }
 
 type PendingItem = PendingContext | PendingStep;
@@ -126,7 +128,8 @@ export class Tutorial {
 			musicVolume: options.musicVolume ?? TUTORIAL_MUSIC_VOLUME,
 			voiceVolume: options.voiceVolume ?? TUTORIAL_VOICE_VOLUME,
 			customStyles: options.customStyles ?? '',
-			playAudioInBrowser: options.playAudioInBrowser ?? true
+			playAudioInBrowser: options.playAudioInBrowser ?? true,
+			overlayPosition: options.overlayPosition ?? 'TL'
 		};
 
 		this.voice = new TutorialVoice(page, {
@@ -151,7 +154,8 @@ export class Tutorial {
 		this.overlay = new TutorialOverlay(page, {
 			title: this.options.title,
 			lang: this.options.lang,
-			highlightDuration: this.options.highlightDuration
+			highlightDuration: this.options.highlightDuration,
+			position: this.options.overlayPosition ?? 'TL'
 		});
 
 		this.timeline = new TutorialTimeline(
@@ -430,7 +434,8 @@ export class Tutorial {
 			delay: options?.delay,
 			voicePreload,
 			key,
-			scene: options?.scene
+			scene: options?.scene,
+			overlayPosition: options?.overlayPosition
 		});
 	}
 
@@ -675,7 +680,7 @@ export class Tutorial {
 					await this.music.ensurePlaying();
 				}
 
-				await this.overlay.showStep(item.overlayText, item.overlayDescription);
+				await this.overlay.showStep(item.overlayText, item.overlayDescription, item.overlayPosition);
 
 				if (this.options.enableVoice && !item.skipVoice) {
 					const audioFilename = this.voice.getFilename(item.voiceText);

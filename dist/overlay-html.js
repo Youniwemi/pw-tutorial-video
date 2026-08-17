@@ -42,10 +42,19 @@ const CONTEXT_ICONS = {
     clarification: '\uD83D\uDCA1',
     attention: '\u26A0\uFE0F'
 };
+function positionClass(position, isRtl) {
+    const effective = isRtl
+        ? { TL: 'TR', TR: 'TL', BL: 'BR', BR: 'BL' }[position]
+        : position;
+    if (effective === 'TL')
+        return '';
+    return `tutorial-overlay-${effective.toLowerCase()}`;
+}
 export function renderStepOverlay(params) {
-    const { tutorialTitle, step, title, description, isRtl, progressPercent = 0 } = params;
+    const { tutorialTitle, step, title, description, isRtl, progressPercent = 0, position = 'TL' } = params;
     const rtlClass = isRtl ? 'tutorial-overlay-rtl' : '';
-    return `<div id="tutorial-overlay" class="tutorial-overlay ${rtlClass}">
+    const posClass = positionClass(position, !!isRtl);
+    return `<div id="tutorial-overlay" class="tutorial-overlay ${rtlClass} ${posClass}">
 	<div class="tutorial-header">
 		<span class="tutorial-icon">\uD83D\uDCCC</span>
 		<h3 class="tutorial-title">${tutorialTitle}</h3>
