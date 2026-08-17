@@ -6,6 +6,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 No `Co-Authored-By` trailer in commits.
 
+## Maintenance rule
+
+When adding or changing a feature, always update:
+1. This `CLAUDE.md` file (architecture, options, design decisions)
+2. Any relevant skill in `.claude/skills/` that documents the feature
+
 ## What this is
 
 `pw-tutorial-video` is a standalone npm package that turns Playwright E2E tests into narrated tutorial videos. Tests run normally in CI; with `TUTORIAL_MODE=true` they produce videos with TTS voice, animated cursor, step overlays, and ffmpeg post-processing.
@@ -15,6 +21,11 @@ No `Co-Authored-By` trailer in commits.
 ```bash
 npm run build      # tsc + copy styles.css → dist/
 npm test           # vitest run (unit tests)
+
+# E2E tests (requires Playwright browsers)
+npx playwright test                          # all e2e tests (non-tutorial mode)
+TUTORIAL_MODE=true TUTORIAL_VOICE=false \
+  npx playwright test e2e/overlay-position   # single e2e file with overlays
 ```
 
 ## Architecture
@@ -58,6 +69,7 @@ Three entry points: `pw-tutorial-video` (main), `pw-tutorial-video/reporter`, `p
 - **`backgroundMusic` defaults to empty string** for external consumers. Pass `backgroundMusic: ''` explicitly if you have no music asset.
 - **Voice playback errors are silent** (`audio.onerror = () => resolve()`) — a wrong `audioBaseUrl` produces no narration without any error.
 - All overlay HTML is built as string templates in `overlay-html.ts` and injected via `page.evaluate()`.
+- **Overlay position** is configurable via `overlayPosition: 'TL' | 'TR' | 'BL' | 'BR'` on `TutorialOptions` (default `'TL'`). Per-step override via `StepOptions.overlayPosition`. RTL mode (`lang: 'ar'`) mirrors positions automatically (TL↔TR, BL↔BR). CSS classes: `.tutorial-overlay-tr`, `.tutorial-overlay-bl`, `.tutorial-overlay-br` (TL is the base, no extra class).
 - **Split mode** (`data-split` on the stage): when multiple scenes are active, the shared tab bar hides and each scene pane gets its own label header + a visible separator. `focus()` accepts `{ ratio: [30, 70] }` for asymmetric splits. In single mode the regular tab bar shows all tabs.
 
 ## Environment variables
