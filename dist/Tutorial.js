@@ -77,7 +77,8 @@ export class Tutorial {
             musicVolume: options.musicVolume ?? TUTORIAL_MUSIC_VOLUME,
             voiceVolume: options.voiceVolume ?? TUTORIAL_VOICE_VOLUME,
             customStyles: options.customStyles ?? '',
-            playAudioInBrowser: options.playAudioInBrowser ?? true
+            playAudioInBrowser: options.playAudioInBrowser ?? true,
+            overlayPosition: options.overlayPosition ?? 'TL'
         };
         this.voice = new TutorialVoice(page, {
             lang: this.options.lang,
@@ -98,7 +99,8 @@ export class Tutorial {
         this.overlay = new TutorialOverlay(page, {
             title: this.options.title,
             lang: this.options.lang,
-            highlightDuration: this.options.highlightDuration
+            highlightDuration: this.options.highlightDuration,
+            position: this.options.overlayPosition ?? 'TL'
         });
         this.timeline = new TutorialTimeline(this.testName, this.options.testFile, this.options.projectName, this.options.lang, options.testTitle ?? '', options.feature ?? '', {
             musicFile: this.options.backgroundMusic?.startsWith('http')
@@ -332,7 +334,8 @@ export class Tutorial {
             delay: options?.delay,
             voicePreload,
             key,
-            scene: options?.scene
+            scene: options?.scene,
+            overlayPosition: options?.overlayPosition
         });
     }
     async highlight(selector, duration) {
@@ -550,7 +553,7 @@ export class Tutorial {
                 if (this.options.backgroundMusic && this.options.playAudioInBrowser) {
                     await this.music.ensurePlaying();
                 }
-                await this.overlay.showStep(item.overlayText, item.overlayDescription);
+                await this.overlay.showStep(item.overlayText, item.overlayDescription, item.overlayPosition);
                 if (this.options.enableVoice && !item.skipVoice) {
                     const audioFilename = this.voice.getFilename(item.voiceText);
                     const voiceStartTime = Date.now();

@@ -51,6 +51,8 @@ export interface TutorialOptions {
 	focus?: SceneFocus;
 	/** Scene switch animation */
 	sceneTransition?: { duration?: number };
+	/** Overlay position: TL (top-left, default), TR (top-right), BL (bottom-left), BR (bottom-right) */
+	overlayPosition?: OverlayPosition;
 }
 
 export interface SceneOptions {
@@ -87,7 +89,11 @@ export interface StepOptions {
 	/** Scene(s) this step plays on. The stage switches before the action runs,
 	 *  because a hidden scene cannot be interacted with. */
 	scene?: SceneFocus;
+	/** Override overlay position for this step */
+	overlayPosition?: OverlayPosition;
 }
+
+export type OverlayPosition = 'TL' | 'TR' | 'BL' | 'BR';
 
 export type ContextStyle = 'goal' | 'clarification' | 'attention';
 

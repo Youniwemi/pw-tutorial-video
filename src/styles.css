@@ -19,7 +19,7 @@
 	/* Sizing */
 	--tutorial-overlay-width: 320px;
 	--tutorial-overlay-top: 20px;
-	--tutorial-overlay-right: 20px;
+	--tutorial-overlay-offset: 20px;
 	--tutorial-border-radius: 12px;
 	--tutorial-padding: 20px;
 	--tutorial-z-index: 999999;
@@ -83,6 +83,17 @@
 	}
 }
 
+@keyframes tutorial-fade-in-bottom {
+	from {
+		opacity: 0;
+		transform: translateY(10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
 @keyframes cursor-click {
 	0%, 100% {
 		transform: translate(-50%, -50%) scale(1);
@@ -95,7 +106,7 @@
 .tutorial-overlay {
 	position: fixed;
 	top: var(--tutorial-overlay-top);
-	right: var(--tutorial-overlay-right);
+	left: var(--tutorial-overlay-offset);
 	width: var(--tutorial-overlay-width);
 	background: #fff;
 	backdrop-filter: blur(12px);
@@ -116,9 +127,31 @@
 }
 
 .tutorial-overlay-rtl {
-	right: auto;
-	left: var(--tutorial-overlay-right);
+	left: auto;
+	right: var(--tutorial-overlay-offset);
 	direction: rtl;
+}
+
+.tutorial-overlay-tr {
+	left: auto;
+	right: var(--tutorial-overlay-offset);
+}
+
+.tutorial-overlay-bl {
+	top: auto;
+	bottom: var(--tutorial-overlay-top);
+}
+
+.tutorial-overlay-br {
+	left: auto;
+	right: var(--tutorial-overlay-offset);
+	top: auto;
+	bottom: var(--tutorial-overlay-top);
+}
+
+.tutorial-overlay-bl,
+.tutorial-overlay-br {
+	animation: tutorial-fade-in-bottom var(--tutorial-animation-duration) ease-out;
 }
 
 .tutorial-overlay-context {

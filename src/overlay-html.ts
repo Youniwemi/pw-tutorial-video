@@ -1,4 +1,4 @@
-import type { ContextStyle, SceneOptions } from './types.js';
+import type { ContextStyle, OverlayPosition, SceneOptions } from './types.js';
 
 const escapeHtml = (s: string): string =>
 	s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
@@ -59,6 +59,14 @@ const CONTEXT_ICONS: Record<ContextStyle, string> = {
 	attention: '\u26A0\uFE0F'
 };
 
+function positionClass(position: OverlayPosition, isRtl: boolean): string {
+	const effective = isRtl
+		? ({ TL: 'TR', TR: 'TL', BL: 'BR', BR: 'BL' } as const)[position]
+		: position;
+	if (effective === 'TL') return '';
+	return `tutorial-overlay-${effective.toLowerCase()}`;
+}
+
 export interface StepOverlayParams {
 	tutorialTitle: string;
 	step: number;
@@ -66,13 +74,15 @@ export interface StepOverlayParams {
 	description?: string;
 	isRtl?: boolean;
 	progressPercent?: number;
+	position?: OverlayPosition;
 }
 
 export function renderStepOverlay(params: StepOverlayParams): string {
-	const { tutorialTitle, step, title, description, isRtl, progressPercent = 0 } = params;
+	const { tutorialTitle, step, title, description, isRtl, progressPercent = 0, position = 'TL' } = params;
 	const rtlClass = isRtl ? 'tutorial-overlay-rtl' : '';
+	const posClass = positionClass(position, !!isRtl);
 
-	return `<div id="tutorial-overlay" class="tutorial-overlay ${rtlClass}">
+	return `<div id="tutorial-overlay" class="tutorial-overlay ${rtlClass} ${posClass}">
 	<div class="tutorial-header">
 		<span class="tutorial-icon">\uD83D\uDCCC</span>
 		<h3 class="tutorial-title">${tutorialTitle}</h3>
