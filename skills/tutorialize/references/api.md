@@ -40,6 +40,7 @@ Or use a fixture that wraps this (the consuming project typically provides a `tu
 | `stepDelay` | `number` | `500` | Delay between steps (ms) |
 | `mouseSteps` | `number` | `25` | Cursor animation smoothness |
 | `customStyles` | `string` | built-in | CSS for overlay |
+| `overlayPosition` | `'TL' \| 'TR' \| 'BL' \| 'BR'` | `'TL'` | Overlay corner position |
 
 ## 2. Core Methods
 
@@ -101,6 +102,7 @@ tutorial.step('Tax Identifier', async () => {
 | `skipVoice` | `boolean` | Skip voice for this step |
 | `description` | `string` | Description below step title |
 | `delay` | `number` | Custom post-step delay (ms) |
+| `overlayPosition` | `'TL' \| 'TR' \| 'BL' \| 'BR'` | Override overlay position for this step |
 
 ### `await tutorial.complete(message?)`
 
@@ -366,7 +368,35 @@ otherwise the cut feels abrupt.
 `frame-ancestors` blocks the scene and leaves an empty pane. Relax it in tutorial
 mode only.
 
-## 11. Checklist
+## 11. Overlay Position
+
+The overlay defaults to **top-left** (`TL`). Set `overlayPosition` globally or per-step to move it.
+
+```typescript
+// Global — all steps in bottom-right
+const tutorial = new Tutorial(page, {
+  title: 'My Tutorial',
+  overlayPosition: 'BR',
+});
+
+// Per-step override — this step only
+tutorial.step('Look here', async () => { ... }, {
+  overlayPosition: 'TR',
+});
+```
+
+| Position | Placement |
+|---|---|
+| `TL` | Top-left (default) |
+| `TR` | Top-right |
+| `BL` | Bottom-left |
+| `BR` | Bottom-right |
+
+**RTL mirroring**: when `lang: 'ar'`, positions mirror automatically — `TL`↔`TR`, `BL`↔`BR`. No manual override needed.
+
+**When to move the overlay**: place it where it won't cover the action. If the step interacts with a top-left form, move the overlay to `BR`. If the action is bottom-right, keep `TL`.
+
+## 12. Checklist
 
 Before submitting a tutorialized test:
 
