@@ -10,7 +10,7 @@ No `Co-Authored-By` trailer in commits.
 
 When adding or changing a feature, always update:
 1. This `CLAUDE.md` file (architecture, options, design decisions)
-2. Any relevant skill in `.claude/skills/` that documents the feature
+2. The skill in `skills/tutorialize/` (especially `references/api.md` for API changes)
 
 ## What this is
 
