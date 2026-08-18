@@ -40,7 +40,7 @@ Or use a fixture that wraps this (the consuming project typically provides a `tu
 | `stepDelay` | `number` | `500` | Delay between steps (ms) |
 | `mouseSteps` | `number` | `25` | Cursor animation smoothness |
 | `customStyles` | `string` | built-in | CSS for overlay |
-| `overlayPosition` | `'TL' \| 'TR' \| 'BL' \| 'BR'` | `'TL'` | Overlay corner position |
+| `overlayPosition` | `'TL' \| 'TR' \| 'BL' \| 'BR'` | `'TR'` | Overlay corner position |
 
 ## 2. Core Methods
 
@@ -370,7 +370,7 @@ mode only.
 
 ## 11. Overlay Position
 
-The overlay defaults to **top-left** (`TL`). Set `overlayPosition` globally or per-step to move it.
+The overlay defaults to **top-right** (`TR`). Set `overlayPosition` globally or per-step to move it.
 
 ```typescript
 // Global — all steps in bottom-right
@@ -387,8 +387,8 @@ tutorial.step('Look here', async () => { ... }, {
 
 | Position | Placement |
 |---|---|
-| `TL` | Top-left (default) |
-| `TR` | Top-right |
+| `TL` | Top-left |
+| `TR` | Top-right (default) |
 | `BL` | Bottom-left |
 | `BR` | Bottom-right |
 

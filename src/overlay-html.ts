@@ -78,7 +78,7 @@ export interface StepOverlayParams {
 }
 
 export function renderStepOverlay(params: StepOverlayParams): string {
-	const { tutorialTitle, step, title, description, isRtl, progressPercent = 0, position = 'TL' } = params;
+	const { tutorialTitle, step, title, description, isRtl, progressPercent = 0, position = 'TR' } = params;
 	const rtlClass = isRtl ? 'tutorial-overlay-rtl' : '';
 	const posClass = positionClass(position, !!isRtl);
 

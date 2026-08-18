@@ -53,7 +53,7 @@ export interface TutorialOptions {
     sceneTransition?: {
         duration?: number;
     };
-    /** Overlay position: TL (top-left, default), TR (top-right), BL (bottom-left), BR (bottom-right) */
+    /** Overlay position: TL (top-left), TR (top-right, default), BL (bottom-left), BR (bottom-right) */
     overlayPosition?: OverlayPosition;
 }
 export interface SceneOptions {

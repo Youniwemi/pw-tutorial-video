@@ -78,7 +78,7 @@ export class Tutorial {
             voiceVolume: options.voiceVolume ?? TUTORIAL_VOICE_VOLUME,
             customStyles: options.customStyles ?? '',
             playAudioInBrowser: options.playAudioInBrowser ?? true,
-            overlayPosition: options.overlayPosition ?? 'TL'
+            overlayPosition: options.overlayPosition ?? 'TR'
         };
         this.voice = new TutorialVoice(page, {
             lang: this.options.lang,
@@ -100,7 +100,7 @@ export class Tutorial {
             title: this.options.title,
             lang: this.options.lang,
             highlightDuration: this.options.highlightDuration,
-            position: this.options.overlayPosition ?? 'TL'
+            position: this.options.overlayPosition ?? 'TR'
         });
         this.timeline = new TutorialTimeline(this.testName, this.options.testFile, this.options.projectName, this.options.lang, options.testTitle ?? '', options.feature ?? '', {
             musicFile: this.options.backgroundMusic?.startsWith('http')
