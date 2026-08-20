@@ -438,6 +438,8 @@ The `mobile` variant automatically:
 
 Any other variant name only suffixes outputs and stamps `data-tutorial-variant` (no preset). The reporter matches timelines by `testTitle` **and** variant (newest mtime wins), so both runs may share the same output dir.
 
+In tutorial mode `mobileStage()` records **oversampled 2× by default** (Playwright never upscales video, so 1× phone video is blurry): it forces `--force-device-scale-factor=2`, aligns `deviceScaleFactor` and doubles `video.size` — layout unchanged. Tune with `mobileStage(2, 'Pixel 7', { scale })`. Caveat: `test.use()` replaces the config's `launchOptions`; repeat any tutorial-mode Chromium args via `{ launchArgs: [...] }`.
+
 ## 13. Checklist
 
 Before submitting a tutorialized test:

@@ -285,14 +285,35 @@ describe('mobileStage helper', () => {
 		expect(use.video).toBeUndefined();
 	});
 
-	it('freezes the video size in tutorial mode and accepts an explicit viewport', async () => {
+	it('records oversampled 2x in tutorial mode and accepts an explicit viewport', async () => {
 		process.env.TUTORIAL_VARIANT = 'mobile';
 		process.env.TUTORIAL_MODE = 'true';
 		const { mobileStage } = await import('../src/stage-presets');
 
 		const use = mobileStage(3, { width: 390, height: 844 });
 		expect(use.viewport).toEqual({ width: 1170, height: 844 });
-		expect(use.video).toEqual({ mode: 'on', size: { width: 1170, height: 844 } });
+		expect(use.video).toEqual({ mode: 'on', size: { width: 2340, height: 1688 } });
+		expect(use.deviceScaleFactor).toBe(2);
+		expect(use.launchOptions).toEqual({ args: ['--force-device-scale-factor=2'] });
+	});
+
+	it('honors a custom scale and extra launch args', async () => {
+		process.env.TUTORIAL_VARIANT = 'mobile';
+		process.env.TUTORIAL_MODE = 'true';
+		const { mobileStage } = await import('../src/stage-presets');
+
+		const use = mobileStage(1, { width: 390, height: 844 }, { scale: 3, launchArgs: ['--foo'] });
+		expect(use.video).toEqual({ mode: 'on', size: { width: 1170, height: 2532 } });
+		expect(use.deviceScaleFactor).toBe(3);
+		expect(use.launchOptions).toEqual({ args: ['--force-device-scale-factor=3', '--foo'] });
+	});
+
+	it('does not touch dsf or launch options outside tutorial mode', async () => {
+		process.env.TUTORIAL_VARIANT = 'mobile';
+		const { mobileStage } = await import('../src/stage-presets');
+
+		const use = mobileStage(2, { width: 390, height: 844 });
+		expect(use).toEqual({ viewport: { width: 780, height: 844 } });
 	});
 
 	it('throws on an unknown device name', async () => {

@@ -331,6 +331,30 @@ variants are present.
 Note: `mobileStage()` must be passed to `test.use()` at the top of the spec —
 the video size is frozen when the browser context is created.
 
+### Sharp mobile video (oversampling)
+
+Playwright records video at *window* pixels and never upscales, so a
+phone-sized viewport would yield a blurry ~400px-wide video. In tutorial mode,
+`mobileStage()` therefore records **oversampled 2× by default**: it launches
+Chromium with `--force-device-scale-factor=2`, aligns `deviceScaleFactor`, and
+doubles the video size — the page layout (CSS viewport) is unchanged, a Pixel 7
+video comes out at 824×1678.
+
+```typescript
+test.use(mobileStage(2, 'Pixel 7', { scale: 3 })); // even sharper
+test.use(mobileStage(2, 'Pixel 7', { scale: 1 })); // old behavior, native CSS pixels
+```
+
+Caveat: `test.use()` replaces the config's `launchOptions` wholesale. If your
+playwright.config passes Chromium args for tutorial runs (e.g.
+`--autoplay-policy=no-user-gesture-required`), repeat them via `launchArgs`:
+
+```typescript
+test.use(mobileStage(2, 'Pixel 7', {
+  launchArgs: ['--autoplay-policy=no-user-gesture-required'],
+}));
+```
+
 ### Playwright Reporter
 
 Auto-merge audio into video after each tutorial test:
