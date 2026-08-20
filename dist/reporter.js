@@ -104,20 +104,32 @@ class TutorialMergeReporter {
     findTimelineByTitle(testTitle) {
         if (!existsSync(OUTPUT_DIR))
             return null;
+        // The same test recorded in several variants leaves one timeline per
+        // variant with the same testTitle: keep the one matching this run's
+        // TUTORIAL_VARIANT (older JSONs without the field count as no-variant),
+        // and break remaining ties by most recent mtime.
+        const runVariant = process.env.TUTORIAL_VARIANT || undefined;
+        const candidates = [];
         for (const entry of readdirSync(OUTPUT_DIR)) {
             if (!entry.endsWith('_timeline.json'))
                 continue;
             const path = join(OUTPUT_DIR, entry);
             try {
                 const data = JSON.parse(readFileSync(path, 'utf-8'));
-                if (data.testTitle === testTitle)
-                    return path;
+                if (data.testTitle !== testTitle)
+                    continue;
+                if ((data.variant || undefined) !== runVariant)
+                    continue;
+                candidates.push({ path, mtimeMs: statSync(path).mtimeMs });
             }
             catch {
                 // ignore malformed
             }
         }
-        return null;
+        if (candidates.length === 0)
+            return null;
+        candidates.sort((a, b) => b.mtimeMs - a.mtimeMs);
+        return candidates[0].path;
     }
 }
 export default TutorialMergeReporter;

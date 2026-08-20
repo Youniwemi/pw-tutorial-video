@@ -11,7 +11,11 @@ const escapeHtml = (s: string): string =>
  * to it. Tabs are always all visible: that is how a viewer knows who else is
  * in the story and who is speaking now.
  */
-export function renderStage(scenes: Record<string, SceneOptions>, active: string[]): string {
+export function renderStage(
+	scenes: Record<string, SceneOptions>,
+	active: string[],
+	pinnedSplit = false
+): string {
 	const isActive = (name: string) => active.includes(name);
 
 	const tabs = Object.entries(scenes)
@@ -35,9 +39,10 @@ export function renderStage(scenes: Record<string, SceneOptions>, active: string
 		)
 		.join('\n\t\t');
 
-	const isSplit = active.length > 1;
+	const isSplit = pinnedSplit || active.length > 1;
+	const layoutAttr = pinnedSplit ? ` data-layout="split"` : '';
 
-	return `<div class="tutorial-stage" id="tutorial-stage" data-split="${isSplit}">
+	return `<div class="tutorial-stage" id="tutorial-stage" data-split="${isSplit}"${layoutAttr}>
 	<div class="tutorial-tabbar">
 		${tabs}
 	</div>

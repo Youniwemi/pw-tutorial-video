@@ -40,6 +40,7 @@ export function generateManifest(tutorials, config) {
             premium: false,
             file: t.videoFile,
             feature: t.timeline.feature,
+            variant: t.timeline.variant,
             uploadDate: new Date().toISOString().slice(0, 10),
             steps: t.stepScreenshots.length
         };

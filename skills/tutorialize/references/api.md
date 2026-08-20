@@ -41,6 +41,7 @@ Or use a fixture that wraps this (the consuming project typically provides a `tu
 | `mouseSteps` | `number` | `25` | Cursor animation smoothness |
 | `customStyles` | `string` | built-in | CSS for overlay |
 | `overlayPosition` | `'TL' \| 'TR' \| 'BL' \| 'BR'` | `'TR'` | Overlay corner position |
+| `variant` | `string` | `env TUTORIAL_VARIANT` | Suffixes `testName` (`<testName>-<variant>`) so a second recording never overwrites the first. `'mobile'` also compacts the overlay and pins the multi-scene split (see below) |
 
 ## 2. Core Methods
 
@@ -412,7 +413,32 @@ tutorial.step('Look here', async () => { ... }, {
 
 **When to move the overlay**: place it where it won't cover the action. If the step interacts with a top-left form, move the overlay to `BR`. If the action is bottom-right, keep `TL`.
 
-## 12. Checklist
+## 12. Variants (mobile recording)
+
+Record a second, phone-sized version of the same tutorial without touching the spec: run with `TUTORIAL_VARIANT=mobile` (or pass `variant: 'mobile'`).
+
+```typescript
+import { Tutorial, mobileStage } from 'pw-tutorial-video';
+
+// Top of the spec: widens viewport + video to N phones side by side.
+// Inert unless TUTORIAL_VARIANT=mobile.
+test.use(mobileStage(2)); // device name ('Pixel 7' default) or explicit {width, height}
+```
+
+```bash
+TUTORIAL_MODE=true npx playwright test                          # <name>.webm
+TUTORIAL_MODE=true TUTORIAL_VARIANT=mobile npx playwright test  # <name>-mobile.webm
+```
+
+The `mobile` variant automatically:
+
+- suffixes every output (`-mobile`) — video, timeline, transcript, screenshots;
+- **pins the split** on multi-scene tutorials: all scenes always visible at equal width, tab bar hidden, per-scene labels shown (inactive dimmed), `focus()` ratios ignored;
+- **compacts the overlay** (smaller card and type, icon + step badge hidden). All of it is CSS variables scoped on `html[data-tutorial-variant='mobile']` remapping `--tutorial-*` to `--tutorial-*-mobile` values — tune from the consuming project with a plain `:root { --tutorial-overlay-width-mobile: 220px; }` override, or bring the icon back with `--tutorial-icon-display-mobile: inline-flex`.
+
+Any other variant name only suffixes outputs and stamps `data-tutorial-variant` (no preset). The reporter matches timelines by `testTitle` **and** variant (newest mtime wins), so both runs may share the same output dir.
+
+## 13. Checklist
 
 Before submitting a tutorialized test:
 

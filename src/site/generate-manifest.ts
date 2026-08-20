@@ -49,6 +49,7 @@ export function generateManifest(tutorials: ScannedTutorial[], config: SiteConfi
 			premium: false,
 			file: t.videoFile,
 			feature: t.timeline.feature,
+			variant: t.timeline.variant,
 			uploadDate: new Date().toISOString().slice(0, 10),
 			steps: t.stepScreenshots.length
 		};

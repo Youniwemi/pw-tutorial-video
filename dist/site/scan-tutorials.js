@@ -36,7 +36,9 @@ export function scanTutorials(inputDir) {
             videoTrimMs: 0,
             steps: [],
             videoPath: '',
-            mergeCommand: ''
+            mergeCommand: '',
+            // No timeline to read the variant from — recognize the common suffixes.
+            variant: baseName.match(/-(mobile|tablet)$/)?.[1]
         };
         results.push({
             timeline: syntheticTimeline,

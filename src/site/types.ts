@@ -23,6 +23,8 @@ export interface VideoManifestEntry {
 	/** Filename relative to videos/ */
 	file: string;
 	feature?: string;
+	/** Recording variant (e.g. 'mobile'); absent = regular/desktop */
+	variant?: string;
 	uploadDate: string;
 	dateModified?: string;
 	steps: number;

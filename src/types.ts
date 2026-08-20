@@ -53,6 +53,12 @@ export interface TutorialOptions {
 	sceneTransition?: { duration?: number };
 	/** Overlay position: TL (top-left), TR (top-right, default), BL (bottom-left), BR (bottom-right) */
 	overlayPosition?: OverlayPosition;
+	/** Variant suffix appended to testName — `<testName>-<variant>` — so a second
+	 *  recording of the same tutorial (video, timeline, transcript, screenshots)
+	 *  never overwrites the first. Defaults to process.env.TUTORIAL_VARIANT.
+	 *  The variant `'mobile'` also switches to a compact overlay and, with 2+
+	 *  scenes, a permanent split stage (all scenes visible, ratios ignored). */
+	variant?: string;
 }
 
 export interface SceneOptions {

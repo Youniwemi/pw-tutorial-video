@@ -7,7 +7,7 @@ const escapeHtml = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt
  * to it. Tabs are always all visible: that is how a viewer knows who else is
  * in the story and who is speaking now.
  */
-export function renderStage(scenes, active) {
+export function renderStage(scenes, active, pinnedSplit = false) {
     const isActive = (name) => active.includes(name);
     const tabs = Object.entries(scenes)
         .map(([name, scene]) => `<div class="tutorial-tab" data-tutorial-tab="${name}" data-active="${isActive(name)}">
@@ -22,8 +22,9 @@ export function renderStage(scenes, active) {
 			<iframe data-tutorial-frame="${name}" src="about:blank"></iframe>
 		</div>`)
         .join('\n\t\t');
-    const isSplit = active.length > 1;
-    return `<div class="tutorial-stage" id="tutorial-stage" data-split="${isSplit}">
+    const isSplit = pinnedSplit || active.length > 1;
+    const layoutAttr = pinnedSplit ? ` data-layout="split"` : '';
+    return `<div class="tutorial-stage" id="tutorial-stage" data-split="${isSplit}"${layoutAttr}>
 	<div class="tutorial-tabbar">
 		${tabs}
 	</div>

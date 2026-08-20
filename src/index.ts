@@ -6,6 +6,8 @@ export type { MergeOptions } from './merge.js';
 
 export { slugify } from './slugify.js';
 
+export { mobileStage } from './stage-presets.js';
+
 export { createTTSProvider, CommandTTSProvider, EdgeTTSProvider } from './tts-provider.js';
 export type { TTSProvider, TTSProviderOptions, TTSResult } from './tts-provider.js';
 

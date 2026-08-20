@@ -7,7 +7,7 @@ import type { ContextStyle, OverlayPosition, SceneOptions } from './types.js';
  * to it. Tabs are always all visible: that is how a viewer knows who else is
  * in the story and who is speaking now.
  */
-export declare function renderStage(scenes: Record<string, SceneOptions>, active: string[]): string;
+export declare function renderStage(scenes: Record<string, SceneOptions>, active: string[], pinnedSplit?: boolean): string;
 export declare const CURSOR_SVG = "\n<svg viewBox=\"0 0 24 24\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n\t<path d=\"M4 4L10.5 20.5L13 13L20.5 10.5L4 4Z\" fill=\"white\" stroke=\"var(--tutorial-cursor-stroke, #1e293b)\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n</svg>\n";
 export interface StepOverlayParams {
     tutorialTitle: string;

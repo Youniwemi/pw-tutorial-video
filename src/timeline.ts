@@ -36,6 +36,10 @@ export interface TimelineData {
 	mergeCommand: string;
 	/** Feature name sourced from @feature:* test tag */
 	feature?: string;
+	/** Recording variant (e.g. 'mobile') — testName already carries its suffix.
+	 *  Lets the reporter pick the right timeline when the same test was recorded
+	 *  in several variants, and the site filter videos by variant. */
+	variant?: string;
 }
 
 export interface TimelineMusicOptions {
@@ -55,6 +59,7 @@ export class TutorialTimeline {
 	private projectName: string;
 	private lang: string;
 	private feature: string = '';
+	private variant: string = '';
 	private musicOptions: TimelineMusicOptions;
 	private startTime: number = 0;
 	private videoTrimMs: number = 0;
@@ -69,8 +74,10 @@ export class TutorialTimeline {
 		testTitle: string = '',
 		feature: string = '',
 		musicOptions: TimelineMusicOptions = {},
-		title: string = ''
+		title: string = '',
+		variant: string = ''
 	) {
+		this.variant = variant;
 		this.testName = testName;
 		this.testTitle = testTitle;
 		this.title = title;
@@ -127,6 +134,7 @@ export class TutorialTimeline {
 			projectName: this.projectName,
 			lang: this.lang,
 			feature: this.feature || undefined,
+			variant: this.variant || undefined,
 			totalDurationMs: Date.now() - this.startTime,
 			videoTrimMs: this.videoTrimMs,
 			steps: this.steps,

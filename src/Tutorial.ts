@@ -77,9 +77,9 @@ const asList = (focus: SceneFocus): string[] => (Array.isArray(focus) ? focus : 
 
 export class Tutorial {
 	private page: Page;
-	// Scene options are kept in their own fields below, not in this bag.
+	// Scene and variant options are kept in their own fields below, not in this bag.
 	private options: Required<
-		Omit<TutorialOptions, 'testTitle' | 'feature' | 'translate' | 'scenes' | 'focus' | 'sceneTransition'>
+		Omit<TutorialOptions, 'testTitle' | 'feature' | 'translate' | 'scenes' | 'focus' | 'sceneTransition' | 'variant'>
 	> & { testTitle?: string; feature?: string };
 	private initialized = false;
 	private testName: string;
@@ -98,10 +98,16 @@ export class Tutorial {
 	private scenes: Record<string, SceneOptions>;
 	private activeScenes: string[] = [];
 	private sceneTransitionMs: number;
+	private variant?: string;
+	/** Mobile multi-scene: every scene stays on stage, focus() only marks the active one. */
+	private pinnedSplit = false;
 
 	constructor(page: Page, options: TutorialOptions) {
 		this.page = page;
-		this.testName = options.testName ?? `tutorial_${Date.now()}`;
+		// Env read here, not at module load, so tests can stub it per-instance.
+		this.variant = options.variant ?? (process.env.TUTORIAL_VARIANT || undefined);
+		const baseName = options.testName ?? `tutorial_${Date.now()}`;
+		this.testName = this.variant && options.testName ? `${baseName}-${this.variant}` : baseName;
 		this.translateFn = options.translate ?? ((k: string) => k);
 
 		const audioBaseUrl = options.audioBaseUrl ?? DEFAULT_AUDIO_BASE_URL;
@@ -172,7 +178,8 @@ export class Tutorial {
 				musicVolume: this.options.musicVolume,
 				voiceVolume: this.options.voiceVolume
 			},
-			this.options.title
+			this.options.title,
+			this.variant ?? ''
 		);
 
 		this.scenes = options.scenes ?? {};
@@ -182,6 +189,7 @@ export class Tutorial {
 			this.activeScenes = asList(options.focus ?? sceneNames[0]);
 			this.activeScenes.forEach((name) => this.requireScene(name));
 		}
+		this.pinnedSplit = this.variant === 'mobile' && sceneNames.length > 1;
 
 		this.videoStartTime = Date.now();
 	}
@@ -211,7 +219,7 @@ export class Tutorial {
 		}
 
 		await this.page.goto(this.options.audioBaseUrl);
-		await this.page.setContent(renderStage(this.scenes, this.activeScenes));
+		await this.page.setContent(renderStage(this.scenes, this.activeScenes, this.pinnedSplit));
 		await this.ensureStyles();
 		await this.initialize();
 	}
@@ -252,9 +260,9 @@ export class Tutorial {
 
 		const ratios = options?.ratio ?? names.map(() => 1);
 
-		await this.page.evaluate(({ active, ratios }) => {
+		await this.page.evaluate(({ active, ratios, pinned }) => {
 			const stage = document.getElementById('tutorial-stage');
-			if (stage) stage.setAttribute('data-split', String(active.length > 1));
+			if (stage) stage.setAttribute('data-split', String(pinned || active.length > 1));
 			document.querySelectorAll('[data-tutorial-tab]').forEach((el) => {
 				const name = el.getAttribute('data-tutorial-tab')!;
 				el.setAttribute('data-active', String(active.includes(name)));
@@ -264,9 +272,10 @@ export class Tutorial {
 				const idx = active.indexOf(name);
 				const isActive = idx !== -1;
 				el.setAttribute('data-active', String(isActive));
-				(el as HTMLElement).style.flex = isActive ? `${ratios[idx]} 1 0` : '';
+				// Pinned split (mobile): every phone keeps its equal width — no inline flex.
+				if (!pinned) (el as HTMLElement).style.flex = isActive ? `${ratios[idx]} 1 0` : '';
 			});
-		}, { active: names, ratios });
+		}, { active: names, ratios, pinned: this.pinnedSplit });
 
 		this.activeScenes = names;
 		await this.page.waitForTimeout(TUTORIAL_MODE ? this.sceneTransitionMs : 0);
@@ -356,13 +365,16 @@ export class Tutorial {
 	private async ensureStyles(): Promise<void> {
 		const styles = this.options.customStyles || DEFAULT_STYLES;
 
-		await this.page.evaluate((css) => {
+		await this.page.evaluate(({ css, variant }) => {
+			// The attribute scopes variant CSS (e.g. the compact mobile overlay) and
+			// survives overlay re-injections, which only replace #tutorial-overlay.
+			if (variant) document.documentElement.setAttribute('data-tutorial-variant', variant);
 			if (document.getElementById('tutorial-styles')) return;
 			const style = document.createElement('style');
 			style.id = 'tutorial-styles';
 			style.textContent = css;
 			document.head.appendChild(style);
-		}, styles);
+		}, { css: styles, variant: this.variant ?? '' });
 	}
 
 	context(key: string, options?: ContextOptions): void {
