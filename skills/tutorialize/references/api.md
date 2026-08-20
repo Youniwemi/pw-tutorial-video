@@ -284,12 +284,28 @@ tutorials/
 ├── output/
 │   └── {name}_timeline.json      # Timing + ffmpeg command
 ├── transcripts/
-│   └── {name}.md                 # Auto-generated transcript
+│   └── {name}.md                 # Auto-generated transcript (editable — see below)
 └── videos/
     ├── {name}.webm               # Merged video + audio
     ├── {name}-poster.webp        # Poster image (step 1)
     └── {name}-step-{n}.webp      # Per-step screenshots
 ```
+
+### Reviewing & correcting narration
+
+The transcript is the review surface: edit the narration texts in
+`tutorials/transcripts/{name}.md`, then run `npx tutorial-transcript apply` —
+it locates each original text in the test source (via the timeline JSON) and
+rewrites the string literals in place. Entries are paired by the `**key:**`
+lines in order (a key used twice corrects each occurrence in turn;
+`**[Complete]**` is the completion message). Two-part narrations
+(`do` + `explain`, title + description) are split at the first sentence
+boundary and both halves replaced. Texts sourced from an i18n catalog, or a
+first sentence that is the verbatim step key, are never rewritten — they are
+reported with their key for a manual fix in the translations. Re-run with
+`TUTORIAL_MODE=true` afterwards: only changed TTS clips are regenerated
+(content-hash caching). `npx tutorial-transcript` (no subcommand) just
+regenerates the transcripts from the timeline JSON.
 
 ## 10. Multiple user profiles (scenes)
 

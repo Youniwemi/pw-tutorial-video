@@ -407,6 +407,42 @@ tutorials/
     └── {test-name}-step-{n}.webp    # Step screenshots
 ```
 
+## Reviewing & Correcting Narration
+
+Every tutorial run auto-generates a markdown transcript in
+`tutorials/transcripts/{test-name}.md`. To rework the narration, edit the
+transcript and write the corrections back into your test source:
+
+```bash
+# 1. (Optional) regenerate transcripts from the timeline JSON files
+npx tutorial-transcript
+
+# 2. Edit tutorials/transcripts/{test-name}.md — fix the narration texts
+
+# 3. Apply: rewrites the corrected texts in your test file
+npx tutorial-transcript apply
+
+# 4. Re-run: only the changed TTS clips are regenerated (content-hash caching)
+TUTORIAL_MODE=true npx playwright test
+```
+
+`apply` pairs each transcript entry with its timeline step (by the `**key:**`
+lines, in order — a key used twice corrects each occurrence in turn; the
+`**[Complete]**` entry is the completion message), then locates the original
+text in the test file (`testFile` from the timeline) as a quoted string
+literal and replaces it. A narration composed of two fields
+(`do` + `explain`, or title + `description`/`text`) is handled by splitting
+old and new text at the first sentence boundary and replacing both halves.
+
+What `apply` **won't** touch: texts that come from an i18n catalog (the
+literal isn't in the test file) and step keys rendered verbatim as titles —
+those are reported with their key so you can fix the translation instead.
+The timeline JSON is updated on success, so re-running `apply` is a no-op.
+
+`npx tutorial-transcript apply [file.md ...]` limits the run to specific
+transcripts; without arguments it processes every `.md` in the transcript
+directory (`TUTORIAL_TRANSCRIPT_DIR`, default `tutorials/transcripts`).
+
 ## Claude Code Integration
 
 This package ships **two assets for Claude Code** that teach AI agents how to convert your Playwright tests into professional tutorials:
