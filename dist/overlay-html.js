@@ -51,7 +51,7 @@ function positionClass(position, isRtl) {
     return `tutorial-overlay-${effective.toLowerCase()}`;
 }
 export function renderStepOverlay(params) {
-    const { tutorialTitle, step, title, description, isRtl, progressPercent = 0, position = 'TL' } = params;
+    const { tutorialTitle, step, title, description, isRtl, progressPercent = 0, position = 'TR' } = params;
     const rtlClass = isRtl ? 'tutorial-overlay-rtl' : '';
     const posClass = positionClass(position, !!isRtl);
     return `<div id="tutorial-overlay" class="tutorial-overlay ${rtlClass} ${posClass}">

@@ -69,7 +69,7 @@ Three entry points: `pw-tutorial-video` (main), `pw-tutorial-video/reporter`, `p
 - **`backgroundMusic` defaults to empty string** for external consumers. Pass `backgroundMusic: ''` explicitly if you have no music asset.
 - **Voice playback errors are silent** (`audio.onerror = () => resolve()`) — a wrong `audioBaseUrl` produces no narration without any error.
 - All overlay HTML is built as string templates in `overlay-html.ts` and injected via `page.evaluate()`.
-- **Overlay position** is configurable via `overlayPosition: 'TL' | 'TR' | 'BL' | 'BR'` on `TutorialOptions` (default `'TL'`). Per-step override via `StepOptions.overlayPosition`. RTL mode (`lang: 'ar'`) mirrors positions automatically (TL↔TR, BL↔BR). CSS classes: `.tutorial-overlay-tr`, `.tutorial-overlay-bl`, `.tutorial-overlay-br` (TL is the base, no extra class).
+- **Overlay position** is configurable via `overlayPosition: 'TL' | 'TR' | 'BL' | 'BR'` on `TutorialOptions` (default `'TR'`). Per-step override via `StepOptions.overlayPosition`. RTL mode (`lang: 'ar'`) mirrors positions automatically (TL↔TR, BL↔BR). CSS classes: `.tutorial-overlay-tr`, `.tutorial-overlay-bl`, `.tutorial-overlay-br` (TL is the base, no extra class).
 - **Split mode** (`data-split` on the stage): when multiple scenes are active, the shared tab bar hides and each scene pane gets its own label header + a visible separator. `focus()` accepts `{ ratio: [30, 70] }` for asymmetric splits. In single mode the regular tab bar shows all tabs.
 
 ## Environment variables

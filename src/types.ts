@@ -51,7 +51,7 @@ export interface TutorialOptions {
 	focus?: SceneFocus;
 	/** Scene switch animation */
 	sceneTransition?: { duration?: number };
-	/** Overlay position: TL (top-left, default), TR (top-right), BL (bottom-left), BR (bottom-right) */
+	/** Overlay position: TL (top-left), TR (top-right, default), BL (bottom-left), BR (bottom-right) */
 	overlayPosition?: OverlayPosition;
 }
 
