@@ -7,4 +7,5 @@ export { TutorialMusic } from './music.js';
 export { TutorialCursor } from './cursor.js';
 export { TutorialOverlay } from './overlay.js';
 export { TutorialTimeline } from './timeline.js';
+export { buildTranscriptMarkdown, parseTranscript, applyCorrections, TranscriptCorrections } from './transcript.js';
 //# sourceMappingURL=index.js.map

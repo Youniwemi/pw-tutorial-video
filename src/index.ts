@@ -14,3 +14,6 @@ export { TutorialMusic } from './music.js';
 export { TutorialCursor } from './cursor.js';
 export { TutorialOverlay } from './overlay.js';
 export { TutorialTimeline } from './timeline.js';
+
+export { buildTranscriptMarkdown, parseTranscript, applyCorrections, TranscriptCorrections } from './transcript.js';
+export type { TranscriptEntry, ApplyReport, ApplyChange, ApplyProblem, ApplyIO } from './transcript.js';

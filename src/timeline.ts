@@ -1,6 +1,7 @@
 import { writeFileSync, mkdirSync, existsSync } from 'fs';
 import { join } from 'path';
 import { buildMergeCommand } from './merge.js';
+import { buildTranscriptMarkdown } from './transcript.js';
 
 export interface TimelineStep {
 	step: number;
@@ -153,39 +154,8 @@ export class TutorialTimeline {
 		const transcriptDir = join(process.cwd(), 'tutorials/transcripts');
 		if (!existsSync(transcriptDir)) mkdirSync(transcriptDir, { recursive: true });
 
-		const lines: string[] = [];
-		lines.push(`# ${data.testName}`);
-		lines.push('');
-		lines.push(`- **Test:** \`${data.testTitle}\``);
-		lines.push(`- **Language:** ${data.lang}`);
-		lines.push(`- **Duration:** ${(data.totalDurationMs / 1000).toFixed(1)}s`);
-		lines.push('');
-		lines.push('---');
-		lines.push('');
-
-		let stepNum = 0;
-		for (const step of data.steps) {
-			if (!step.text) continue;
-
-			if (step.step === 0 && step.title === 'Context') {
-				lines.push(`**[Context]** ${step.text}`);
-				if (step.key) lines.push(`**key:** \`${step.key}\``);
-				lines.push('');
-			} else if (step.title === 'Complete') {
-				lines.push(`**[Complete]** ${step.text}`);
-				lines.push('');
-			} else {
-				stepNum++;
-				lines.push(`### Step ${stepNum}: ${step.title}`);
-				if (step.key) lines.push(`**key:** \`${step.key}\``);
-				lines.push('');
-				lines.push(step.text);
-				lines.push('');
-			}
-		}
-
 		const transcriptPath = join(transcriptDir, `${data.testName}.md`);
-		writeFileSync(transcriptPath, lines.join('\n'), 'utf-8');
+		writeFileSync(transcriptPath, buildTranscriptMarkdown(data), 'utf-8');
 		console.log(`[Timeline] Transcript: tutorials/transcripts/${data.testName}.md`);
 	}
 }
