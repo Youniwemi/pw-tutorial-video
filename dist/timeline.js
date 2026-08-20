@@ -13,12 +13,14 @@ export class TutorialTimeline {
     projectName;
     lang;
     feature = '';
+    variant = '';
     musicOptions;
     startTime = 0;
     videoTrimMs = 0;
     steps = [];
     videoPath = '';
-    constructor(testName, testFile = '', projectName = '', lang = 'fr', testTitle = '', feature = '', musicOptions = {}, title = '') {
+    constructor(testName, testFile = '', projectName = '', lang = 'fr', testTitle = '', feature = '', musicOptions = {}, title = '', variant = '') {
+        this.variant = variant;
         this.testName = testName;
         this.testTitle = testTitle;
         this.title = title;
@@ -71,6 +73,7 @@ export class TutorialTimeline {
             projectName: this.projectName,
             lang: this.lang,
             feature: this.feature || undefined,
+            variant: this.variant || undefined,
             totalDurationMs: Date.now() - this.startTime,
             videoTrimMs: this.videoTrimMs,
             steps: this.steps,

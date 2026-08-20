@@ -6,12 +6,14 @@ interface Props {
 	videoUrl: string;
 	steps?: string[];
 	href?: string;
+	/** Recording variant (e.g. 'mobile'); absent = regular/desktop */
+	variant?: string;
 }
 
-const { id, title, duration, videoUrl, steps = [], href } = Astro.props;
+const { id, title, duration, videoUrl, steps = [], href, variant } = Astro.props;
 ---
 
-<div class="video-card" data-video-url={videoUrl} data-video-id={id}>
+<div class="video-card" data-video-url={videoUrl} data-video-id={id} data-variant={variant ?? ''}>
 	<div class="video-thumbnail">
 		{steps.length > 0 ? (
 			<div class="step-carousel">
@@ -44,6 +46,7 @@ const { id, title, duration, videoUrl, steps = [], href } = Astro.props;
 		<div class="video-title">{title}</div>
 		<div class="video-meta">
 			<span class="video-duration">&#x1F550; {duration}</span>
+			{variant && <span class="video-variant">{variant === 'mobile' ? '📱 ' : ''}{variant}</span>}
 			{href && (
 				<a href={href} class="card-page-link" onclick="event.stopPropagation()">→</a>
 			)}
@@ -52,6 +55,15 @@ const { id, title, duration, videoUrl, steps = [], href } = Astro.props;
 </div>
 
 <style>
+	.video-variant {
+		font-size: 0.75rem;
+		color: var(--color-text-muted, #666);
+		border: 1px solid var(--color-border, #ddd);
+		border-radius: 999px;
+		padding: 0.1rem 0.5rem;
+		text-transform: capitalize;
+	}
+
 	.card-page-link {
 		margin-left: auto;
 		font-size: 0.9rem;

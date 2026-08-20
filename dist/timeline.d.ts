@@ -30,6 +30,10 @@ export interface TimelineData {
     mergeCommand: string;
     /** Feature name sourced from @feature:* test tag */
     feature?: string;
+    /** Recording variant (e.g. 'mobile') — testName already carries its suffix.
+     *  Lets the reporter pick the right timeline when the same test was recorded
+     *  in several variants, and the site filter videos by variant. */
+    variant?: string;
 }
 export interface TimelineMusicOptions {
     musicFile?: string;
@@ -47,12 +51,13 @@ export declare class TutorialTimeline {
     private projectName;
     private lang;
     private feature;
+    private variant;
     private musicOptions;
     private startTime;
     private videoTrimMs;
     private steps;
     private videoPath;
-    constructor(testName: string, testFile?: string, projectName?: string, lang?: string, testTitle?: string, feature?: string, musicOptions?: TimelineMusicOptions, title?: string);
+    constructor(testName: string, testFile?: string, projectName?: string, lang?: string, testTitle?: string, feature?: string, musicOptions?: TimelineMusicOptions, title?: string, variant?: string);
     /**
      * Mark the start of the tutorial (second 0 for video)
      */

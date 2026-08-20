@@ -18,6 +18,9 @@ export declare class Tutorial {
     private scenes;
     private activeScenes;
     private sceneTransitionMs;
+    private variant?;
+    /** Mobile multi-scene: every scene stays on stage, focus() only marks the active one. */
+    private pinnedSplit;
     constructor(page: Page, options: TutorialOptions);
     private requireScene;
     /**

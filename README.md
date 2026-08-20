@@ -282,6 +282,55 @@ await tutorial.complete();
   stage, so narration audio loads same-origin. Point `audioBaseUrl` at the app
   serving `static/audio/tutorial-voice/`.
 
+## Variants — record the same tutorial for mobile
+
+Set `TUTORIAL_VARIANT=mobile` (or pass `variant: 'mobile'`) to record a second,
+phone-sized version of a tutorial without touching the spec:
+
+```typescript
+import { Tutorial, mobileStage } from 'pw-tutorial-video';
+
+// Widens the viewport (and video) to N phones side by side.
+// Inert unless TUTORIAL_VARIANT=mobile — the same spec records both versions.
+test.use(mobileStage(2)); // default device 'Pixel 7'; or mobileStage(2, 'iPhone 14'), or an explicit {width, height}
+
+const tutorial = new Tutorial(page, { /* options unchanged */ });
+```
+
+```bash
+TUTORIAL_MODE=true npx playwright test                          # → tutorials/videos/<name>.webm
+TUTORIAL_MODE=true TUTORIAL_VARIANT=mobile npx playwright test  # → tutorials/videos/<name>-mobile.webm
+```
+
+What the `mobile` variant does automatically:
+
+- **Suffixes every output** with `-mobile` (video, timeline, transcript,
+  screenshots, poster) so the desktop version is never overwritten.
+- **Pins the split** on multi-scene tutorials: every phone stays visible at
+  equal width for the whole video, the tab bar never shows, per-scene labels
+  take over (the inactive one is dimmed), and `focus()` ratios are ignored —
+  on phone-width panes an asymmetric split has no room to work.
+- **Compacts the overlay**: smaller card, smaller type, icon and step badge
+  hidden. It is all CSS variables scoped under `html[data-tutorial-variant='mobile']`
+  remapping to `--tutorial-*-mobile` values, so tuning it is a plain `:root`
+  override from your own styles (see [Styling](#styling)):
+
+```css
+:root {
+  --tutorial-overlay-width-mobile: 220px;
+  --tutorial-icon-display-mobile: inline-flex; /* bring the icon back */
+}
+```
+
+Any other variant name (`TUTORIAL_VARIANT=tablet`) only suffixes the outputs
+and stamps `data-tutorial-variant` — no preset. The reporter matches each run
+to the timeline of the same variant, so both runs can share
+`TUTORIAL_OUTPUT_DIR`, and the gallery site gains a Desktop/Mobile filter when
+variants are present.
+
+Note: `mobileStage()` must be passed to `test.use()` at the top of the spec —
+the video size is frozen when the browser context is created.
+
 ### Playwright Reporter
 
 Auto-merge audio into video after each tutorial test:
@@ -333,6 +382,7 @@ TUTORIAL_TTS_CMD='my-tts --voice premium -l {lang} {text} -o {output}'
 | Variable | Default | Description |
 |---|---|---|
 | `TUTORIAL_MODE` | `false` | Enable tutorial video generation |
+| `TUTORIAL_VARIANT` | none | Recording variant — suffixes outputs; `mobile` also compacts the overlay and pins the split |
 | `TUTORIAL_VOICE` | `true` | Enable/disable voice narration |
 | `TUTORIAL_VOICE_NAME` | auto | TTS voice name override |
 | `TUTORIAL_TTS_CMD` | `say` (macOS) | Custom TTS command |

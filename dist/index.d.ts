@@ -3,6 +3,7 @@ export type { TutorialOptions, StepOptions, ContextOptions, ContextStyle, Overla
 export { buildMergeCommand } from './merge.js';
 export type { MergeOptions } from './merge.js';
 export { slugify } from './slugify.js';
+export { mobileStage } from './stage-presets.js';
 export { createTTSProvider, CommandTTSProvider, EdgeTTSProvider } from './tts-provider.js';
 export type { TTSProvider, TTSProviderOptions, TTSResult } from './tts-provider.js';
 export { TutorialVoice } from './voice.js';

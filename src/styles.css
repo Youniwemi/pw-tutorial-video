@@ -24,6 +24,14 @@
 	--tutorial-padding: 20px;
 	--tutorial-z-index: 999999;
 
+	/* Overlay surface — override --tutorial-overlay-bg with an rgba() for transparency */
+	--tutorial-overlay-bg: #fff;
+	--tutorial-overlay-blur: 12px;
+	--tutorial-overlay-shadow: 0 25px 50px -12px var(--tutorial-shadow), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+	--tutorial-icon-size: 24px;
+	--tutorial-context-max-width: 500px;
+	--tutorial-scene-inactive-opacity: 0.55;
+
 	/* Animation */
 	--tutorial-animation-duration: 0.3s;
 	--tutorial-pulse-duration: 1.5s;
@@ -50,6 +58,62 @@
 	--tutorial-step-title-size: 18px;
 	--tutorial-description-size: 14px;
 	--tutorial-badge-size: 12px;
+
+	/* Mobile variant values — the html[data-tutorial-variant='mobile'] block below
+	   only remaps the base variables to these, so tuning the mobile look from a
+	   consuming project is a plain `:root { ... }` override. */
+	--tutorial-overlay-width-mobile: min(250px, calc(100vw - 2 * var(--tutorial-overlay-offset)));
+	--tutorial-overlay-top-mobile: 12px;
+	--tutorial-overlay-offset-mobile: 12px;
+	--tutorial-padding-mobile: 12px;
+	--tutorial-title-size-mobile: 12px;
+	--tutorial-step-title-size-mobile: 14px;
+	--tutorial-description-size-mobile: 12px;
+	--tutorial-badge-size-mobile: 10px;
+	--tutorial-icon-size-mobile: 16px;
+	--tutorial-overlay-blur-mobile: 6px;
+	--tutorial-overlay-shadow-mobile: 0 10px 25px -8px var(--tutorial-shadow);
+	--tutorial-context-max-width-mobile: min(420px, 85vw);
+	/* Lightened content: icon and step badge hidden — bring them back with
+	   `:root { --tutorial-icon-display-mobile: inline-flex; }` */
+	--tutorial-icon-display-mobile: none;
+	--tutorial-badge-display-mobile: none;
+}
+
+/* ── Mobile variant (data-tutorial-variant set by the Tutorial class) ──────
+   Compact overlay for phone-sized panes: pure variable remaps + two display
+   toggles, nothing structural. */
+html[data-tutorial-variant='mobile'] {
+	--tutorial-overlay-width: var(--tutorial-overlay-width-mobile);
+	--tutorial-overlay-top: var(--tutorial-overlay-top-mobile);
+	--tutorial-overlay-offset: var(--tutorial-overlay-offset-mobile);
+	--tutorial-padding: var(--tutorial-padding-mobile);
+	--tutorial-title-size: var(--tutorial-title-size-mobile);
+	--tutorial-step-title-size: var(--tutorial-step-title-size-mobile);
+	--tutorial-description-size: var(--tutorial-description-size-mobile);
+	--tutorial-badge-size: var(--tutorial-badge-size-mobile);
+	--tutorial-icon-size: var(--tutorial-icon-size-mobile);
+	--tutorial-overlay-blur: var(--tutorial-overlay-blur-mobile);
+	--tutorial-overlay-shadow: var(--tutorial-overlay-shadow-mobile);
+	--tutorial-context-max-width: var(--tutorial-context-max-width-mobile);
+}
+
+html[data-tutorial-variant='mobile'] .tutorial-icon {
+	display: var(--tutorial-icon-display-mobile);
+}
+
+html[data-tutorial-variant='mobile'] .tutorial-step-badge {
+	display: var(--tutorial-badge-display-mobile);
+}
+
+html[data-tutorial-variant='mobile'] .tutorial-header {
+	margin-bottom: 8px;
+	padding-bottom: 6px;
+}
+
+html[data-tutorial-variant='mobile'] .tutorial-progress {
+	margin-top: 8px;
+	height: 3px;
 }
 
 @keyframes tutorial-pulse {
@@ -108,16 +172,16 @@
 	top: var(--tutorial-overlay-top);
 	left: var(--tutorial-overlay-offset);
 	width: var(--tutorial-overlay-width);
-	background: #fff;
-	backdrop-filter: blur(12px);
-	-webkit-backdrop-filter: blur(12px);
+	background: var(--tutorial-overlay-bg);
+	backdrop-filter: blur(var(--tutorial-overlay-blur));
+	-webkit-backdrop-filter: blur(var(--tutorial-overlay-blur));
 	border: 1px solid rgba(255, 255, 255, 0.1);
 	border-radius: var(--tutorial-border-radius);
 	padding: var(--tutorial-padding);
 	z-index: var(--tutorial-z-index);
 	font-family: var(--tutorial-font-family);
 	color: var(--tutorial-text);
-	box-shadow: 0 25px 50px -12px var(--tutorial-shadow), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+	box-shadow: var(--tutorial-overlay-shadow);
 	animation: tutorial-fade-in var(--tutorial-animation-duration) ease-out;
 	/* Never swallow clicks on app elements behind the overlay — the tutorial
 	 * is read-only and narrating, not interactive. Without this, fixed-position
@@ -162,10 +226,10 @@
 	transform: translate(-50%, -50%);
 	width: auto;
 	min-width: var(--tutorial-overlay-width);
-	max-width: 500px;
+	max-width: var(--tutorial-context-max-width);
 	text-align: center;
 	padding: calc(var(--tutorial-padding) * 1.5);
-	background: #ffffff;
+	background: var(--tutorial-overlay-bg);
 	border: 1px solid var(--tutorial-border);
 	box-shadow: 0 25px 80px -12px var(--tutorial-shadow), 0 0 40px var(--tutorial-primary-lighter);
 	animation: tutorial-fade-in-center var(--tutorial-animation-duration) ease-out;
@@ -232,7 +296,7 @@
 }
 
 .tutorial-icon {
-	font-size: 24px;
+	font-size: var(--tutorial-icon-size);
 }
 
 .tutorial-title {
@@ -542,4 +606,32 @@
 	height: 100%;
 	border: 0;
 	background: var(--tutorial-scene-bg);
+}
+
+/* ── Pinned split (mobile multi-scene) ──────────────────────
+   Every scene stays visible at equal width for the whole tutorial: the tab
+   bar never shows, per-scene labels take over, and focus() only dims the
+   inactive labels. Set via data-layout="split" by the Tutorial class. */
+
+.tutorial-stage[data-layout='split'] .tutorial-tabbar {
+	display: none;
+}
+
+.tutorial-stage[data-layout='split'] .tutorial-scenes {
+	gap: var(--tutorial-stage-gap);
+	background: var(--tutorial-stage-bg);
+}
+
+.tutorial-stage[data-layout='split'] .tutorial-scene,
+.tutorial-stage[data-layout='split'] .tutorial-scene[data-active='false'] {
+	display: flex;
+	flex: 1 1 0;
+}
+
+.tutorial-stage[data-layout='split'] .tutorial-scene-label {
+	display: flex;
+}
+
+.tutorial-stage[data-layout='split'] .tutorial-scene[data-active='false'] .tutorial-scene-label {
+	opacity: var(--tutorial-scene-inactive-opacity);
 }
