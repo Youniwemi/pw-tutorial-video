@@ -401,6 +401,27 @@ Set `TUTORIAL_TTS_CMD` with placeholders:
 TUTORIAL_TTS_CMD='my-tts --voice premium -l {lang} {text} -o {output}'
 ```
 
+### Pre-rendering the voice cache
+
+TTS synthesis is the slow part of a tutorial run, and clips are cached by
+`md5(lang:text)` — the hash covers the **text only**, so a voice or
+`TUTORIAL_TTS_CMD` change never invalidates old clips. `regen-voices` generates
+the clips outside of any test run:
+
+```bash
+npx pw-tutorial-video regen-voices                    # synthesize the missing clips
+npx pw-tutorial-video regen-voices --workers=4        # parallel TTS (default 2)
+npx pw-tutorial-video regen-voices --force            # after a voice change: redo everything
+npx pw-tutorial-video regen-voices --lang=fr          # one language only
+rm -rf static/audio/tutorial-voice && npx pw-tutorial-video regen-voices   # full rebuild
+```
+
+Narration texts are collected from the artifacts that record them verbatim:
+the transcripts (`tutorials/transcripts/*.md`) and the timelines
+(`tutorials/output/*_timeline.json`). The project `.env` is loaded for the
+`TUTORIAL_*` settings. Videos are not remixed — the next `TUTORIAL_MODE=true`
+run picks the clips up from cache.
+
 ## Environment Variables
 
 | Variable | Default | Description |

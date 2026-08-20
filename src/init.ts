@@ -35,12 +35,16 @@ function usage() {
 Usage: pw-tutorial-video <command> [options]
 
 Commands:
-  init         Install /tutorialize skill and tutorial-crafter agent into .claude/
-  build-site   Generate a static tutorial video gallery site
+  init          Install /tutorialize skill and tutorial-crafter agent into .claude/
+  build-site    Generate a static tutorial video gallery site
+  regen-voices  Pre-render the narration voice clips without running any test
 
 Options:
   -y, --yes              Answer yes to everything (for scripted updates)
   --config=<path>        Path to tutorial-site.config.js (build-site only)
+  --lang=<lang>          regen-voices: only this language
+  --workers=<n>          regen-voices: parallel TTS syntheses (default 2)
+  --force                regen-voices: re-synthesize cached clips too (voice change)
 `);
 }
 
@@ -150,6 +154,37 @@ if (!command || command === 'init') {
 	const configPath = configFlag ? configFlag.split('=')[1] : undefined;
 	import('./site/build-site.js')
 		.then(({ buildSite }) => buildSite(configPath))
+		.catch((err) => {
+			console.error(err);
+			process.exit(1);
+		});
+} else if (command === 'regen-voices') {
+	// The TTS settings usually live in the project's .env (TUTORIAL_TTS_CMD…).
+	try {
+		process.loadEnvFile?.(join(process.cwd(), '.env'));
+	} catch {
+		// no .env — environment variables alone drive the TTS
+	}
+	const flag = (name: string) => process.argv.find((a) => a.startsWith(`--${name}=`))?.split('=')[1];
+	const audioDir = join(process.cwd(), 'static', 'audio', 'tutorial-voice');
+	import('./voice-prerender.js')
+		.then(({ regenVoices }) =>
+			regenVoices(audioDir, {
+				lang: flag('lang'),
+				workers: flag('workers') ? parseInt(flag('workers')!, 10) : undefined,
+				force: process.argv.includes('--force')
+			})
+		)
+		.then(({ total, done, failed }) => {
+			if (total === 0) {
+				console.log(
+					'No narration texts found — sources: tutorials/transcripts/ and tutorials/output/.'
+				);
+			} else {
+				console.log(`\n${done} voice clip(s) synthesized${failed ? `, ${failed} failed` : ''}.`);
+			}
+			if (failed) process.exit(1);
+		})
 		.catch((err) => {
 			console.error(err);
 			process.exit(1);
