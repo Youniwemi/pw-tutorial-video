@@ -4,6 +4,8 @@
 
 Write your tests once, get polished how-to videos with voice narration, animated cursor, step overlays, background music, and ffmpeg post-processing. No screen-recording software, no video editors, no extra effort.
 
+🌐 **[Project site](https://youniwemi.github.io/pw-tutorial-video/)** · 🎬 **[Live demo gallery](https://youniwemi.github.io/pw-tutorial-video/gallery/)** — every gallery video is recorded by this repo's own CI from its e2e tests on each push to `main`.
+
 ---
 
 ## Why pw-tutorial-video?
@@ -724,6 +726,46 @@ npx serve tutorial-site-dist
 pw-tutorial-video build-site                      # Uses ./tutorial-site.config.js
 pw-tutorial-video build-site --config=path/to.js   # Custom config path
 ```
+
+### Deploying to GitHub Pages from CI
+
+The gallery is a plain static site, so it deploys anywhere — this repository deploys its own on every push to `main` ([`.github/workflows/deploy-site.yml`](.github/workflows/deploy-site.yml)): a marketing landing page at the site root and the generated gallery under `/gallery/`.
+
+![Landing page deployed to GitHub Pages](docs/images/landing-page.png)
+
+The workflow, in short:
+
+```yaml
+on:
+  push:
+    branches: [main]
+
+steps:
+  - uses: actions/checkout@v4
+  - uses: actions/setup-node@v4
+    with: { node-version: 22, cache: npm }
+  - run: npm ci
+  - run: sudo apt-get update && sudo apt-get install -y ffmpeg
+  - run: pipx install edge-tts                     # real narration on Linux
+  - run: npx playwright install --with-deps chromium
+  - run: npm run test:e2e:video                    # TUTORIAL_MODE=true playwright test
+  - run: npx pw-tutorial-video build-site -y
+  - run: |                                         # landing page + gallery
+      mkdir -p _site/gallery
+      cp -r landing/. _site/
+      cp -r tutorial-site-dist/. _site/gallery/
+  - uses: peaceiris/actions-gh-pages@v4
+    with:
+      github_token: ${{ secrets.GITHUB_TOKEN }}
+      publish_dir: ./_site
+```
+
+Things to know when adapting it:
+
+- **TTS on Linux** — there is no macOS `say` on CI runners. With [`edge-tts`](https://pypi.org/project/edge-tts/) on the PATH the voice system falls back to it automatically, so the published videos have real narration. Alternatively set `TUTORIAL_TTS_CMD` to any command you prefer.
+- **Sub-path hosting** — GitHub Pages serves project sites under `/<repo>/`. Set `baseUrl` in `tutorial-site.config.js` to the full public URL **including the path** (this repo uses `https://youniwemi.github.io/pw-tutorial-video/gallery/`); the site build derives the Astro `site` + `base` from it so all links and assets resolve.
+- **Pages source** — the workflow publishes to the `gh-pages` branch; configure Pages (Settings → Pages) to serve from that branch.
+- Skip the landing-page assembly step and publish `tutorial-site-dist/` directly if you only want the gallery at the site root.
 
 ## How It Works
 

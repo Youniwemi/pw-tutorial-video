@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pw-tutorial-video — Turn Playwright tests into narrated tutorial videos</title>
+<meta name="description" content="Turn your Playwright end-to-end tests into professional narrated tutorial videos — TTS voice, animated cursor, step overlays, ffmpeg post-processing. Zero screen recording.">
+<meta property="og:title" content="pw-tutorial-video">
+<meta property="og:description" content="Your Playwright tests are your tutorial source. Run them for CI; flip a flag and they produce narrated how-to videos.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎬</text></svg>">
+<style>
+:root{
+  --bg:#0b0d17;--bg-soft:#12152a;--card:#171b33;--border:#272c4d;
+  --text:#e6e8f5;--muted:#9aa0c3;--accent:#818cf8;--accent-strong:#6366f1;
+  --code-bg:#0d1023;--green:#34d399;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--text);
+  font:16px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+.wrap{max-width:1060px;margin:0 auto;padding:0 24px}
+
+/* header */
+header{display:flex;align-items:center;justify-content:space-between;padding:20px 0}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;color:var(--text)}
+.brand:hover{text-decoration:none}
+nav{display:flex;gap:22px;align-items:center;font-size:15px}
+nav a{color:var(--muted)}
+nav a:hover{color:var(--text);text-decoration:none}
+.gh{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--border);
+  border-radius:8px;padding:7px 14px;color:var(--text)}
+.gh:hover{border-color:var(--accent);text-decoration:none}
+
+/* hero */
+.hero{padding:72px 0 56px;text-align:center;
+  background:radial-gradient(ellipse 70% 55% at 50% -10%,rgba(99,102,241,.28),transparent)}
+.hero h1{font-size:clamp(34px,5.4vw,58px);line-height:1.12;letter-spacing:-.02em;font-weight:800}
+.hero h1 em{font-style:normal;background:linear-gradient(90deg,#818cf8,#c084fc);
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p.sub{max-width:660px;margin:22px auto 0;font-size:19px;color:var(--muted)}
+.cta{margin-top:36px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.btn{display:inline-block;border-radius:10px;padding:13px 26px;font-weight:600;font-size:16px}
+.btn:hover{text-decoration:none}
+.btn-primary{background:var(--accent-strong);color:#fff}
+.btn-primary:hover{background:#7477f0}
+.btn-ghost{border:1px solid var(--border);color:var(--text)}
+.btn-ghost:hover{border-color:var(--accent)}
+.install{margin-top:30px;display:inline-flex;align-items:center;gap:12px;
+  background:var(--code-bg);border:1px solid var(--border);border-radius:10px;
+  padding:12px 18px;font:14px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.install .dollar{color:var(--green)}
+
+/* sections */
+section{padding:64px 0}
+h2{font-size:30px;letter-spacing:-.01em;text-align:center}
+.lead{max-width:640px;margin:14px auto 0;text-align:center;color:var(--muted)}
+
+/* how it works */
+.steps{margin-top:44px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.step{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:26px}
+.step .n{display:inline-flex;width:32px;height:32px;align-items:center;justify-content:center;
+  border-radius:50%;background:rgba(99,102,241,.18);color:var(--accent);font-weight:700}
+.step h3{margin:14px 0 8px;font-size:18px}
+.step p{color:var(--muted);font-size:15px}
+.step code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  font-size:13px;background:var(--code-bg);border:1px solid var(--border);
+  border-radius:6px;padding:2px 6px;color:var(--accent)}
+
+/* code sample */
+.codebox{margin:44px auto 0;max-width:760px;background:var(--code-bg);
+  border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.codebox .bar{display:flex;gap:6px;padding:12px 16px;border-bottom:1px solid var(--border)}
+.codebox .bar i{width:11px;height:11px;border-radius:50%;background:var(--border)}
+.codebox pre{padding:20px 22px;overflow-x:auto;
+  font:13.5px/1.7 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#c6cae8}
+.c-kw{color:#c084fc}.c-str{color:#7dd3a8}.c-fn{color:#8ab8ff}.c-cm{color:#5b6191}
+
+/* features */
+.grid{margin-top:44px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.feat{background:var(--bg-soft);border:1px solid var(--border);border-radius:14px;padding:22px}
+.feat .ico{font-size:24px}
+.feat h3{margin:10px 0 6px;font-size:16px}
+.feat p{color:var(--muted);font-size:14px}
+
+/* gallery banner */
+.banner{background:linear-gradient(135deg,rgba(99,102,241,.22),rgba(192,132,252,.14));
+  border:1px solid var(--border);border-radius:18px;padding:52px 32px;text-align:center}
+.banner h2{font-size:26px}
+.banner p{margin:12px auto 0;max-width:560px;color:var(--muted)}
+.banner .btn{margin-top:26px}
+
+footer{border-top:1px solid var(--border);margin-top:20px;padding:34px 0;
+  color:var(--muted);font-size:14px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+
+@media (max-width:820px){
+  .steps,.grid{grid-template-columns:1fr}
+  nav .hide-sm{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <a class="brand" href="./">🎬 pw-tutorial-video</a>
+    <nav>
+      <a class="hide-sm" href="#how">How it works</a>
+      <a class="hide-sm" href="#features">Features</a>
+      <a href="./gallery/">Gallery</a>
+      <a class="gh" href="https://github.com/Youniwemi/pw-tutorial-video">GitHub</a>
+    </nav>
+  </header>
+</div>
+
+<div class="hero">
+  <div class="wrap">
+    <h1>Your Playwright tests are<br><em>your tutorial videos</em></h1>
+    <p class="sub">Write your e2e tests once — get polished how-to videos with voice narration,
+      animated cursor, step overlays and background music. No screen recording, no video editor,
+      no docs that lag behind the product.</p>
+    <div class="cta">
+      <a class="btn btn-primary" href="./gallery/">▶ Watch the demo gallery</a>
+      <a class="btn btn-ghost" href="https://github.com/Youniwemi/pw-tutorial-video#quick-start">Get started</a>
+    </div>
+    <div class="install"><span class="dollar">$</span> npm install --save-dev pw-tutorial-video</div>
+  </div>
+</div>
+
+<div class="wrap">
+  <section id="how">
+    <h2>One test, two outputs</h2>
+    <p class="lead">All tutorial logic is a no-op in normal runs — your CI stays fast.
+      Flip one environment variable and the same test produces a broadcast-ready video.</p>
+    <div class="steps">
+      <div class="step"><span class="n">1</span>
+        <h3>Annotate your test</h3>
+        <p>Wrap the actions you already wrote in <code>tutorial.step()</code> and
+           <code>tutorial.context()</code> with the narration text.</p>
+      </div>
+      <div class="step"><span class="n">2</span>
+        <h3>Run in CI as usual</h3>
+        <p><code>playwright test</code> executes the steps sequentially — zero overhead,
+           no video, your e2e suite is untouched.</p>
+      </div>
+      <div class="step"><span class="n">3</span>
+        <h3>Flip the flag</h3>
+        <p><code>TUTORIAL_MODE=true</code> records the run with TTS voice, cursor animation
+           and overlays, then ffmpeg merges it all into the final video.</p>
+      </div>
+    </div>
+
+    <div class="codebox">
+      <div class="bar"><i></i><i></i><i></i></div>
+      <pre><span class="c-kw">import</span> { Tutorial } <span class="c-kw">from</span> <span class="c-str">'pw-tutorial-video'</span>;
+
+<span class="c-fn">test</span>(<span class="c-str">'Create your first invoice'</span>, <span class="c-kw">async</span> ({ page }, testInfo) =&gt; {
+  <span class="c-kw">const</span> tutorial = <span class="c-kw">new</span> <span class="c-fn">Tutorial</span>(page, { title: <span class="c-str">'Create Your First Invoice'</span>, lang: <span class="c-str">'en'</span> });
+
+  tutorial.<span class="c-fn">context</span>(<span class="c-str">'In this tutorial, we create and send an invoice.'</span>);
+  tutorial.<span class="c-fn">step</span>(<span class="c-str">'Open the invoices page'</span>, <span class="c-kw">async</span> () =&gt; {
+    <span class="c-kw">await</span> page.<span class="c-fn">click</span>(<span class="c-str">'a[href="/invoices"]'</span>);
+  });
+
+  <span class="c-kw">await</span> tutorial.<span class="c-fn">complete</span>(<span class="c-str">'Done! Your invoice is on its way.'</span>);
+  <span class="c-cm">// playwright test          → plain e2e run</span>
+  <span class="c-cm">// TUTORIAL_MODE=true …     → narrated tutorial video</span>
+});</pre>
+    </div>
+  </section>
+
+  <section id="features">
+    <h2>Everything a tutorial needs, automated</h2>
+    <div class="grid">
+      <div class="feat"><span class="ico">🎙️</span><h3>Voice narration</h3>
+        <p>macOS <code>say</code>, Microsoft Edge TTS, or any custom command — clips are
+           content-hashed and cached.</p></div>
+      <div class="feat"><span class="ico">🖱️</span><h3>Animated cursor</h3>
+        <p>Smooth, eased mouse movement with click animations following your test actions.</p></div>
+      <div class="feat"><span class="ico">📋</span><h3>Step overlays</h3>
+        <p>On-screen banners with step titles, progress and context cards — position and
+           style configurable.</p></div>
+      <div class="feat"><span class="ico">🎵</span><h3>Background music</h3>
+        <p>Looping soundtrack mixed by ffmpeg with fade-out on completion.</p></div>
+      <div class="feat"><span class="ico">📱</span><h3>Variants &amp; mobile</h3>
+        <p>Record desktop and mobile variants of the same tutorial, side-by-side multi-scene
+           layouts included.</p></div>
+      <div class="feat"><span class="ico">🌍</span><h3>Multi-language</h3>
+        <p>Per-language voices and filenames, full RTL support — one test, many locales.</p></div>
+      <div class="feat"><span class="ico">📝</span><h3>Transcripts</h3>
+        <p>Markdown transcripts generated from the timeline; edit them and write corrections
+           back into your tests.</p></div>
+      <div class="feat"><span class="ico">🖼️</span><h3>Gallery site</h3>
+        <p><code>build-site</code> turns your recordings into a static video gallery with
+           step-by-step guides.</p></div>
+      <div class="feat"><span class="ico">⚡</span><h3>Zero overhead</h3>
+        <p>Without <code>TUTORIAL_MODE</code> everything is a no-op — your test suite runs
+           exactly as before.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="banner">
+      <h2>See it in action</h2>
+      <p>The demo gallery is generated by this project's own CI: every push to main re-runs the
+         Playwright e2e suite in tutorial mode and publishes the narrated videos here.</p>
+      <a class="btn btn-primary" href="./gallery/">Browse the gallery →</a>
+    </div>
+  </section>
+
+  <footer>
+    <span>MIT licensed</span>
+    <span>
+      <a href="https://github.com/Youniwemi/pw-tutorial-video">GitHub</a> ·
+      <a href="https://www.npmjs.com/package/pw-tutorial-video">npm</a> ·
+      <a href="./gallery/">Gallery</a>
+    </span>
+  </footer>
+</div>
+
+</body>
+</html>
