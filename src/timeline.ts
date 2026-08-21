@@ -29,6 +29,10 @@ export interface TimelineData {
 	totalDurationMs: number;
 	/** Milliseconds to trim from video start (preload time) */
 	videoTrimMs: number;
+	/** True when a full-screen black sync marker was recorded right before
+	 *  timeline zero — the reporter then computes the exact trim from the
+	 *  video itself (blackdetect) instead of trusting videoTrimMs. */
+	syncMarker?: boolean;
 	steps: TimelineStep[];
 	/** Video file path from Playwright */
 	videoPath: string;
@@ -63,6 +67,7 @@ export class TutorialTimeline {
 	private musicOptions: TimelineMusicOptions;
 	private startTime: number = 0;
 	private videoTrimMs: number = 0;
+	private syncMarker: boolean = false;
 	private steps: TimelineStep[] = [];
 	private videoPath: string = '';
 
@@ -91,9 +96,10 @@ export class TutorialTimeline {
 	/**
 	 * Mark the start of the tutorial (second 0 for video)
 	 */
-	start(videoTrimMs: number = 0): void {
+	start(videoTrimMs: number = 0, syncMarker: boolean = false): void {
 		this.startTime = Date.now();
 		this.videoTrimMs = videoTrimMs;
+		this.syncMarker = syncMarker;
 		console.log(`[Timeline] Started at ${new Date().toISOString()} (trim ${videoTrimMs}ms from video start)`);
 	}
 
@@ -137,6 +143,7 @@ export class TutorialTimeline {
 			variant: this.variant || undefined,
 			totalDurationMs: Date.now() - this.startTime,
 			videoTrimMs: this.videoTrimMs,
+			syncMarker: this.syncMarker || undefined,
 			steps: this.steps,
 			videoPath: this.videoPath
 		};

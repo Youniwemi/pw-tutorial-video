@@ -9,6 +9,12 @@ declare class TutorialMergeReporter implements Reporter {
     constructor(options?: TutorialReporterOptions);
     onBegin(): void;
     onTestEnd(test: TestCase, result: TestResult): void;
+    /**
+     * Find the full-screen black sync marker in the source video and return
+     * the timestamp (seconds) of its END — the exact video time of timeline
+     * zero. Returns null when no black interval is found.
+     */
+    private detectSyncMarker;
     private patchTutorialsDuration;
     private findTimelineByTitle;
 }

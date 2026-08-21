@@ -17,6 +17,7 @@ export class TutorialTimeline {
     musicOptions;
     startTime = 0;
     videoTrimMs = 0;
+    syncMarker = false;
     steps = [];
     videoPath = '';
     constructor(testName, testFile = '', projectName = '', lang = 'fr', testTitle = '', feature = '', musicOptions = {}, title = '', variant = '') {
@@ -33,9 +34,10 @@ export class TutorialTimeline {
     /**
      * Mark the start of the tutorial (second 0 for video)
      */
-    start(videoTrimMs = 0) {
+    start(videoTrimMs = 0, syncMarker = false) {
         this.startTime = Date.now();
         this.videoTrimMs = videoTrimMs;
+        this.syncMarker = syncMarker;
         console.log(`[Timeline] Started at ${new Date().toISOString()} (trim ${videoTrimMs}ms from video start)`);
     }
     /**
@@ -76,6 +78,7 @@ export class TutorialTimeline {
             variant: this.variant || undefined,
             totalDurationMs: Date.now() - this.startTime,
             videoTrimMs: this.videoTrimMs,
+            syncMarker: this.syncMarker || undefined,
             steps: this.steps,
             videoPath: this.videoPath
         };

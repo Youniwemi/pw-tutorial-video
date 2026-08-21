@@ -276,6 +276,24 @@ export class Tutorial {
         if (this.initialized || !TUTORIAL_MODE)
             return;
         await this.ensureStyles();
+        // Debug overlay: paints wall-clock epoch ms into the recording so any
+        // audio/video desync can be measured frame by frame on the final file.
+        if (process.env.TUTORIAL_DEBUG_CLOCK === 'true') {
+            await this.page.evaluate(() => {
+                if (document.getElementById('tutorial-debug-clock'))
+                    return;
+                const el = document.createElement('div');
+                el.id = 'tutorial-debug-clock';
+                el.style.cssText =
+                    'position:fixed;bottom:4px;left:4px;z-index:2147483647;font:bold 24px monospace;background:#000;color:#0f0;padding:2px 8px;pointer-events:none';
+                document.body.appendChild(el);
+                const tick = () => {
+                    el.textContent = String(Date.now() % 1000000);
+                    requestAnimationFrame(tick);
+                };
+                tick();
+            }).catch(() => { });
+        }
         await this.cursor.initialize();
         if (this.options.backgroundMusic && this.options.playAudioInBrowser) {
             await this.music.start();
@@ -561,11 +579,24 @@ export class Tutorial {
         const preloads = this.pendingItems.map(item => item.voicePreload);
         preloads.push(completionVoicePreload);
         await Promise.all(preloads);
-        // Recording starts when the page is created, not when this Tutorial is
-        // constructed — anything the test does before `new Tutorial()` (goto,
-        // login, waits) is on tape but not in `videoStartTime`, and would leave
-        // every frame lagging the audio clips by that gap. The video file is
-        // created when recording starts, so its birthtime is the true anchor.
+        // Sync marker: recording starts at page creation and the recorder may
+        // buffer several seconds before the file even exists, so no wall-clock
+        // anchor (constructor time, file birthtime) reliably maps to the video's
+        // t=0. Instead, flash a full-screen black frame whose END is timeline
+        // zero: the reporter finds it on tape with ffmpeg blackdetect and sets
+        // the exact trim. The wall-clock trim below stays as the fallback.
+        const syncMarker = await this.page.evaluate(() => {
+            const el = document.createElement('div');
+            el.id = 'tutorial-sync-marker';
+            el.style.cssText = 'position:fixed;inset:0;background:#000;z-index:2147483647';
+            (document.body ?? document.documentElement).appendChild(el);
+        }).then(() => true).catch(() => false);
+        if (syncMarker) {
+            await this.page.waitForTimeout(500);
+            await this.page.evaluate(() => {
+                document.getElementById('tutorial-sync-marker')?.remove();
+            }).catch(() => { });
+        }
         let videoTrimMs = Date.now() - this.videoStartTime;
         try {
             const video = this.page.video();
@@ -578,7 +609,7 @@ export class Tutorial {
         catch {
             // No video or no birthtime on this platform — keep the constructor anchor.
         }
-        this.timeline.start(videoTrimMs);
+        this.timeline.start(videoTrimMs, syncMarker);
         await this.initialize();
         this.overlay.setTotalSteps(this.stepCounter);
         let currentStep = 0;

@@ -23,6 +23,10 @@ export interface TimelineData {
     totalDurationMs: number;
     /** Milliseconds to trim from video start (preload time) */
     videoTrimMs: number;
+    /** True when a full-screen black sync marker was recorded right before
+     *  timeline zero — the reporter then computes the exact trim from the
+     *  video itself (blackdetect) instead of trusting videoTrimMs. */
+    syncMarker?: boolean;
     steps: TimelineStep[];
     /** Video file path from Playwright */
     videoPath: string;
@@ -55,13 +59,14 @@ export declare class TutorialTimeline {
     private musicOptions;
     private startTime;
     private videoTrimMs;
+    private syncMarker;
     private steps;
     private videoPath;
     constructor(testName: string, testFile?: string, projectName?: string, lang?: string, testTitle?: string, feature?: string, musicOptions?: TimelineMusicOptions, title?: string, variant?: string);
     /**
      * Mark the start of the tutorial (second 0 for video)
      */
-    start(videoTrimMs?: number): void;
+    start(videoTrimMs?: number, syncMarker?: boolean): void;
     /**
      * Set the video path (from Playwright's page.video()?.path())
      */

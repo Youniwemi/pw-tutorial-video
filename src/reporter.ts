@@ -61,13 +61,46 @@ class TutorialMergeReporter implements Reporter {
 				}
 			}
 
+			let finalCmd = mergeCmd;
+			if (timeline.syncMarker && videoPath && existsSync(videoPath)) {
+				const exactTrim = this.detectSyncMarker(videoPath);
+				if (exactTrim !== null) {
+					const declared = (timeline.videoTrimMs ?? 0) / 1000;
+					console.log(`[TutorialMerge] Sync marker at ${exactTrim.toFixed(3)}s (wall-clock trim was ${declared.toFixed(3)}s)`);
+					const ss = `-ss ${exactTrim.toFixed(3)}`;
+					finalCmd = /-ss [\d.]+/.test(finalCmd)
+						? finalCmd.replace(/-ss [\d.]+/, ss)
+						: finalCmd.replace('ffmpeg -y', `ffmpeg -y ${ss}`);
+				} else {
+					console.log('[TutorialMerge] Sync marker not found on tape — using wall-clock trim');
+				}
+			}
+
 			console.log(`[TutorialMerge] Merging: ${test.title}`);
-			execSync(mergeCmd, { stdio: 'inherit' });
+			execSync(finalCmd, { stdio: 'inherit' });
 			console.log(`[TutorialMerge] Done: ${test.title}`);
 
 			this.patchTutorialsDuration(timeline);
 		} catch (e: any) {
 			console.error(`[TutorialMerge] Failed for "${test.title}": ${e.message}`);
+		}
+	}
+
+	/**
+	 * Find the full-screen black sync marker in the source video and return
+	 * the timestamp (seconds) of its END — the exact video time of timeline
+	 * zero. Returns null when no black interval is found.
+	 */
+	private detectSyncMarker(videoPath: string): number | null {
+		try {
+			const out = execSync(
+				`ffmpeg -hide_banner -i "${videoPath}" -vf "blackdetect=d=0.2:pic_th=0.95" -an -f null - 2>&1`,
+				{ encoding: 'utf-8', maxBuffer: 32 * 1024 * 1024 }
+			);
+			const m = out.match(/black_end:([\d.]+)/);
+			return m ? parseFloat(m[1]) : null;
+		} catch {
+			return null;
 		}
 	}
 
