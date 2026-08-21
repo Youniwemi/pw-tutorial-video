@@ -1,0 +1,30 @@
+{
+  "id": "mobile-split-demo",
+  "title": "Mobile split demo",
+  "duration": "0:17",
+  "lang": "en",
+  "accent": "#6366f1",
+  "video": "videos/mobile-split-demo.webm",
+  "poster": "videos/mobile-split-demo-step-1.webp",
+  "page": "mobile-split-demo/",
+  "steps": [
+    {
+      "num": 1,
+      "title": "Sara ouvre son espace comptable",
+      "text": "Sara ouvre son espace comptable",
+      "image": "videos/mobile-split-demo-step-1.webp"
+    },
+    {
+      "num": 2,
+      "title": "Le client répond sur son téléphone",
+      "text": "Le client répond sur son téléphone",
+      "image": "videos/mobile-split-demo-step-2.webp"
+    },
+    {
+      "num": 3,
+      "title": "Retour chez la comptable",
+      "text": "Retour chez la comptable",
+      "image": "videos/mobile-split-demo-step-3.webp"
+    }
+  ]
+}

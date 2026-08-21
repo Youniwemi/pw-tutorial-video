@@ -1,0 +1,49 @@
+{
+  "tutorials": [
+    {
+      "id": "mobile-split-demo",
+      "title": "Mobile split demo",
+      "duration": "0:17"
+    },
+    {
+      "id": "tutorial_1787342422006",
+      "title": "Typing a secret without leaking it",
+      "duration": "0:15"
+    },
+    {
+      "id": "tutorial_1787342443951",
+      "title": "Two profiles, one video",
+      "duration": "0:23"
+    },
+    {
+      "id": "tutorial_1787342576582",
+      "title": "Overlay TL",
+      "duration": "0:09"
+    },
+    {
+      "id": "tutorial_1787342587183",
+      "title": "Overlay TR",
+      "duration": "0:09"
+    },
+    {
+      "id": "tutorial_1787342597066",
+      "title": "Overlay BL",
+      "duration": "0:09"
+    },
+    {
+      "id": "tutorial_1787342606981",
+      "title": "Overlay BR",
+      "duration": "0:09"
+    },
+    {
+      "id": "tutorial_1787342616857",
+      "title": "Position override",
+      "duration": "0:09"
+    },
+    {
+      "id": "tutorial_1787342629459",
+      "title": "Split screen demo",
+      "duration": "0:22"
+    }
+  ]
+}

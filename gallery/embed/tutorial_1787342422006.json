@@ -1,0 +1,30 @@
+{
+  "id": "tutorial_1787342422006",
+  "title": "Typing a secret without leaking it",
+  "duration": "0:15",
+  "lang": "en",
+  "accent": "#6366f1",
+  "video": "videos/tutorial_1787342422006.webm",
+  "poster": "videos/tutorial_1787342422006-step-1.webp",
+  "page": "tutorial_1787342422006/",
+  "steps": [
+    {
+      "num": 1,
+      "title": "The email is typed normally — it stays readable",
+      "text": "The email is typed normally — it stays readable",
+      "image": "videos/tutorial_1787342422006-step-1.webp"
+    },
+    {
+      "num": 2,
+      "title": "The password is typed blurred — unreadable on screen",
+      "text": "The password is typed blurred — unreadable on screen",
+      "image": "videos/tutorial_1787342422006-step-2.webp"
+    },
+    {
+      "num": 3,
+      "title": "Submit",
+      "text": "Submit",
+      "image": "videos/tutorial_1787342422006-step-3.webp"
+    }
+  ]
+}

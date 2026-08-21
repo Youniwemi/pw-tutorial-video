@@ -1,0 +1,31 @@
+{
+  "id": "tutorial_1787342443951",
+  "title": "Two profiles, one video",
+  "description": "Two people, two sessions, one screen.",
+  "duration": "0:23",
+  "lang": "en",
+  "accent": "#6366f1",
+  "video": "videos/tutorial_1787342443951.webm",
+  "poster": "videos/tutorial_1787342443951-step-1.webp",
+  "page": "tutorial_1787342443951/",
+  "steps": [
+    {
+      "num": 1,
+      "title": "Sara signs in to the accounting app",
+      "text": "Sara signs in to the accounting app",
+      "image": "videos/tutorial_1787342443951-step-1.webp"
+    },
+    {
+      "num": 2,
+      "title": "ACME signs in to the client portal",
+      "text": "ACME signs in to the client portal",
+      "image": "videos/tutorial_1787342443951-step-2.webp"
+    },
+    {
+      "num": 3,
+      "title": "Both profiles, signed in at once",
+      "text": "Both profiles, signed in at once",
+      "image": "videos/tutorial_1787342443951-step-3.webp"
+    }
+  ]
+}

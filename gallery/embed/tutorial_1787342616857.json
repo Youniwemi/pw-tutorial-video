@@ -1,0 +1,24 @@
+{
+  "id": "tutorial_1787342616857",
+  "title": "Position override",
+  "duration": "0:09",
+  "lang": "en",
+  "accent": "#6366f1",
+  "video": "videos/tutorial_1787342616857.webm",
+  "poster": "videos/tutorial_1787342616857-step-1.webp",
+  "page": "tutorial_1787342616857/",
+  "steps": [
+    {
+      "num": 1,
+      "title": "Top-left step",
+      "text": "Top-left step",
+      "image": "videos/tutorial_1787342616857-step-1.webp"
+    },
+    {
+      "num": 2,
+      "title": "Bottom-right step",
+      "text": "Bottom-right step",
+      "image": "videos/tutorial_1787342616857-step-2.webp"
+    }
+  ]
+}
