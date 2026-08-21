@@ -643,7 +643,7 @@ narration text paired with its screenshot. Context narrations recorded
 mid-flow appear as callouts between steps, and steps recorded without voice
 still show their text.
 
-![Video page with thumbnail strip and text guide](https://raw.githubusercontent.com/Youniwemi/pw-tutorial-video/main/docs/images/video-page.png)
+![Video page with thumbnail strip and text guide](docs/images/video-page.png)
 
 Two settings control the guide (`tutorials` block of the config):
 
@@ -657,12 +657,12 @@ Two settings control the guide (`tutorials` block of the config):
 
 | `stepsLayout: 'cards'` | Strip thumbnail clicked → lightbox with caption |
 |---|---|
-| ![Cards layout](https://raw.githubusercontent.com/Youniwemi/pw-tutorial-video/main/docs/images/steps-cards.png) | ![Strip lightbox](https://raw.githubusercontent.com/Youniwemi/pw-tutorial-video/main/docs/images/strip-lightbox.png) |
+| ![Cards layout](docs/images/steps-cards.png) | ![Strip lightbox](docs/images/strip-lightbox.png) |
 
 <details>
 <summary><code>stepsLayout: 'full'</code> — full-width screenshot per step</summary>
 
-![Full layout](https://raw.githubusercontent.com/Youniwemi/pw-tutorial-video/main/docs/images/steps-full.png)
+![Full layout](docs/images/steps-full.png)
 
 </details>
 

@@ -12,7 +12,7 @@ A feature or behavior change is **not done** until all of these ship together (s
 
 1. **`CLAUDE.md`** updated — architecture, options, design decisions
 2. **The skill** in `skills/tutorialize/` updated — especially `references/api.md` for API or timing changes
-3. **`README.md`** updated — every user-facing option and workflow; site-visible changes get screenshots in `docs/images/` (~900px wide, referenced via `https://raw.githubusercontent.com/Youniwemi/pw-tutorial-video/main/docs/images/...` so they render on npm too)
+3. **`README.md`** updated — every user-facing option and workflow; site-visible changes get screenshots in `docs/images/` (~900px wide, referenced with relative paths like `docs/images/x.png` — GitHub renders them on any branch, and npm resolves them through package.json's `repository` field)
 4. **Unit tests** covering the new behavior (`npm test` green)
 5. **`npm run build`** run, so the committed `dist/` matches `src/`
 
