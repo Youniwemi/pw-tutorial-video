@@ -2,9 +2,31 @@
 
 **Turn your Playwright end-to-end tests into professional narrated tutorial videos — automatically.**
 
-Write your tests once, get polished how-to videos with voice narration, animated cursor, step overlays, background music, and ffmpeg post-processing. No screen-recording software, no video editors, no extra effort.
+Write your tests once, get polished how-to videos with voice narration, animated cursor, step overlays, background music, and ffmpeg post-processing. Publish them as a static gallery site, and embed any tutorial back into your app as contextual help with a single `data-tutorial` attribute. No screen-recording software, no video editors, no docs that lag behind the product.
 
 🌐 **[Project site](https://youniwemi.github.io/pw-tutorial-video/)** · 🎬 **[Live demo gallery](https://youniwemi.github.io/pw-tutorial-video/gallery/)** — every gallery video is recorded by this repo's own CI from its e2e tests on each push to `main`.
+
+---
+
+## Table of Contents
+
+- [Why pw-tutorial-video?](#why-pw-tutorial-video)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [API Reference](#api-reference)
+- [Multiple user profiles](#multiple-user-profiles)
+- [Variants — record the same tutorial for mobile](#variants--record-the-same-tutorial-for-mobile)
+- [TTS Configuration](#tts-configuration)
+- [Environment Variables](#environment-variables)
+- [Styling](#styling)
+- [Output Files](#output-files)
+- [Reviewing & Correcting Narration](#reviewing--correcting-narration)
+- [Claude Code Integration](#claude-code-integration)
+- [Tutorial Gallery Site](#tutorial-gallery-site)
+  - [In-app help widget](#in-app-help-widget)
+  - [Deploying to GitHub Pages from CI](#deploying-to-github-pages-from-ci)
+- [How It Works](#how-it-works)
+- [License](#license)
 
 ---
 
@@ -29,6 +51,8 @@ Most software teams maintain **tests** and **documentation** separately. Tests v
 - **Transcript generation** — Markdown transcripts auto-generated from timeline data
 - **Multi-language** — Full RTL support (Arabic), per-language video filenames, i18n-ready
 - **Playwright Reporter** — Auto-merges audio into video as each tutorial test completes
+- **Gallery site** — `build-site` turns your recordings into a static video gallery with step-by-step guides, ready for any static host
+- **In-app help widget** — the published gallery serves a `widget.js`: one `data-tutorial` attribute opens any tutorial as an overlay inside your own app
 - **Zero runtime overhead** — All tutorial logic is no-op when `TUTORIAL_MODE` is not set
 
 ## Installation

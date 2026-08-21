@@ -14,6 +14,8 @@ test.describe('overlay position', () => {
 
 			const tutorial = new Tutorial(page, {
 				title: `Overlay ${pos}`,
+				// Stable slug: gallery page + widget embed URLs survive re-recordings
+				testName: `overlay-${pos.toLowerCase()}`,
 				testTitle: `overlay at ${pos}`,
 				testFile: 'overlay-position.spec.ts',
 				projectName: 'chromium',
@@ -54,6 +56,7 @@ test.describe('overlay position', () => {
 
 		const tutorial = new Tutorial(page, {
 			title: 'Position override',
+			testName: 'overlay-position-override',
 			testTitle: 'per-step position override',
 			testFile: 'overlay-position.spec.ts',
 			projectName: 'chromium',
