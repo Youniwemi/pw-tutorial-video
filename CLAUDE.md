@@ -6,11 +6,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 No `Co-Authored-By` trailer in commits.
 
-## Maintenance rule
+## Definition of done
 
-When adding or changing a feature, always update:
-1. This `CLAUDE.md` file (architecture, options, design decisions)
-2. The skill in `skills/tutorialize/` (especially `references/api.md` for API changes)
+A feature or behavior change is **not done** until all of these ship together (same PR):
+
+1. **`CLAUDE.md`** updated — architecture, options, design decisions
+2. **The skill** in `skills/tutorialize/` updated — especially `references/api.md` for API or timing changes
+3. **`README.md`** updated — every user-facing option and workflow; site-visible changes get screenshots in `docs/images/` (~900px wide, referenced via `https://raw.githubusercontent.com/Youniwemi/pw-tutorial-video/main/docs/images/...` so they render on npm too)
+4. **Unit tests** covering the new behavior (`npm test` green)
+5. **`npm run build`** run, so the committed `dist/` matches `src/`
+
+Before declaring any task complete, walk this list and fix what's missing.
 
 ## What this is
 
