@@ -1,3 +1,226 @@
-<!DOCTYPE html><html lang="en"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="description" content="pw-tutorial-video"><title>pw-tutorial-video | pw-tutorial-video</title><style>:root{--color-primary: #6366f1;--color-primary-dark: #4f46e5;--color-bg: #f8fafc;--color-bg-card: #ffffff;--color-text: #1e293b;--color-text-muted: #64748b;--color-border: #e2e8f0;--color-pro: #f59e0b;--font-family: system-ui, -apple-system, sans-serif;--radius: .75rem;--shadow: 0 4px 12px rgba(0, 0, 0, .08);--shadow-hover: 0 8px 24px rgba(0, 0, 0, .12)}@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--color-bg: #0f172a;--color-bg-card: #1e293b;--color-text: #e2e8f0;--color-text-muted: #94a3b8;--color-border: #334155;--shadow: 0 4px 12px rgba(0, 0, 0, .3);--shadow-hover: 0 8px 24px rgba(0, 0, 0, .4)}}:root[data-theme=dark]{--color-bg: #0f172a;--color-bg-card: #1e293b;--color-text: #e2e8f0;--color-text-muted: #94a3b8;--color-border: #334155;--shadow: 0 4px 12px rgba(0, 0, 0, .3);--shadow-hover: 0 8px 24px rgba(0, 0, 0, .4)}*{box-sizing:border-box;margin:0;padding:0}body{font-family:var(--font-family, system-ui, -apple-system, sans-serif);background:var(--color-bg);color:var(--color-text);line-height:1.6;min-height:100vh;display:flex;flex-direction:column}header{background:var(--color-bg-card);border-bottom:1px solid var(--color-border);position:sticky;top:0;z-index:100}.header-content{max-width:1200px;margin:0 auto;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center}.logo{display:flex;align-items:center;gap:.5rem;text-decoration:none;color:var(--color-text);font-weight:600;font-size:1.1rem}.logo-icon{font-size:1.5rem}.logo-img{height:32px;width:auto}main{flex:1;max-width:1200px;margin:0 auto;padding:2rem;width:100%}.hero{text-align:center;padding:3rem 1rem}.hero h1{font-size:2.5rem;margin-bottom:.5rem;color:var(--color-text)}.hero p{font-size:1.25rem;color:var(--color-text-muted)}.category{margin-bottom:3rem}.category-header{display:flex;align-items:center;gap:.5rem;margin-bottom:1.5rem;padding-bottom:.5rem;border-bottom:2px solid var(--color-border)}.category-header h2{font-size:1.25rem;font-weight:600}.category-icon{font-size:1.25rem}.video-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.5rem}.video-card{background:var(--color-bg-card);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);transition:all .3s ease;cursor:pointer}.video-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-hover)}.video-thumbnail{position:relative;aspect-ratio:16 / 9;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center}.video-thumbnail img{width:100%;height:100%;object-fit:cover}.play-button{position:absolute;width:60px;height:60px;background:#fffffff2;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;transition:transform .2s}.video-card:hover .play-button{transform:scale(1.1)}.video-info{padding:1rem}.video-title{font-weight:600;margin-bottom:.25rem;font-size:1rem}.video-meta{display:flex;align-items:center;gap:.75rem;color:var(--color-text-muted);font-size:.875rem}.video-duration{display:flex;align-items:center;gap:.25rem}.video-modal{position:fixed;inset:0;background:#000000f2;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1000;padding:2rem}.video-modal video{max-width:100%;max-height:70vh;border-radius:var(--radius)}.video-modal-close{position:absolute;top:1rem;right:1rem;background:#fff;border:none;width:40px;height:40px;border-radius:50%;font-size:1.5rem;cursor:pointer;z-index:10}.video-modal-close:hover{background:#f0f0f0}footer{background:var(--color-bg-card);border-top:1px solid var(--color-border);padding:1.5rem}.footer-content{max-width:1200px;margin:0 auto;display:flex;justify-content:center;gap:1rem;color:var(--color-text-muted);font-size:.875rem}.footer-content a{color:var(--color-text-muted);text-decoration:none}.footer-content a:hover{color:var(--color-primary)}@media(max-width:768px){.hero h1{font-size:1.75rem}.hero p{font-size:1rem}.video-grid{grid-template-columns:1fr}.header-content{padding:1rem}main{padding:1rem}}
-.card-page-link[data-astro-cid-g6m6frnh]{margin-left:auto;font-size:.9rem;color:var(--color-text-muted);text-decoration:none;transition:color .2s;flex-shrink:0}.card-page-link[data-astro-cid-g6m6frnh]:hover{color:var(--color-primary)}.placeholder-thumb[data-astro-cid-g6m6frnh]{width:100%;height:100%;background:linear-gradient(135deg,#667eea,#764ba2)}.step-carousel[data-astro-cid-g6m6frnh]{position:absolute;inset:0}.step-img[data-astro-cid-g6m6frnh]{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .3s}.step-img[data-astro-cid-g6m6frnh].active{opacity:1}.step-prev[data-astro-cid-g6m6frnh],.step-next[data-astro-cid-g6m6frnh]{position:absolute;top:50%;transform:translateY(-50%);background:#00000080;color:#fff;border:none;width:28px;height:28px;border-radius:50%;font-size:1.2rem;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;z-index:2}.step-prev[data-astro-cid-g6m6frnh]{left:6px}.step-next[data-astro-cid-g6m6frnh]{right:6px}.video-card[data-astro-cid-g6m6frnh]:hover .step-prev[data-astro-cid-g6m6frnh],.video-card[data-astro-cid-g6m6frnh]:hover .step-next[data-astro-cid-g6m6frnh]{opacity:1}.step-dots[data-astro-cid-g6m6frnh]{position:absolute;bottom:6px;left:50%;transform:translate(-50%);display:flex;gap:4px;z-index:2}.step-dot[data-astro-cid-g6m6frnh]{width:5px;height:5px;border-radius:50%;background:#fff6;cursor:pointer;transition:background .2s}.step-dot[data-astro-cid-g6m6frnh].active{background:#fff}.video-container[data-astro-cid-2tu5i5ra]{display:flex;align-items:center;gap:1rem;max-width:100%}.video-nav[data-astro-cid-2tu5i5ra]{background:#ffffffe6;border:none;width:50px;height:50px;border-radius:50%;font-size:2rem;cursor:pointer;transition:all .2s;flex-shrink:0;display:flex;align-items:center;justify-content:center;line-height:1}.video-nav[data-astro-cid-2tu5i5ra]:hover{background:#fff;transform:scale(1.1)}.video-nav[data-astro-cid-2tu5i5ra]:disabled{opacity:.3;cursor:not-allowed;transform:none}.video-title-bar[data-astro-cid-2tu5i5ra]{display:flex;justify-content:space-between;align-items:center;width:100%;max-width:900px;margin-top:1rem;padding:0 60px;color:#fff;font-size:.9rem}#video-title[data-astro-cid-2tu5i5ra]{font-weight:500}#video-counter[data-astro-cid-2tu5i5ra]{opacity:.7}
-</style></head> <body style="--color-primary: #6366f1; --font-family: system-ui, -apple-system, sans-serif"> <header> <div class="header-content"> <a href="/pw-tutorial-video/" class="logo"> <span class="logo-icon">🎬</span> <span class="logo-text">pw-tutorial-video</span> </a> </div> </header> <main>  <section class="hero"> <h1>pw-tutorial-video</h1> <p>Video tutorials</p> </section> <section class="category"> <div class="category-header"> <span class="category-icon">📹</span> <h2>General</h2> </div> <div class="video-grid"> <div class="video-card" data-video-url="/pw-tutorial-video/videos/split-demo.webm" data-video-id="split-demo" data-astro-cid-g6m6frnh> <div class="video-thumbnail" data-astro-cid-g6m6frnh> <div class="placeholder-thumb" data-astro-cid-g6m6frnh></div> <div class="play-button" data-astro-cid-g6m6frnh>▶</div> </div> <div class="video-info" data-astro-cid-g6m6frnh> <div class="video-title" data-astro-cid-g6m6frnh>Split demo</div> <div class="video-meta" data-astro-cid-g6m6frnh> <span class="video-duration" data-astro-cid-g6m6frnh>&#x1F550; </span> <a href="/pw-tutorial-video/split-demo" class="card-page-link" onclick="event.stopPropagation()" data-astro-cid-g6m6frnh>→</a> </div> </div> </div>  <script type="module">document.querySelectorAll(".step-carousel").forEach(l=>{const s=l.querySelectorAll(".step-img"),o=l.querySelectorAll(".step-dot"),i=l.querySelector(".step-prev"),d=l.querySelector(".step-next"),a=l.closest(".video-card");let e=0,c=!1,r=null;const n=t=>{s[e].classList.remove("active"),o[e]?.classList.remove("active"),e=(t%s.length+s.length)%s.length,s[e].classList.add("active"),o[e]?.classList.add("active")};i?.addEventListener("click",t=>{t.stopPropagation(),n(e-1)}),d?.addEventListener("click",t=>{t.stopPropagation(),n(e+1)}),o.forEach((t,v)=>t.addEventListener("click",p=>{p.stopPropagation(),n(v)})),a?.addEventListener("mouseenter",()=>{s.length<2||(c=!1,r=setInterval(()=>{c=!0,n(e+1)},800))}),a?.addEventListener("mouseleave",()=>{r&&(clearInterval(r),r=null),c&&n(0)})});</script><div class="video-card" data-video-url="/pw-tutorial-video/videos/tutorial_1786461631477.webm" data-video-id="tutorial_1786461631477" data-astro-cid-g6m6frnh> <div class="video-thumbnail" data-astro-cid-g6m6frnh> <div class="step-carousel" data-astro-cid-g6m6frnh> <img src="/pw-tutorial-video/videos/tutorial_1786461631477-step-1.webp" alt="Step 1" loading="eager" class="step-img active" data-astro-cid-g6m6frnh><img src="/pw-tutorial-video/videos/tutorial_1786461631477-step-2.webp" alt="Step 2" loading="lazy" class="step-img" data-astro-cid-g6m6frnh><img src="/pw-tutorial-video/videos/tutorial_1786461631477-step-3.webp" alt="Step 3" loading="lazy" class="step-img" data-astro-cid-g6m6frnh>  <button class="step-prev" aria-label="Previous step" data-astro-cid-g6m6frnh>‹</button> <button class="step-next" aria-label="Next step" data-astro-cid-g6m6frnh>›</button> <div class="step-dots" data-astro-cid-g6m6frnh> <span class="step-dot active" data-astro-cid-g6m6frnh></span><span class="step-dot" data-astro-cid-g6m6frnh></span><span class="step-dot" data-astro-cid-g6m6frnh></span> </div>  </div> <div class="play-button" data-astro-cid-g6m6frnh>▶</div> </div> <div class="video-info" data-astro-cid-g6m6frnh> <div class="video-title" data-astro-cid-g6m6frnh>Tutorial 1786461631477</div> <div class="video-meta" data-astro-cid-g6m6frnh> <span class="video-duration" data-astro-cid-g6m6frnh>&#x1F550; 0:12</span> <a href="/pw-tutorial-video/tutorial_1786461631477" class="card-page-link" onclick="event.stopPropagation()" data-astro-cid-g6m6frnh>→</a> </div> </div> </div>   </div> </section><div id="video-modal" class="video-modal" style="display: none;" data-astro-cid-2tu5i5ra> <button class="video-modal-close" aria-label="Close" data-astro-cid-2tu5i5ra>×</button> <div class="video-container" data-astro-cid-2tu5i5ra> <button class="video-nav video-nav-prev" aria-label="Previous" style="display: none;" data-astro-cid-2tu5i5ra>‹</button> <video controls id="modal-video" data-astro-cid-2tu5i5ra> <source src="" type="video/webm" data-astro-cid-2tu5i5ra> </video> <button class="video-nav video-nav-next" aria-label="Next" style="display: none;" data-astro-cid-2tu5i5ra>›</button> </div> <div class="video-title-bar" data-astro-cid-2tu5i5ra> <span id="video-title" data-astro-cid-2tu5i5ra></span> <span id="video-counter" data-astro-cid-2tu5i5ra></span> </div> </div>  <script type="module">document.addEventListener("DOMContentLoaded",()=>{const t=document.getElementById("video-modal"),o=document.getElementById("modal-video"),f=t?.querySelector(".video-modal-close"),c=t?.querySelector(".video-nav-prev"),i=t?.querySelector(".video-nav-next"),a=o?.querySelector("source"),y=document.getElementById("video-title"),v=document.getElementById("video-counter"),d=Array.from(document.querySelectorAll(".video-card"));let n=0;const l=e=>{if(e<0||e>=d.length)return;n=e;const r=d[e],u=r.getAttribute("data-video-url"),m=r.querySelector(".video-title")?.textContent||"";u&&a&&o&&(a.src=u,o.load(),o.play(),y&&(y.textContent=m),v&&(v.textContent=`${e+1} / ${d.length}`),c&&(c.style.display="flex",c.disabled=e===0),i&&(i.style.display="flex",i.disabled=e===d.length-1))};d.forEach((e,r)=>{e.addEventListener("click",()=>{t&&(t.style.display="flex",l(r))})}),c?.addEventListener("click",e=>{e.stopPropagation(),l(n-1)}),i?.addEventListener("click",e=>{e.stopPropagation(),l(n+1)}),o?.addEventListener("ended",()=>{n<d.length-1&&l(n+1)});const s=()=>{t&&o&&(t.style.display="none",o.pause())};f?.addEventListener("click",s),t?.addEventListener("click",e=>{e.target===t&&s()}),document.addEventListener("keydown",e=>{t?.style.display==="flex"&&(e.key==="Escape"&&s(),e.key==="ArrowLeft"&&l(n-1),e.key==="ArrowRight"&&l(n+1))})});</script>  </main> <footer> <div class="footer-content"> <span>© 2026 pw-tutorial-video</span> <span>·</span> <span>Built with pw-tutorial-video</span> </div> </footer> </body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pw-tutorial-video — Turn Playwright tests into narrated tutorial videos</title>
+<meta name="description" content="Turn your Playwright end-to-end tests into professional narrated tutorial videos — TTS voice, animated cursor, step overlays, ffmpeg post-processing. Zero screen recording.">
+<meta property="og:title" content="pw-tutorial-video">
+<meta property="og:description" content="Your Playwright tests are your tutorial source. Run them for CI; flip a flag and they produce narrated how-to videos.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎬</text></svg>">
+<style>
+:root{
+  --bg:#0b0d17;--bg-soft:#12152a;--card:#171b33;--border:#272c4d;
+  --text:#e6e8f5;--muted:#9aa0c3;--accent:#818cf8;--accent-strong:#6366f1;
+  --code-bg:#0d1023;--green:#34d399;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--text);
+  font:16px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+.wrap{max-width:1060px;margin:0 auto;padding:0 24px}
+
+/* header */
+header{display:flex;align-items:center;justify-content:space-between;padding:20px 0}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;color:var(--text)}
+.brand:hover{text-decoration:none}
+nav{display:flex;gap:22px;align-items:center;font-size:15px}
+nav a{color:var(--muted)}
+nav a:hover{color:var(--text);text-decoration:none}
+.gh{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--border);
+  border-radius:8px;padding:7px 14px;color:var(--text)}
+.gh:hover{border-color:var(--accent);text-decoration:none}
+
+/* hero */
+.hero{padding:72px 0 56px;text-align:center;
+  background:radial-gradient(ellipse 70% 55% at 50% -10%,rgba(99,102,241,.28),transparent)}
+.hero h1{font-size:clamp(34px,5.4vw,58px);line-height:1.12;letter-spacing:-.02em;font-weight:800}
+.hero h1 em{font-style:normal;background:linear-gradient(90deg,#818cf8,#c084fc);
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p.sub{max-width:660px;margin:22px auto 0;font-size:19px;color:var(--muted)}
+.cta{margin-top:36px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.btn{display:inline-block;border-radius:10px;padding:13px 26px;font-weight:600;font-size:16px}
+.btn:hover{text-decoration:none}
+.btn-primary{background:var(--accent-strong);color:#fff}
+.btn-primary:hover{background:#7477f0}
+.btn-ghost{border:1px solid var(--border);color:var(--text)}
+.btn-ghost:hover{border-color:var(--accent)}
+.install{margin-top:30px;display:inline-flex;align-items:center;gap:12px;
+  background:var(--code-bg);border:1px solid var(--border);border-radius:10px;
+  padding:12px 18px;font:14px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.install .dollar{color:var(--green)}
+
+/* sections */
+section{padding:64px 0}
+h2{font-size:30px;letter-spacing:-.01em;text-align:center}
+.lead{max-width:640px;margin:14px auto 0;text-align:center;color:var(--muted)}
+
+/* how it works */
+.steps{margin-top:44px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.step{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:26px}
+.step .n{display:inline-flex;width:32px;height:32px;align-items:center;justify-content:center;
+  border-radius:50%;background:rgba(99,102,241,.18);color:var(--accent);font-weight:700}
+.step h3{margin:14px 0 8px;font-size:18px}
+.step p{color:var(--muted);font-size:15px}
+.step code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  font-size:13px;background:var(--code-bg);border:1px solid var(--border);
+  border-radius:6px;padding:2px 6px;color:var(--accent)}
+
+/* code sample */
+.codebox{margin:44px auto 0;max-width:760px;background:var(--code-bg);
+  border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.codebox .bar{display:flex;gap:6px;padding:12px 16px;border-bottom:1px solid var(--border)}
+.codebox .bar i{width:11px;height:11px;border-radius:50%;background:var(--border)}
+.codebox pre{padding:20px 22px;overflow-x:auto;
+  font:13.5px/1.7 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#c6cae8}
+.c-kw{color:#c084fc}.c-str{color:#7dd3a8}.c-fn{color:#8ab8ff}.c-cm{color:#5b6191}
+
+/* features */
+.grid{margin-top:44px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.feat{background:var(--bg-soft);border:1px solid var(--border);border-radius:14px;padding:22px}
+.feat .ico{font-size:24px}
+.feat h3{margin:10px 0 6px;font-size:16px}
+.feat p{color:var(--muted);font-size:14px}
+
+/* gallery banner */
+.banner{background:linear-gradient(135deg,rgba(99,102,241,.22),rgba(192,132,252,.14));
+  border:1px solid var(--border);border-radius:18px;padding:52px 32px;text-align:center}
+.banner h2{font-size:26px}
+.banner p{margin:12px auto 0;max-width:560px;color:var(--muted)}
+.banner .btn{margin-top:26px}
+
+footer{border-top:1px solid var(--border);margin-top:20px;padding:34px 0;
+  color:var(--muted);font-size:14px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+
+@media (max-width:820px){
+  .steps,.grid{grid-template-columns:1fr}
+  nav .hide-sm{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <a class="brand" href="./">🎬 pw-tutorial-video</a>
+    <nav>
+      <a class="hide-sm" href="#how">How it works</a>
+      <a class="hide-sm" href="#features">Features</a>
+      <a href="./gallery/">Gallery</a>
+      <a class="gh" href="https://github.com/Youniwemi/pw-tutorial-video">GitHub</a>
+    </nav>
+  </header>
+</div>
+
+<div class="hero">
+  <div class="wrap">
+    <h1>Your Playwright tests are<br><em>your tutorial videos</em></h1>
+    <p class="sub">Write your e2e tests once — get polished how-to videos with voice narration,
+      animated cursor, step overlays and background music. No screen recording, no video editor,
+      no docs that lag behind the product.</p>
+    <div class="cta">
+      <a class="btn btn-primary" href="./gallery/">▶ Watch the demo gallery</a>
+      <a class="btn btn-ghost" href="https://github.com/Youniwemi/pw-tutorial-video#quick-start">Get started</a>
+    </div>
+    <div class="install"><span class="dollar">$</span> npm install --save-dev pw-tutorial-video</div>
+  </div>
+</div>
+
+<div class="wrap">
+  <section id="how">
+    <h2>One test, two outputs</h2>
+    <p class="lead">All tutorial logic is a no-op in normal runs — your CI stays fast.
+      Flip one environment variable and the same test produces a broadcast-ready video.</p>
+    <div class="steps">
+      <div class="step"><span class="n">1</span>
+        <h3>Annotate your test</h3>
+        <p>Wrap the actions you already wrote in <code>tutorial.step()</code> and
+           <code>tutorial.context()</code> with the narration text.</p>
+      </div>
+      <div class="step"><span class="n">2</span>
+        <h3>Run in CI as usual</h3>
+        <p><code>playwright test</code> executes the steps sequentially — zero overhead,
+           no video, your e2e suite is untouched.</p>
+      </div>
+      <div class="step"><span class="n">3</span>
+        <h3>Flip the flag</h3>
+        <p><code>TUTORIAL_MODE=true</code> records the run with TTS voice, cursor animation
+           and overlays, then ffmpeg merges it all into the final video.</p>
+      </div>
+    </div>
+
+    <div class="codebox">
+      <div class="bar"><i></i><i></i><i></i></div>
+      <pre><span class="c-kw">import</span> { Tutorial } <span class="c-kw">from</span> <span class="c-str">'pw-tutorial-video'</span>;
+
+<span class="c-fn">test</span>(<span class="c-str">'Create your first invoice'</span>, <span class="c-kw">async</span> ({ page }, testInfo) =&gt; {
+  <span class="c-kw">const</span> tutorial = <span class="c-kw">new</span> <span class="c-fn">Tutorial</span>(page, { title: <span class="c-str">'Create Your First Invoice'</span>, lang: <span class="c-str">'en'</span> });
+
+  tutorial.<span class="c-fn">context</span>(<span class="c-str">'In this tutorial, we create and send an invoice.'</span>);
+  tutorial.<span class="c-fn">step</span>(<span class="c-str">'Open the invoices page'</span>, <span class="c-kw">async</span> () =&gt; {
+    <span class="c-kw">await</span> page.<span class="c-fn">click</span>(<span class="c-str">'a[href="/invoices"]'</span>);
+  });
+
+  <span class="c-kw">await</span> tutorial.<span class="c-fn">complete</span>(<span class="c-str">'Done! Your invoice is on its way.'</span>);
+  <span class="c-cm">// playwright test          → plain e2e run</span>
+  <span class="c-cm">// TUTORIAL_MODE=true …     → narrated tutorial video</span>
+});</pre>
+    </div>
+  </section>
+
+  <section id="features">
+    <h2>Everything a tutorial needs, automated</h2>
+    <div class="grid">
+      <div class="feat"><span class="ico">🎙️</span><h3>Voice narration</h3>
+        <p>macOS <code>say</code>, Microsoft Edge TTS, or any custom command — clips are
+           content-hashed and cached.</p></div>
+      <div class="feat"><span class="ico">🖱️</span><h3>Animated cursor</h3>
+        <p>Smooth, eased mouse movement with click animations following your test actions.</p></div>
+      <div class="feat"><span class="ico">📋</span><h3>Step overlays</h3>
+        <p>On-screen banners with step titles, progress and context cards — position and
+           style configurable.</p></div>
+      <div class="feat"><span class="ico">🎵</span><h3>Background music</h3>
+        <p>Looping soundtrack mixed by ffmpeg with fade-out on completion.</p></div>
+      <div class="feat"><span class="ico">📱</span><h3>Variants &amp; mobile</h3>
+        <p>Record desktop and mobile variants of the same tutorial, side-by-side multi-scene
+           layouts included.</p></div>
+      <div class="feat"><span class="ico">🌍</span><h3>Multi-language</h3>
+        <p>Per-language voices and filenames, full RTL support — one test, many locales.</p></div>
+      <div class="feat"><span class="ico">📝</span><h3>Transcripts</h3>
+        <p>Markdown transcripts generated from the timeline; edit them and write corrections
+           back into your tests.</p></div>
+      <div class="feat"><span class="ico">🖼️</span><h3>Gallery site</h3>
+        <p><code>build-site</code> turns your recordings into a static video gallery with
+           step-by-step guides.</p></div>
+      <div class="feat"><span class="ico">⚡</span><h3>Zero overhead</h3>
+        <p>Without <code>TUTORIAL_MODE</code> everything is a no-op — your test suite runs
+           exactly as before.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="banner">
+      <h2>See it in action</h2>
+      <p>The demo gallery is generated by this project's own CI: every push to main re-runs the
+         Playwright e2e suite in tutorial mode and publishes the narrated videos here.</p>
+      <a class="btn btn-primary" href="./gallery/">Browse the gallery →</a>
+    </div>
+  </section>
+
+  <footer>
+    <span>MIT licensed</span>
+    <span>
+      <a href="https://github.com/Youniwemi/pw-tutorial-video">GitHub</a> ·
+      <a href="https://www.npmjs.com/package/pw-tutorial-video">npm</a> ·
+      <a href="./gallery/">Gallery</a>
+    </span>
+  </footer>
+</div>
+
+</body>
+</html>
