@@ -166,7 +166,7 @@ const tutorial = new Tutorial(page, options);
 | `backgroundMusic` | `string` | `''` | Music file URL |
 | `musicVolume` | `number` | `0.15` | Background music volume (0-1) |
 | `voiceVolume` | `number` | `2.5` | Voice volume multiplier |
-| `stepDelay` | `number` | `500` | Delay between steps (ms) |
+| `stepDelay` | `number` | `500` | Delay before the action for non-voiced steps (ms). Voiced steps overlap narration and action instead: the action starts at the estimated end of the `do` sentence inside the clip (25% of the clip for single-phase steps), and the step lasts `max(narration, offset + action)` |
 | `mouseSteps` | `number` | `25` | Cursor animation smoothness |
 | `customStyles` | `string` | built-in | Custom CSS for overlays |
 | `scenes` | `Record<string, SceneOptions>` | — | Named scenes for multi-profile tutorials — see [Multiple user profiles](#multiple-user-profiles) |

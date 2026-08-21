@@ -31,6 +31,21 @@ async function getSharp() {
         return null;
     }
 }
+/**
+ * When to start a step's action inside its narration clip (option B of
+ * docs/narration-action-overlap.md — one merged clip, computed offset).
+ *
+ * Two-phase (`doText` known): character-share estimate of where the "do"
+ * sentence ends — `duration × (len(do) + 2) / len(full)` (the +2 is the
+ * ". " separator). Single-phase: fixed 25% of the clip.
+ */
+export function narrationActionOffset(durationMs, fullText, doText) {
+    if (!doText || !fullText || doText.length >= fullText.length) {
+        return Math.round(durationMs * 0.25);
+    }
+    const fraction = Math.min(1, (doText.length + 2) / fullText.length);
+    return Math.round(durationMs * fraction);
+}
 const asList = (focus) => (Array.isArray(focus) ? focus : [focus]);
 export class Tutorial {
     page;
@@ -318,17 +333,24 @@ export class Tutorial {
         }
         this.stepCounter++;
         let voiceText;
+        let voiceDoText;
         if (options?.voiceText) {
             voiceText = options.voiceText;
+            // Same sentence-boundary rule as `tutorial-transcript apply`.
+            const boundary = options.voiceText.indexOf('. ');
+            if (boundary > 0)
+                voiceDoText = options.voiceText.slice(0, boundary);
         }
         else if (options?.do && options?.explain) {
             voiceText = `${options.do}. ${options.explain}`;
+            voiceDoText = options.do;
         }
         else if (options?.do) {
             voiceText = options.do;
         }
         else if (options?.description) {
             voiceText = `${title}. ${options.description}`;
+            voiceDoText = title;
         }
         else {
             voiceText = title;
@@ -343,6 +365,7 @@ export class Tutorial {
             overlayText: options?.do ?? title,
             overlayDescription: options?.explain ?? options?.description,
             voiceText,
+            voiceDoText,
             skipVoice: options?.skipVoice,
             delay: options?.delay,
             voicePreload,
@@ -548,10 +571,16 @@ export class Tutorial {
             if (item.type === 'context') {
                 await this.overlay.showContext(item.title, item.text, item.style);
                 if (this.options.enableVoice) {
+                    // Wall clock comes from the clip's metadata duration, not from the
+                    // browser "ended" event — an early/failed playback must not let the
+                    // next step's narration start over this one in the mix.
                     const audioFilename = this.voice.getFilename(item.voiceText);
                     const voiceStartTime = Date.now();
-                    const duration = await this.voice.play(item.voiceText);
+                    const duration = await this.voice.startPlayback(item.voiceText);
                     this.timeline.addStep(0, 'Context', audioFilename, duration, voiceStartTime, item.voiceText, item.key, this.stagedScene);
+                    const remaining = duration - (Date.now() - voiceStartTime);
+                    if (remaining > 0)
+                        await this.page.waitForTimeout(remaining);
                 }
                 await this.page.waitForTimeout(this.options.stepDelay);
             }
@@ -568,13 +597,26 @@ export class Tutorial {
                 }
                 await this.overlay.showStep(item.overlayText, item.overlayDescription, item.overlayPosition);
                 if (this.options.enableVoice && !item.skipVoice) {
+                    // Narration/action overlap (option B): start the merged clip,
+                    // launch the action at the estimated end of its "do" half, then
+                    // clamp wall clock to the clip duration so the next clip never
+                    // overlaps in the ffmpeg mix.
                     const audioFilename = this.voice.getFilename(item.voiceText);
                     const voiceStartTime = Date.now();
-                    const duration = await this.voice.play(item.voiceText);
+                    const duration = await this.voice.startPlayback(item.voiceText);
                     this.timeline.addStep(currentStep, item.title, audioFilename, duration, voiceStartTime, item.voiceText, item.key, this.stagedScene);
+                    const offset = narrationActionOffset(duration, item.voiceText, item.voiceDoText);
+                    if (offset > 0)
+                        await this.page.waitForTimeout(offset);
+                    await item.action();
+                    const remaining = duration - (Date.now() - voiceStartTime);
+                    if (remaining > 0)
+                        await this.page.waitForTimeout(remaining);
                 }
-                await this.page.waitForTimeout(this.options.stepDelay);
-                await item.action();
+                else {
+                    await this.page.waitForTimeout(this.options.stepDelay);
+                    await item.action();
+                }
                 await this.page.waitForTimeout(item.delay ?? 300);
                 await this.captureStepScreenshot(currentStep);
             }
@@ -583,8 +625,11 @@ export class Tutorial {
         if (this.options.enableVoice) {
             const audioFilename = this.voice.getFilename(completionMessage);
             const voiceStartTime = Date.now();
-            const duration = await this.voice.play(completionMessage);
+            const duration = await this.voice.startPlayback(completionMessage);
             this.timeline.addStep(this.stepCounter + 1, 'Complete', audioFilename, duration, voiceStartTime, completionMessage, undefined, this.stagedScene);
+            const remaining = duration - (Date.now() - voiceStartTime);
+            if (remaining > 0)
+                await this.page.waitForTimeout(remaining);
         }
         if (this.music.isInitialized) {
             await this.music.stop(true);

@@ -15,7 +15,6 @@ test('split demo — tabs, ratios, back to tabs', { tag: '@tutorial' }, async ({
 		testTitle: 'split demo — tabs, ratios, back to tabs',
 		lang: 'fr',
 		audioBaseUrl: ACCOUNTANT_ORIGIN,
-		enableVoice: false,
 		backgroundMusic: '',
 		scenes: SCENES,
 		focus: 'accountant',

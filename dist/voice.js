@@ -117,6 +117,34 @@ export class TutorialVoice {
         return getAudioFilename(text, this.options.lang);
     }
     /**
+     * Start audio playback without waiting for it to finish.
+     * Returns the clip duration in ms — the caller owns the wall clock
+     * (action offset + clamp to duration), so headed playback and the
+     * ffmpeg merge stay in sync.
+     * No-op when TUTORIAL_MODE is not enabled (returns 0).
+     */
+    async startPlayback(text) {
+        if (!TUTORIAL_MODE)
+            return 0;
+        let audio = this.preloadedAudio.get(text);
+        if (!audio)
+            audio = await this.generateAudio(text);
+        if (!audio) {
+            console.warn(`[Voice] Failed to generate audio for: "${text.substring(0, 30)}..."`);
+            return 0;
+        }
+        if (this.options.playInBrowser) {
+            // Fire-and-forget: a navigation during the step action may kill the
+            // context — playback loss is acceptable, timing comes from durationMs.
+            await this.page
+                .evaluate(({ url }) => {
+                new Audio(url).play().catch(() => { });
+            }, { url: `${this.options.audioBaseUrl}${audio.url}` })
+                .catch(() => { });
+        }
+        return audio.durationMs;
+    }
+    /**
      * Play audio in browser (optional, for live viewing)
      * Returns duration in ms
      * Will generate audio on-demand if not preloaded.

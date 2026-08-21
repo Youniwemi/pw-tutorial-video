@@ -50,6 +50,14 @@ export declare class TutorialVoice {
      */
     getFilename(text: string): string;
     /**
+     * Start audio playback without waiting for it to finish.
+     * Returns the clip duration in ms — the caller owns the wall clock
+     * (action offset + clamp to duration), so headed playback and the
+     * ffmpeg merge stay in sync.
+     * No-op when TUTORIAL_MODE is not enabled (returns 0).
+     */
+    startPlayback(text: string): Promise<number>;
+    /**
      * Play audio in browser (optional, for live viewing)
      * Returns duration in ms
      * Will generate audio on-demand if not preloaded.

@@ -1,6 +1,11 @@
 # Narration/action overlap — the do·explain·voiceText problem
 
-Status: **design discussion** — nothing here is implemented.
+Status: **option B implemented** (2026-08-21). `Tutorial.complete()` starts each
+voiced step's action at `narrationActionOffset()` into the merged clip
+(character-share estimate for two-phase, 25% for single-phase, voiceText split
+at its first `'. '`), and clamps wall clock to the clip duration so clips never
+overlap in the mix. `TutorialVoice.startPlayback()` fires playback without
+awaiting the end. C2 remains the follow-up if the estimate proves audible.
 
 ## The problem
 

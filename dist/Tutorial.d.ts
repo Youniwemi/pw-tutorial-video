@@ -1,6 +1,15 @@
 import type { Page, Locator, FrameLocator } from '@playwright/test';
 import type { TutorialOptions, StepOptions, ContextOptions, SceneFocus, FocusOptions } from './types.js';
 import { TutorialTimeline } from './timeline.js';
+/**
+ * When to start a step's action inside its narration clip (option B of
+ * docs/narration-action-overlap.md — one merged clip, computed offset).
+ *
+ * Two-phase (`doText` known): character-share estimate of where the "do"
+ * sentence ends — `duration × (len(do) + 2) / len(full)` (the +2 is the
+ * ". " separator). Single-phase: fixed 25% of the clip.
+ */
+export declare function narrationActionOffset(durationMs: number, fullText: string, doText?: string): number;
 export declare class Tutorial {
     private page;
     private options;

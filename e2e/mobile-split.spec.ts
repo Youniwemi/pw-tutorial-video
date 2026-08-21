@@ -23,7 +23,6 @@ test('mobile split — two phones always visible', { tag: '@tutorial' }, async (
 		testTitle: 'mobile split — two phones always visible',
 		lang: 'fr',
 		audioBaseUrl: ACCOUNTANT_ORIGIN,
-		enableVoice: false,
 		backgroundMusic: '',
 		scenes: SCENES,
 		focus: 'accountant',

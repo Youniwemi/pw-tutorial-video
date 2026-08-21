@@ -614,6 +614,138 @@ describe('Step Options: do + explain', () => {
 	});
 });
 
+describe('narrationActionOffset', () => {
+	it('two-phase: character-share estimate of the do/explain boundary', async () => {
+		const { narrationActionOffset } = await import('../src/Tutorial');
+		// full = "do. explain" → "1234. 1234567890" (16 chars), do = 4 chars
+		const offset = narrationActionOffset(1600, '1234. 1234567890', '1234');
+		expect(offset).toBe(600); // (4 + 2) / 16 × 1600
+	});
+
+	it('single-phase: fixed 25% of the clip', async () => {
+		const { narrationActionOffset } = await import('../src/Tutorial');
+		expect(narrationActionOffset(2000, 'Click the button')).toBe(500);
+	});
+
+	it('degenerate inputs fall back to 25%', async () => {
+		const { narrationActionOffset } = await import('../src/Tutorial');
+		expect(narrationActionOffset(1000, 'abc', 'abc')).toBe(250);
+		expect(narrationActionOffset(1000, '', '')).toBe(250);
+		expect(narrationActionOffset(0, 'a. b', 'a')).toBe(0);
+	});
+
+	it('never exceeds the clip duration', async () => {
+		const { narrationActionOffset } = await import('../src/Tutorial');
+		expect(narrationActionOffset(1000, 'ab. c', 'ab')).toBeLessThanOrEqual(1000);
+	});
+});
+
+describe('Narration/action overlap (option B)', () => {
+	let mockPage: ReturnType<typeof createMockPage>;
+
+	beforeEach(() => {
+		mockPage = createMockPage();
+		vi.resetModules();
+	});
+
+	afterEach(() => {
+		vi.doUnmock('../src/voice');
+	});
+
+	const setup = async (durationMs: number) => {
+		process.env.TUTORIAL_MODE = 'true';
+		vi.resetModules();
+		const startPlayback = vi.fn().mockResolvedValue(durationMs);
+		vi.doMock('../src/voice', () => ({
+			TutorialVoice: vi.fn().mockImplementation(() => ({
+				startPlayback,
+				play: vi.fn().mockResolvedValue(durationMs),
+				preloadSingle: vi.fn().mockResolvedValue(undefined),
+				getFilename: vi.fn().mockReturnValue('mock.wav'),
+				switchPage: vi.fn()
+			}))
+		}));
+		const { Tutorial } = await import('../src/Tutorial');
+		return { Tutorial, startPlayback };
+	};
+
+	it('starts the action during the narration, at the estimated do boundary', async () => {
+		const originalEnv = process.env.TUTORIAL_MODE;
+		try {
+			const { Tutorial, startPlayback } = await setup(1600);
+			const tutorial = new Tutorial(mockPage as any, { title: 'Test', backgroundMusic: '' });
+
+			const events: string[] = [];
+			mockPage.waitForTimeout.mockImplementation(async (ms: number) => {
+				events.push(`wait:${ms}`);
+			});
+			tutorial.step('1234', async () => {
+				events.push('action');
+			}, { do: '1234', explain: '1234567890' });
+
+			await tutorial.complete('Done!');
+
+			expect(startPlayback).toHaveBeenCalledWith('1234. 1234567890');
+			const actionIdx = events.indexOf('action');
+			// offset wait right before the action: (4+2)/16 × 1600 = 600
+			expect(events[actionIdx - 1]).toBe('wait:600');
+			// wall clock clamped to clip duration: remainder waited after the action
+			// (mocked waits are instant, so the remainder is close to the full 1600ms)
+			const remainder = Number(events[actionIdx + 1].split(':')[1]);
+			expect(remainder).toBeGreaterThan(0);
+			expect(remainder).toBeLessThanOrEqual(1600);
+		} finally {
+			process.env.TUTORIAL_MODE = originalEnv;
+		}
+	});
+
+	it('voiceText splits at its first sentence boundary', async () => {
+		const originalEnv = process.env.TUTORIAL_MODE;
+		try {
+			const { Tutorial } = await setup(1600);
+			const tutorial = new Tutorial(mockPage as any, { title: 'Test', backgroundMusic: '' });
+
+			const events: string[] = [];
+			mockPage.waitForTimeout.mockImplementation(async (ms: number) => {
+				events.push(`wait:${ms}`);
+			});
+			tutorial.step('Key', async () => {
+				events.push('action');
+			}, { voiceText: '1234. 1234567890' });
+
+			await tutorial.complete('Done!');
+
+			const actionIdx = events.indexOf('action');
+			expect(events[actionIdx - 1]).toBe('wait:600');
+		} finally {
+			process.env.TUTORIAL_MODE = originalEnv;
+		}
+	});
+
+	it('single-phase step starts its action at 25% of the clip', async () => {
+		const originalEnv = process.env.TUTORIAL_MODE;
+		try {
+			const { Tutorial } = await setup(2000);
+			const tutorial = new Tutorial(mockPage as any, { title: 'Test', backgroundMusic: '' });
+
+			const events: string[] = [];
+			mockPage.waitForTimeout.mockImplementation(async (ms: number) => {
+				events.push(`wait:${ms}`);
+			});
+			tutorial.step('Click the button', async () => {
+				events.push('action');
+			});
+
+			await tutorial.complete('Done!');
+
+			const actionIdx = events.indexOf('action');
+			expect(events[actionIdx - 1]).toBe('wait:500');
+		} finally {
+			process.env.TUTORIAL_MODE = originalEnv;
+		}
+	});
+});
+
 describe('Context Styles', () => {
 	let mockPage: ReturnType<typeof createMockPage>;
 

@@ -35,7 +35,6 @@ async function stage(page: Page, testTitle: string) {
 		lang: 'en',
 		// The stage is served from this origin so narration audio loads freely.
 		audioBaseUrl: ACCOUNTANT_ORIGIN,
-		enableVoice: false,
 		backgroundMusic: '',
 		scenes: SCENES,
 		focus: 'accountant',

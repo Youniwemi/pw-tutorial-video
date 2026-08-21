@@ -1,4 +1,4 @@
-export { Tutorial } from './Tutorial.js';
+export { Tutorial, narrationActionOffset } from './Tutorial.js';
 export { buildMergeCommand } from './merge.js';
 export { slugify } from './slugify.js';
 export { mobileStage } from './stage-presets.js';

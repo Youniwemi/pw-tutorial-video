@@ -1,4 +1,4 @@
-export { Tutorial } from './Tutorial.js';
+export { Tutorial, narrationActionOffset } from './Tutorial.js';
 export type { TutorialOptions, StepOptions, ContextOptions, ContextStyle, OverlayPosition, FocusOptions, SceneFocus, SceneOptions } from './types.js';
 
 export { buildMergeCommand } from './merge.js';

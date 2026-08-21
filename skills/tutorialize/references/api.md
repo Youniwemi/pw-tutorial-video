@@ -154,9 +154,21 @@ Action starts at 25% of voice duration.
 
 "Do" voice plays first. Action starts when "explain" begins.
 
+The narration is one merged audio clip; the do/explain boundary inside it is
+*estimated* by character share (`duration × (len(do) + 2) / len(full)`), so the
+action may start slightly before or after the audible end of the "do". A
+`voiceText` override is split at its first `'. '` (same rule as
+`tutorial-transcript apply`); a voiceText with no sentence boundary behaves as
+single-phase (action at 25%). Wall clock is always clamped to
+`max(clip duration, offset + action)`, so the next clip never overlaps in the
+ffmpeg mix.
+
 ### Between steps
 
-`stepDelay` ms pause (default 500ms). Override per-step with `{ delay: 1000 }`.
+Voiced steps overlap narration and action (no `stepDelay` pause). Steps without
+voice (`skipVoice`, voice disabled) pause `stepDelay` ms (default 500ms) before
+the action. Every step ends with a trailing pause — override per-step with
+`{ delay: 1000 }` (default 300ms).
 
 ## 5. Critical Rules
 
