@@ -14,6 +14,20 @@ export interface SiteConfig {
 	};
 }
 
+/** One entry of a video page's step-by-step guide, built from the timeline
+ *  narration merged with the step screenshots. */
+export interface ManifestStep {
+	/** Timeline step number; absent for mid-flow context narrations */
+	n?: number;
+	title?: string;
+	/** Narration text spoken during this step */
+	text?: string;
+	/** Screenshot filename relative to videos/ */
+	image?: string;
+	/** True for a context narration shown between steps (no number, no image) */
+	context?: boolean;
+}
+
 export interface VideoManifestEntry {
 	id: string;
 	category: string;
@@ -28,6 +42,10 @@ export interface VideoManifestEntry {
 	uploadDate: string;
 	dateModified?: string;
 	steps: number;
+	/** Intro narration (leading context steps), shown under the video title */
+	description?: string;
+	/** Step-by-step guide rendered on the video page */
+	stepsDetail?: ManifestStep[];
 }
 
 export interface VideoManifest {

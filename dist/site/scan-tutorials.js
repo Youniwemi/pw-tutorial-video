@@ -43,7 +43,7 @@ export function scanTutorials(inputDir) {
         results.push({
             timeline: syntheticTimeline,
             videoFile: videoFileName,
-            stepScreenshots: steps.sort((a, b) => a.n - b.n).map((s) => s.file)
+            stepScreenshots: steps.sort((a, b) => a.n - b.n)
         });
     }
     return results;
