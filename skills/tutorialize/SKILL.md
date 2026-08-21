@@ -49,3 +49,6 @@ COMPLETE: Celebrate the outcome, suggest what's next
 - Test passes without `TUTORIAL_MODE` (plain E2E)
 - Test passes with `TUTORIAL_MODE=true` (video generation)
 - Watch the generated video — does it feel human?
+- Narration texts also become the gallery site's step-by-step guide
+  (`npx pw-tutorial-video build-site`) — even `skipVoice` steps show their
+  text there, so write every step text to read well on the page too.

@@ -17,7 +17,7 @@ function collectFromTimelines(timelineDir) {
         try {
             const data = JSON.parse(readFileSync(join(timelineDir, file), 'utf-8'));
             for (const step of data.steps) {
-                if (step.text?.trim())
+                if (step.audioFile && step.text?.trim())
                     entries.push({ lang: data.lang, text: step.text });
             }
         }

@@ -19,13 +19,17 @@ export function scaffold(config: SiteConfig, manifest: VideoManifest, tempDir: s
 		font: string;
 		baseUrl: string;
 		lang: string;
+		stepsLayout: string;
+		showStrip: boolean;
 	} = {
 		title: config.title,
 		logo: config.logo,
 		primaryColor: config.primaryColor,
 		font: config.font,
 		baseUrl: config.baseUrl,
-		lang: config.lang
+		lang: config.lang,
+		stepsLayout: config.tutorials?.stepsLayout || 'text',
+		showStrip: config.tutorials?.showStrip !== false
 	};
 
 	if (config.logo && existsSync(config.logo)) {

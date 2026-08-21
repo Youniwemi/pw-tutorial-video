@@ -47,6 +47,16 @@ describe('buildTranscriptMarkdown', () => {
 		const md = buildTranscriptMarkdown(data);
 		expect(md).not.toContain('Silent');
 	});
+
+	it('skips unvoiced steps (empty audioFile) even when they carry text', () => {
+		const data = sampleTimeline();
+		data.steps.splice(2, 0, { step: 2, title: 'Muet', text: 'Texte affiché mais non narré.', audioFile: '', startMs: 4000, durationMs: 0 });
+		const md = buildTranscriptMarkdown(data);
+		expect(md).not.toContain('Muet');
+		expect(md).not.toContain('non narré');
+		// Step numbering ignores the unvoiced step
+		expect(md).toContain('### Step 3: Envoyer');
+	});
 });
 
 describe('parseTranscript', () => {

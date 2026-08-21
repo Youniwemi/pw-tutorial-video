@@ -5,8 +5,8 @@ import type { TimelineData } from '../timeline.js';
 export interface ScannedTutorial {
 	timeline: TimelineData;
 	videoFile: string;
-	/** Filenames sorted by step number */
-	stepScreenshots: string[];
+	/** Screenshot filenames with their step number, sorted by step number */
+	stepScreenshots: { n: number; file: string }[];
 }
 
 export function scanTutorials(inputDir: string): ScannedTutorial[] {
@@ -57,7 +57,7 @@ export function scanTutorials(inputDir: string): ScannedTutorial[] {
 		results.push({
 			timeline: syntheticTimeline,
 			videoFile: videoFileName,
-			stepScreenshots: steps.sort((a, b) => a.n - b.n).map((s) => s.file)
+			stepScreenshots: steps.sort((a, b) => a.n - b.n)
 		});
 	}
 

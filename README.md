@@ -629,11 +629,42 @@ The command scans your `tutorials/` directory for videos, screenshots, and timel
 ```
 tutorial-site-dist/          # Static site output (configurable)
 ├── index.html               # Gallery home — videos grouped by category
-├── {video-slug}/index.html  # Dedicated page per video with player + step screenshots
+├── {video-slug}/index.html  # Dedicated page per video: player + step-by-step guide
 └── videos/                  # Copied from tutorials/videos/
     ├── *.webm               # Video files
-    └── *-step-*.webp        # Step screenshots (carousel on cards)
+    └── *-step-*.webp        # Step screenshots (carousel on cards, guide on video pages)
 ```
+
+### Video pages & the step guide
+
+Each video page shows the player, the tutorial's intro narration as a
+description, and a **step-by-step guide** built from the timeline: every step's
+narration text paired with its screenshot. Context narrations recorded
+mid-flow appear as callouts between steps, and steps recorded without voice
+still show their text.
+
+![Video page with thumbnail strip and text guide](docs/images/video-page.png)
+
+Two settings control the guide (`tutorials` block of the config):
+
+| Setting | Values | Effect |
+|---|---|---|
+| `showStrip` | `true` (default) / `false` | Horizontal thumbnail strip under the video info. Clicking a thumbnail opens the screenshot in a lightbox with the step's number, title and text as a caption. |
+| `stepsLayout` | `'text'` (default) | Text-only cards — clicking a step reveals its screenshot inline. |
+| | `'cards'` | Numbered cards with a small screenshot; click opens the lightbox. |
+| | `'full'` | Narration text + full-width screenshot under each step. |
+| | `'none'` | No step guide (strip only, if enabled). |
+
+| `stepsLayout: 'cards'` | Strip thumbnail clicked → lightbox with caption |
+|---|---|
+| ![Cards layout](docs/images/steps-cards.png) | ![Strip lightbox](docs/images/strip-lightbox.png) |
+
+<details>
+<summary><code>stepsLayout: 'full'</code> — full-width screenshot per step</summary>
+
+![Full layout](docs/images/steps-full.png)
+
+</details>
 
 ### Configuration
 
@@ -664,6 +695,8 @@ export default {
       heroTitle: "Learn My App",
       heroSubtitle: "Step-by-step video tutorials",
     },
+    stepsLayout: "text",   // Step guide on video pages: 'text' | 'cards' | 'full' | 'none'
+    showStrip: true,       // Thumbnail strip above the guide (click = lightbox + caption)
   },
 };
 ```

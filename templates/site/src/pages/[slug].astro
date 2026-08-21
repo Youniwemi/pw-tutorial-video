@@ -1,8 +1,7 @@
 ---
-import { readdirSync, existsSync } from 'fs';
-import { join } from 'path';
 import Base from '../layouts/Base.astro';
 import tutorials from '../data/tutorials.json';
+import siteConfig from '../data/site-config.json';
 
 export function getStaticPaths() {
 	const all = (tutorials as any).videos;
@@ -15,28 +14,20 @@ export function getStaticPaths() {
 const { video, index, allVideos } = Astro.props as any;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
-// Step screenshots
-const videosDir = join(process.cwd(), 'public/videos');
-type StepEntry = { n: number; url: string };
-const steps: string[] = [];
-if (existsSync(videosDir)) {
-	const stem = video.file.replace(/\.[^.]+$/, '');
-	const escaped = stem.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-	const pattern = new RegExp(`^${escaped}-step-(\\d+)\\.(png|jpe?g|webp|avif)$`);
-	const seen = new Map<number, { url: string; ext: string }>();
-	for (const file of readdirSync(videosDir)) {
-		const m = file.match(pattern);
-		if (!m) continue;
-		const n = parseInt(m[1]);
-		const cur = seen.get(n);
-		if (!cur || (m[2] === 'webp' && cur.ext !== 'webp')) {
-			seen.set(n, { url: `${base}/videos/${file}`, ext: m[2] });
-		}
-	}
-	steps.push(...[...seen.entries()].sort((a, b) => a[0] - b[0]).map(([, s]) => s.url));
-}
+// 'text' | 'cards' | 'full' | 'none' — see SiteConfig.tutorials.stepsLayout
+const layout = (siteConfig as any).stepsLayout || 'text';
+// The thumbnail strip is independent of the guide layout (SiteConfig.tutorials.showStrip)
+const showStrip = (siteConfig as any).showStrip !== false;
 
-const poster = steps[0];
+type Step = { n?: number; title?: string; text?: string; image?: string; context?: boolean };
+const stepsDetail: Step[] = video.stepsDetail ?? [];
+
+// Sequential display numbers for numbered entries (contexts don't count)
+let counter = 0;
+const numbered = stepsDetail.map((s) => ({ ...s, num: s.context ? undefined : ++counter }));
+const shots = numbered.filter((s) => s.image);
+
+const poster = shots[0]?.image;
 const prev = index > 0 ? allVideos[index - 1] : null;
 const next = index < allVideos.length - 1 ? allVideos[index + 1] : null;
 ---
@@ -46,29 +37,122 @@ const next = index < allVideos.length - 1 ? allVideos[index + 1] : null;
 		<a href={`${base}/`} class="back-link">← All tutorials</a>
 
 		<div class="video-player-wrap">
-			<video controls class="video-player" poster={poster}>
+			<video controls class="video-player" poster={poster ? `${base}/videos/${poster}` : undefined}>
 				<source src={`${base}/videos/${video.file}`} type="video/webm" />
 			</video>
 		</div>
 
 		<div class="video-page-info">
 			<h1 class="video-page-title">{video.title}</h1>
+			{video.description && <p class="video-page-desc">{video.description}</p>}
 			<div class="video-page-meta">
 				<span class="video-duration">&#x1F553; {video.duration}</span>
 			</div>
 		</div>
 
-		{steps.length > 0 && (
+		{showStrip && shots.length > 0 && (
 			<div class="steps-section">
 				<div class="step-strip">
-					{steps.map((src: string, i: number) => (
-						<div class="step-frame">
-							<img src={src} alt={`Step ${i + 1}`} loading={i === 0 ? 'eager' : 'lazy'} />
-							<span class="step-num">{i + 1}</span>
-						</div>
+					{shots.map((s) => (
+						<button
+							class="step-frame"
+							data-full={`${base}/videos/${s.image}`}
+							data-num={s.num}
+							data-title={s.title || ''}
+							data-text={s.text || ''}
+							aria-label={`Step ${s.num}${s.title ? `: ${s.title}` : ''}`}
+						>
+							<img src={`${base}/videos/${s.image}`} alt={s.title || `Step ${s.num}`} loading={s.num === 1 ? 'eager' : 'lazy'} />
+							<span class="step-num">{s.num}</span>
+						</button>
 					))}
 				</div>
 			</div>
+		)}
+
+		{layout === 'full' && numbered.length > 0 && (
+			<section class="steps-guide">
+				{numbered.map((s) => (
+					s.context ? (
+						<p class="step-context">{s.text}</p>
+					) : (
+						<div class="step-block">
+							<div class="step-header">
+								<span class="step-number">{s.num}</span>
+								<div class="step-copy">
+									{s.title && <h2 class="step-title">{s.title}</h2>}
+									{s.text && <p class="step-text">{s.text}</p>}
+								</div>
+							</div>
+							{s.image && (
+								<img
+									class="step-shot"
+									src={`${base}/videos/${s.image}`}
+									alt={s.title || `Step ${s.num}`}
+									loading={s.num === 1 ? 'eager' : 'lazy'}
+								/>
+							)}
+						</div>
+					)
+				))}
+			</section>
+		)}
+
+		{layout === 'cards' && numbered.length > 0 && (
+			<section class="steps-cards">
+				{numbered.map((s) => (
+					s.context ? (
+						<p class="step-context">{s.text}</p>
+					) : (
+						<div class="step-card">
+							<span class="step-number">{s.num}</span>
+							<div class="step-copy">
+								{s.title && <h2 class="step-title">{s.title}</h2>}
+								{s.text && <p class="step-text">{s.text}</p>}
+							</div>
+							{s.image && (
+								<button
+									class="step-thumb"
+									data-full={`${base}/videos/${s.image}`}
+									data-num={s.num}
+									data-title={s.title || ''}
+									data-text={s.text || ''}
+									aria-label={`Enlarge screenshot of step ${s.num}`}
+								>
+									<img src={`${base}/videos/${s.image}`} alt={s.title || `Step ${s.num}`} loading="lazy" />
+									<span class="step-zoom">⤢</span>
+								</button>
+							)}
+						</div>
+					)
+				))}
+			</section>
+		)}
+
+		{layout === 'text' && numbered.length > 0 && (
+			<section class="steps-text">
+				{numbered.map((s) => (
+					s.context ? (
+						<p class="step-context">{s.text}</p>
+					) : (
+						<div class:list={['step-row', { 'has-shot': !!s.image }]}>
+							<button class="step-row-head" aria-expanded="false" disabled={!s.image}>
+								<span class="step-number">{s.num}</span>
+								<span class="step-copy">
+									{s.title && <span class="step-title">{s.title}</span>}
+									{s.text && <span class="step-text">{s.text}</span>}
+								</span>
+								{s.image && <span class="step-chevron">▾</span>}
+							</button>
+							{s.image && (
+								<div class="step-reveal">
+									<img src={`${base}/videos/${s.image}`} alt={s.title || `Step ${s.num}`} loading="lazy" />
+								</div>
+							)}
+						</div>
+					)
+				))}
+			</section>
 		)}
 
 		<nav class="video-nav-row" aria-label="navigation">
@@ -90,7 +174,67 @@ const next = index < allVideos.length - 1 ? allVideos[index + 1] : null;
 			</div>
 		</nav>
 	</div>
+
+	{(showStrip || layout === 'cards') && (
+		<div class="lightbox" id="step-lightbox" hidden>
+			<figure class="lightbox-figure">
+				<img alt="" />
+				<figcaption class="lightbox-caption" hidden>
+					<span class="lightbox-num"></span>
+					<span class="lightbox-copy">
+						<strong class="lightbox-title"></strong>
+						<span class="lightbox-text"></span>
+					</span>
+				</figcaption>
+			</figure>
+		</div>
+	)}
 </Base>
+
+<script>
+	// Strip + cards thumbnails: click to enlarge in the lightbox, with the
+	// step's number, title and text as a caption.
+	const lightbox = document.getElementById('step-lightbox');
+	if (lightbox) {
+		const img = lightbox.querySelector('img')!;
+		const caption = lightbox.querySelector<HTMLElement>('.lightbox-caption')!;
+		const num = lightbox.querySelector<HTMLElement>('.lightbox-num')!;
+		const title = lightbox.querySelector<HTMLElement>('.lightbox-title')!;
+		const text = lightbox.querySelector<HTMLElement>('.lightbox-text')!;
+
+		const open = (source: HTMLElement) => {
+			img.src = source.dataset.full || '';
+			num.textContent = source.dataset.num || '';
+			title.textContent = source.dataset.title || '';
+			text.textContent = source.dataset.text || '';
+			caption.hidden = !(source.dataset.title || source.dataset.text);
+			lightbox.hidden = false;
+			document.body.style.overflow = 'hidden';
+		};
+
+		document.querySelectorAll<HTMLElement>('.step-thumb, .step-frame').forEach((thumb) => {
+			thumb.addEventListener('click', () => open(thumb));
+		});
+
+		const close = () => {
+			lightbox.hidden = true;
+			document.body.style.overflow = '';
+		};
+		lightbox.addEventListener('click', close);
+		document.addEventListener('keydown', (e) => {
+			if (e.key === 'Escape' && !lightbox.hidden) close();
+		});
+	}
+
+	// Text layout: click a step to reveal its screenshot
+	document.querySelectorAll<HTMLElement>('.step-row.has-shot .step-row-head').forEach((head) => {
+		head.addEventListener('click', () => {
+			const row = head.closest('.step-row')!;
+			const open = row.classList.toggle('open');
+			head.setAttribute('aria-expanded', String(open));
+		});
+	});
+</script>
 
 <style>
 	.video-page {
@@ -137,6 +281,13 @@ const next = index < allVideos.length - 1 ? allVideos[index + 1] : null;
 		line-height: 1.3;
 	}
 
+	.video-page-desc {
+		color: var(--color-text-muted);
+		font-size: 1rem;
+		line-height: 1.6;
+		margin-bottom: 0.75rem;
+	}
+
 	.video-page-meta {
 		display: flex;
 		align-items: center;
@@ -150,6 +301,55 @@ const next = index < allVideos.length - 1 ? allVideos[index + 1] : null;
 		align-items: center;
 		gap: 0.25rem;
 	}
+
+	/* ── Shared step bits ─────────────────────────────────────────── */
+
+	.step-number {
+		flex-shrink: 0;
+		width: 2rem;
+		height: 2rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 50%;
+		background: var(--color-primary);
+		color: #fff;
+		font-weight: 700;
+		font-size: 0.95rem;
+	}
+
+	.step-copy {
+		min-width: 0;
+		flex: 1;
+	}
+
+	.step-title {
+		display: block;
+		font-size: 1.1rem;
+		font-weight: 600;
+		line-height: 1.4;
+		margin: 0.2rem 0 0.35rem;
+		color: var(--color-text);
+	}
+
+	.step-text {
+		display: block;
+		color: var(--color-text-muted);
+		line-height: 1.6;
+		margin: 0;
+		font-size: 0.95rem;
+	}
+
+	.step-context {
+		color: var(--color-text-muted);
+		font-style: italic;
+		line-height: 1.6;
+		border-inline-start: 3px solid var(--color-primary);
+		padding-inline-start: 1rem;
+		margin: 0;
+	}
+
+	/* ── strip layout ─────────────────────────────────────────────── */
 
 	.steps-section {
 		margin-bottom: 2rem;
@@ -183,6 +383,10 @@ const next = index < allVideos.length - 1 ? allVideos[index + 1] : null;
 		border-radius: 0.5rem;
 		overflow: hidden;
 		box-shadow: var(--shadow);
+		padding: 0;
+		border: 0;
+		background: none;
+		cursor: zoom-in;
 	}
 
 	.step-frame img {
@@ -190,6 +394,11 @@ const next = index < allVideos.length - 1 ? allVideos[index + 1] : null;
 		height: 113px;
 		object-fit: cover;
 		display: block;
+		transition: transform 0.2s;
+	}
+
+	.step-frame:hover img {
+		transform: scale(1.04);
 	}
 
 	.step-num {
@@ -203,6 +412,243 @@ const next = index < allVideos.length - 1 ? allVideos[index + 1] : null;
 		padding: 0.1rem 0.4rem;
 		border-radius: 0.25rem;
 	}
+
+	/* ── full layout ──────────────────────────────────────────────── */
+
+	.steps-guide {
+		display: flex;
+		flex-direction: column;
+		gap: 2.5rem;
+		margin-bottom: 3rem;
+	}
+
+	.step-block {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	.step-header {
+		display: flex;
+		align-items: flex-start;
+		gap: 1rem;
+	}
+
+	.step-shot {
+		width: 100%;
+		display: block;
+		border-radius: var(--radius);
+		border: 1px solid var(--color-border);
+		box-shadow: var(--shadow);
+	}
+
+	/* ── cards layout ─────────────────────────────────────────────── */
+
+	.steps-cards {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		margin-bottom: 3rem;
+	}
+
+	.step-card {
+		display: flex;
+		align-items: flex-start;
+		gap: 1rem;
+		padding: 1rem 1.25rem;
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius);
+		background: var(--color-bg-card);
+		box-shadow: var(--shadow);
+	}
+
+	.step-thumb {
+		position: relative;
+		flex-shrink: 0;
+		width: 180px;
+		padding: 0;
+		border: 1px solid var(--color-border);
+		border-radius: 0.5rem;
+		overflow: hidden;
+		cursor: zoom-in;
+		background: none;
+		display: block;
+	}
+
+	.step-thumb img {
+		width: 100%;
+		height: 102px;
+		object-fit: cover;
+		display: block;
+		transition: transform 0.2s;
+	}
+
+	.step-thumb:hover img {
+		transform: scale(1.04);
+	}
+
+	.step-zoom {
+		position: absolute;
+		right: 6px;
+		bottom: 6px;
+		background: rgba(0, 0, 0, 0.65);
+		color: #fff;
+		font-size: 0.8rem;
+		line-height: 1;
+		padding: 0.25rem 0.35rem;
+		border-radius: 0.3rem;
+	}
+
+	/* ── text layout ──────────────────────────────────────────────── */
+
+	.steps-text {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		margin-bottom: 3rem;
+	}
+
+	.step-row {
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius);
+		background: var(--color-bg-card);
+		overflow: hidden;
+	}
+
+	.step-row-head {
+		display: flex;
+		align-items: flex-start;
+		gap: 1rem;
+		width: 100%;
+		padding: 1rem 1.25rem;
+		border: 0;
+		background: none;
+		text-align: inherit;
+		font: inherit;
+		color: inherit;
+	}
+
+	.step-row.has-shot .step-row-head {
+		cursor: pointer;
+	}
+
+	.step-row.has-shot .step-row-head:hover {
+		background: color-mix(in srgb, var(--color-primary) 5%, transparent);
+	}
+
+	.step-chevron {
+		flex-shrink: 0;
+		align-self: center;
+		color: var(--color-text-muted);
+		transition: transform 0.2s;
+	}
+
+	.step-row.open .step-chevron {
+		transform: rotate(180deg);
+	}
+
+	.step-reveal {
+		display: none;
+		padding: 0 1.25rem 1.25rem;
+	}
+
+	.step-row.open .step-reveal {
+		display: block;
+	}
+
+	.step-reveal img {
+		width: 100%;
+		display: block;
+		border-radius: 0.5rem;
+		border: 1px solid var(--color-border);
+	}
+
+	/* ── lightbox ─────────────────────────────────────────────────── */
+
+	.lightbox[hidden] {
+		display: none;
+	}
+
+	.lightbox {
+		position: fixed;
+		inset: 0;
+		z-index: 100;
+		background: rgba(0, 0, 0, 0.85);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 2rem;
+		cursor: zoom-out;
+	}
+
+	.lightbox-figure {
+		max-width: min(1100px, 100%);
+		max-height: 100%;
+		margin: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.9rem;
+		align-items: center;
+	}
+
+	.lightbox img {
+		max-width: 100%;
+		max-height: 75vh;
+		border-radius: 0.5rem;
+		box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+	}
+
+	.lightbox-caption {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.75rem;
+		max-width: 700px;
+		color: #e2e8f0;
+		cursor: default;
+	}
+
+	.lightbox-caption[hidden] {
+		display: none;
+	}
+
+	.lightbox-num {
+		flex-shrink: 0;
+		width: 1.7rem;
+		height: 1.7rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 50%;
+		background: var(--color-primary);
+		color: #fff;
+		font-weight: 700;
+		font-size: 0.85rem;
+	}
+
+	.lightbox-num:empty {
+		display: none;
+	}
+
+	.lightbox-copy {
+		display: flex;
+		flex-direction: column;
+		gap: 0.2rem;
+		text-align: start;
+	}
+
+	.lightbox-title {
+		font-size: 1rem;
+		line-height: 1.4;
+		color: #fff;
+	}
+
+	.lightbox-text {
+		font-size: 0.9rem;
+		line-height: 1.55;
+		color: #cbd5e1;
+	}
+
+	/* ── prev/next nav ────────────────────────────────────────────── */
 
 	.video-nav-row {
 		display: flex;
@@ -272,6 +718,24 @@ const next = index < allVideos.length - 1 ? allVideos[index + 1] : null;
 
 		.step-frame img {
 			height: 85px;
+		}
+
+		.step-card {
+			flex-wrap: wrap;
+		}
+
+		.step-thumb {
+			width: 100%;
+		}
+
+		.step-thumb img {
+			height: auto;
+		}
+
+		.step-number {
+			width: 1.6rem;
+			height: 1.6rem;
+			font-size: 0.85rem;
 		}
 
 		.nav-title {

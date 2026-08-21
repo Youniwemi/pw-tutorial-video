@@ -6,11 +6,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 No `Co-Authored-By` trailer in commits.
 
-## Maintenance rule
+## Definition of done
 
-When adding or changing a feature, always update:
-1. This `CLAUDE.md` file (architecture, options, design decisions)
-2. The skill in `skills/tutorialize/` (especially `references/api.md` for API changes)
+A feature or behavior change is **not done** until all of these ship together (same PR):
+
+1. **`CLAUDE.md`** updated — architecture, options, design decisions
+2. **The skill** in `skills/tutorialize/` updated — especially `references/api.md` for API or timing changes
+3. **`README.md`** updated — every user-facing option and workflow; site-visible changes get screenshots in `docs/images/` (~900px wide, referenced with relative paths like `docs/images/x.png` — GitHub renders them on any branch, and npm resolves them through package.json's `repository` field)
+4. **Unit tests** covering the new behavior (`npm test` green)
+5. **`npm run build`** run, so the committed `dist/` matches `src/`
+
+Before declaring any task complete, walk this list and fix what's missing.
 
 ## What this is
 
@@ -80,6 +86,9 @@ Three entry points: `pw-tutorial-video` (main), `pw-tutorial-video/reporter`, `p
 - **Mobile variant preset** (`variant === 'mobile'`, internal — no extra options): (1) *pinned split* when 2+ scenes — `data-layout="split"` on the stage, all scenes always visible at equal width, tab bar never shown, labels always visible (inactive dimmed), `focus()` ignores ratios and never sets inline flex; (2) *compact overlay* — pure CSS-variable remaps under `html[data-tutorial-variant='mobile']` from `--tutorial-*-mobile` values defined in `:root` (so consumers tune them with a plain `:root` override), plus icon/step-badge hidden via `--tutorial-icon-display-mobile`/`--tutorial-badge-display-mobile`. Outside the mobile variant, stage/focus behavior is strictly unchanged.
 - **Overlay surface is variable-driven**: `--tutorial-overlay-bg` (was hardcoded `#fff` — set an `rgba()` for transparency), `--tutorial-overlay-blur`, `--tutorial-overlay-shadow`, `--tutorial-icon-size`, `--tutorial-context-max-width`.
 - **Site variant filter**: the manifest entries carry `variant` (read from the timeline, filename suffix `-mobile`/`-tablet` as fallback); the gallery index shows a Desktop/Mobile filter when variants exist and cards get a variant badge.
+- **Site step guide layout** is configurable via `tutorials.stepsLayout` in `tutorial-site.config.js`: `'text'` (default — text-only cards, click reveals the screenshot inline), `'cards'` (numbered text cards with a small screenshot, click opens a lightbox), `'full'` (narration text + full-width screenshot per step), `'none'` (no guide). The thumbnail strip is a separate toggle, `tutorials.showStrip` (default `true`), rendered above the guide; clicking a strip thumbnail opens the screenshot in the lightbox with its step's number, title and text as a caption. Scaffold passes both to the template through `site-config.json`.
+- **Site step data**: `buildStepsDetail()` (`src/site/generate-manifest.ts`) merges timeline steps with the scanned screenshots by step number into `stepsDetail` on the manifest entry: leading context narrations become `description` (shown under the title), mid-flow contexts stay in the list as unnumbered callouts, and the `Complete` narration is excluded. Display numbers are sequential (contexts don't count). A video with no timeline still gets a screenshot-only guide, and screenshots whose step is absent from the timeline (older recordings) are inserted at their position with no text.
+- **Unvoiced steps are recorded in the timeline** with empty `audioFile` and `durationMs: 0` (steps with `skipVoice`, or any step/context/complete when voice is disabled), so their text reaches the site's step guide. Empty `audioFile` marks them: `buildMergeCommand`, `buildTranscriptMarkdown`, `applyCorrections`, and voice-prerender all skip such steps — transcripts stay narration-only and no TTS is synthesized for them.
 
 ## Environment variables
 

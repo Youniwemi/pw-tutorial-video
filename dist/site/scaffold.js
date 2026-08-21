@@ -13,7 +13,9 @@ export function scaffold(config, manifest, tempDir) {
         primaryColor: config.primaryColor,
         font: config.font,
         baseUrl: config.baseUrl,
-        lang: config.lang
+        lang: config.lang,
+        stepsLayout: config.tutorials?.stepsLayout || 'text',
+        showStrip: config.tutorials?.showStrip !== false
     };
     if (config.logo && existsSync(config.logo)) {
         const logoExt = config.logo.split('.').pop();

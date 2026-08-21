@@ -33,7 +33,8 @@ export function buildTranscriptMarkdown(data: TimelineData): string {
 
 	let stepNum = 0;
 	for (const step of data.steps) {
-		if (!step.text) continue;
+		// Unvoiced steps (empty audioFile) have no narration to correct.
+		if (!step.text || !step.audioFile) continue;
 
 		if (step.step === 0 && step.title === 'Context') {
 			lines.push(`**[Context]** ${step.text}`);
@@ -271,7 +272,7 @@ export function applyCorrections(
 	let cursor = 0;
 
 	for (const step of data.steps) {
-		if (!step.text) continue;
+		if (!step.text || !step.audioFile) continue;
 
 		const kind: TranscriptEntry['kind'] =
 			step.step === 0 && step.title === 'Context' ? 'context'

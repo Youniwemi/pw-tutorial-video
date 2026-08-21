@@ -53,8 +53,9 @@ export function buildMergeCommand(
 		audioIdx = 2;
 	}
 
-	// Add voice clips
+	// Add voice clips — unvoiced steps (empty audioFile) carry no narration
 	for (const step of timeline.steps) {
+		if (!step.audioFile) continue;
 		const audioPath = join(opts.audioDir, step.audioFile);
 		if (!fileExists(audioPath)) {
 			console.warn(`Missing audio: ${step.audioFile}`);

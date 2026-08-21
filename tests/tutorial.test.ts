@@ -141,6 +141,31 @@ describe('Tutorial Class', () => {
 		}
 	});
 
+	it('records unvoiced steps in the timeline (empty audioFile, zero duration)', async () => {
+		const originalEnv = process.env.TUTORIAL_MODE;
+		process.env.TUTORIAL_MODE = 'true';
+
+		try {
+			vi.resetModules();
+			const { Tutorial } = await import('../src/Tutorial');
+			const tutorial = new Tutorial(mockPage as any, { title: 'Test', enableVoice: false });
+
+			tutorial.context('Intro', { text: 'Some context.' });
+			tutorial.step('First step', async () => {});
+
+			await tutorial.complete();
+
+			const timeline = tutorial.getTimeline();
+			const [context, step, complete] = timeline.steps;
+
+			expect(context).toMatchObject({ step: 0, title: 'Context', text: 'Intro. Some context.', audioFile: '', durationMs: 0 });
+			expect(step).toMatchObject({ step: 1, title: 'First step', text: 'First step', audioFile: '', durationMs: 0 });
+			expect(complete).toMatchObject({ title: 'Complete', audioFile: '', durationMs: 0 });
+		} finally {
+			process.env.TUTORIAL_MODE = originalEnv;
+		}
+	});
+
 	it('should skip tutorial actions when TUTORIAL_MODE is false', async () => {
 		const originalEnv = process.env.TUTORIAL_MODE;
 		delete process.env.TUTORIAL_MODE;
