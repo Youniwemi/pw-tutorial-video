@@ -754,6 +754,10 @@ export class Tutorial {
 					this.timeline.addStep(0, 'Context', audioFilename, duration, voiceStartTime, item.voiceText, item.key, this.stagedScene);
 					const remaining = duration - (Date.now() - voiceStartTime);
 					if (remaining > 0) await this.page.waitForTimeout(remaining);
+				} else {
+					// Unvoiced (empty audioFile, zero duration): recorded for the site's
+					// step guide, ignored by the merge/transcript/prerender pipeline.
+					this.timeline.addStep(0, 'Context', '', 0, Date.now(), item.voiceText, item.key, this.stagedScene);
 				}
 
 				await this.page.waitForTimeout(this.options.stepDelay);
@@ -790,6 +794,7 @@ export class Tutorial {
 					const remaining = duration - (Date.now() - voiceStartTime);
 					if (remaining > 0) await this.page.waitForTimeout(remaining);
 				} else {
+					this.timeline.addStep(currentStep, item.title, '', 0, Date.now(), item.voiceText, item.key, this.stagedScene);
 					await this.page.waitForTimeout(this.options.stepDelay);
 					await item.action();
 				}
@@ -808,6 +813,8 @@ export class Tutorial {
 			this.timeline.addStep(this.stepCounter + 1, 'Complete', audioFilename, duration, voiceStartTime, completionMessage, undefined, this.stagedScene);
 			const remaining = duration - (Date.now() - voiceStartTime);
 			if (remaining > 0) await this.page.waitForTimeout(remaining);
+		} else {
+			this.timeline.addStep(this.stepCounter + 1, 'Complete', '', 0, Date.now(), completionMessage, undefined, this.stagedScene);
 		}
 
 		if (this.music.isInitialized) {

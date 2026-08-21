@@ -19,7 +19,8 @@ export function buildTranscriptMarkdown(data) {
     lines.push('');
     let stepNum = 0;
     for (const step of data.steps) {
-        if (!step.text)
+        // Unvoiced steps (empty audioFile) have no narration to correct.
+        if (!step.text || !step.audioFile)
             continue;
         if (step.step === 0 && step.title === 'Context') {
             lines.push(`**[Context]** ${step.text}`);
@@ -205,7 +206,7 @@ export function applyCorrections(data, entries, io) {
     let dirty = false;
     let cursor = 0;
     for (const step of data.steps) {
-        if (!step.text)
+        if (!step.text || !step.audioFile)
             continue;
         const kind = step.step === 0 && step.title === 'Context' ? 'context'
             : step.title === 'Complete' ? 'complete'

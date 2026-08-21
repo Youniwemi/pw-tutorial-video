@@ -80,6 +80,26 @@ describe('buildStepsDetail', () => {
 		expect(stepsDetail[2]).toEqual({ n: 2, image: 'demo-step-2.webp' });
 	});
 
+	it('shows text for unvoiced timeline steps (empty audioFile)', () => {
+		const unvoiced: TimelineStep = { step: 2, title: 'Étape muette', text: 'Texte affiché sans narration.', audioFile: '', startMs: 5000, durationMs: 0 };
+		const t = makeTutorial(
+			[step(1, 'Premier', 'Faites ceci.'), unvoiced],
+			[
+				{ n: 1, file: 'demo-step-1.webp' },
+				{ n: 2, file: 'demo-step-2.webp' }
+			]
+		);
+
+		const { stepsDetail } = buildStepsDetail(t);
+
+		expect(stepsDetail[1]).toEqual({
+			n: 2,
+			title: 'Étape muette',
+			text: 'Texte affiché sans narration.',
+			image: 'demo-step-2.webp'
+		});
+	});
+
 	it('handles a video with no timeline (screenshots only)', () => {
 		const t = makeTutorial([], [
 			{ n: 1, file: 'demo-step-1.webp' },

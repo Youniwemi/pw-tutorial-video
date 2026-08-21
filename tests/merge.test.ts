@@ -37,6 +37,28 @@ describe('buildMergeCommand', () => {
 		expect(result.filter).toContain('adelay=13492|13492');
 	});
 
+	it('should skip unvoiced steps (empty audioFile)', () => {
+		const timeline = {
+			totalDurationMs: 66849,
+			steps: [
+				{ audioFile: 'abc123.wav', startMs: 7988 },
+				{ audioFile: '', startMs: 10000 },
+				{ audioFile: 'def456.wav', startMs: 13492 }
+			]
+		};
+		// checkFileExists returns true for everything — without the guard the
+		// empty audioFile would resolve to the audio dir itself and be added.
+		const result = buildMergeCommand(
+			timeline,
+			'/path/to/video.webm',
+			'/path/to/output.webm',
+			{ musicFile: '', checkFileExists: () => true }
+		);
+
+		expect(result.inputs).toHaveLength(3);
+		expect(result.filter).not.toContain('adelay=10000');
+	});
+
 	it('should use correct video duration from timeline', () => {
 		const result = buildMergeCommand(
 			{ ...mockTimeline, totalDurationMs: 120000 },

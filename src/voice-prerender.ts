@@ -37,7 +37,7 @@ function collectFromTimelines(timelineDir: string): NarrationText[] {
 		try {
 			const data = JSON.parse(readFileSync(join(timelineDir, file), 'utf-8')) as TimelineData;
 			for (const step of data.steps) {
-				if (step.text?.trim()) entries.push({ lang: data.lang, text: step.text });
+				if (step.audioFile && step.text?.trim()) entries.push({ lang: data.lang, text: step.text });
 			}
 		} catch {
 			console.warn(`[Voice] Skipping unreadable timeline: ${file}`);

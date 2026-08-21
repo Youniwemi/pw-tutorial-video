@@ -49,7 +49,12 @@ describe('voice pre-rendering', () => {
 			join(timelineDir, 'demo_timeline.json'),
 			JSON.stringify({
 				lang: 'fr',
-				steps: [{ step: 1, title: 'x', text: 'Voilà.' }, { step: 2, title: 'y', text: 'Suivant.' }]
+				steps: [
+					{ step: 1, title: 'x', text: 'Voilà.', audioFile: 'a1.mp3' },
+					{ step: 2, title: 'y', text: 'Suivant.', audioFile: 'a2.mp3' },
+					// Unvoiced step (site guide only) — must not be synthesized
+					{ step: 3, title: 'z', text: 'Silencieux.', audioFile: '' }
+				]
 			})
 		);
 

@@ -170,6 +170,10 @@ voice (`skipVoice`, voice disabled) pause `stepDelay` ms (default 500ms) before
 the action. Every step ends with a trailing pause — override per-step with
 `{ delay: 1000 }` (default 300ms).
 
+Unvoiced steps/contexts are still recorded in the timeline JSON (empty
+`audioFile`, `durationMs: 0`) so the generated site's step guide can show their
+text; the merge, transcript, and voice-prerender pipelines ignore them.
+
 ## 5. Critical Rules
 
 ### 5.1 No blank-screen opening
