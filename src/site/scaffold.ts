@@ -1,6 +1,7 @@
 import { cpSync, mkdirSync, writeFileSync, existsSync } from 'fs';
 import { join, dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
+import { buildEmbedFiles } from './embed.js';
 import type { SiteConfig, VideoManifest } from './types.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -42,6 +43,14 @@ export function scaffold(config: SiteConfig, manifest: VideoManifest, tempDir: s
 	mkdirSync(join(tempDir, 'src', 'data'), { recursive: true });
 	writeFileSync(join(tempDir, 'src', 'data', 'site-config.json'), JSON.stringify(siteConfigData, null, 2));
 	writeFileSync(join(tempDir, 'src', 'data', 'tutorials.json'), JSON.stringify(manifest, null, 2));
+
+	// In-app widget data: one JSON payload per tutorial + an index, served
+	// next to widget.js (template public/) so any app can embed tutorials.
+	const embedDir = join(tempDir, 'public', 'embed');
+	mkdirSync(embedDir, { recursive: true });
+	for (const file of buildEmbedFiles(manifest, config)) {
+		writeFileSync(join(tempDir, 'public', file.path), JSON.stringify(file.data, null, 2));
+	}
 
 	const videosDir = join(resolve(config.input), 'videos');
 	const publicVideos = join(tempDir, 'public', 'videos');

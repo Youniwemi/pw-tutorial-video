@@ -308,6 +308,14 @@ tutorials/
     └── {name}-step-{n}.webp      # Per-step screenshots
 ```
 
+`npx pw-tutorial-video build-site` turns this directory into a static gallery
+site. Besides the pages, the build emits `widget.js` + `embed/<slug>.json`
+payloads so any app can embed a tutorial in-app: load
+`<script src="<site>/widget.js" defer>` and add a `data-tutorial="<slug>"`
+attribute to any element (slug = video id, i.e. the tutorial `name` plus
+`-<variant>` if any). `window.PwTutorial.open(slug)` is the programmatic
+equivalent.
+
 ### Reviewing & correcting narration
 
 The transcript is the review surface: edit the narration texts in

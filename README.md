@@ -632,6 +632,10 @@ The command scans your `tutorials/` directory for videos, screenshots, and timel
 tutorial-site-dist/          # Static site output (configurable)
 ├── index.html               # Gallery home — videos grouped by category
 ├── {video-slug}/index.html  # Dedicated page per video: player + step-by-step guide
+├── widget.js                # Embeddable in-app help widget (see below)
+├── embed/                   # Widget data
+│   ├── {video-slug}.json    # One payload per tutorial: video, description, steps
+│   └── index.json           # All available slugs (discovery/debugging)
 └── videos/                  # Copied from tutorials/videos/
     ├── *.webm               # Video files
     └── *-step-*.webp        # Step screenshots (carousel on cards, guide on video pages)
@@ -667,6 +671,48 @@ Two settings control the guide (`tutorials` block of the config):
 ![Full layout](docs/images/steps-full.png)
 
 </details>
+
+### In-app help widget
+
+The published gallery doubles as a documentation backend for your app. Every
+build ships a `widget.js` at the site root plus one JSON payload per tutorial
+under `embed/`. Load the script from your deployed gallery and mark any
+element with `data-tutorial="<video-slug>"`:
+
+```html
+<script src="https://tutorials.myapp.com/widget.js" defer></script>
+
+<button data-tutorial="create-account">📘 How does this work?</button>
+```
+
+Clicking the element opens an overlay right inside your app — the tutorial
+video, its intro narration, and the full step-by-step guide (click a step to
+reveal its screenshot), with a link to the full tutorial page on the gallery:
+
+![In-app widget opened over a host application](docs/images/widget.png)
+
+Notes:
+
+- **Zero dependencies, framework-agnostic** — clicks are handled by event
+  delegation, so buttons added later (React/Vue re-renders) work without
+  re-initialization. Styles live in a shadow root and can't leak either way;
+  the widget inherits your app's font.
+- **Slugs** are the video ids — the file names in the gallery's `videos/`
+  directory (a tutorial's `name`, plus `-<variant>` for variant recordings).
+  `GET <site>/embed/index.json` lists them all.
+- **Programmatic API**: `window.PwTutorial.open('create-account')` and
+  `window.PwTutorial.close()` — e.g. to launch a tutorial from an onboarding
+  checklist instead of a button.
+- **Theming**: the gallery's `primaryColor` is the default accent; override it
+  from the host page with `.pw-tutorial-widget { --pw-tutorial-accent: #16a34a; }`.
+- **Cross-origin**: the widget fetches `embed/<slug>.json` from the gallery
+  host, so the gallery must send `Access-Control-Allow-Origin` for your app's
+  origin. GitHub Pages sends `*` out of the box; on Netlify or Cloudflare
+  Pages add a headers rule for `/embed/*` (e.g. a `_headers` file with
+  `Access-Control-Allow-Origin: *`). Video and screenshots are plain media
+  elements and need no CORS.
+- **RTL** tutorials (`lang: 'ar'`, …) render the whole panel right-to-left;
+  individual texts use `dir="auto"` either way.
 
 ### Configuration
 
