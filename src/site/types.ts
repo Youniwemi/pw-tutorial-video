@@ -12,11 +12,15 @@ export interface SiteConfig {
 		categories?: Record<string, { icon: string; label: string }>;
 		ui?: { heroTitle?: string; heroSubtitle?: string };
 		/** Video page step guide layout:
-		 *  - 'strip': horizontal thumbnail strip (default)
+		 *  - 'text':  text-only cards, click to reveal the screenshot (default)
 		 *  - 'cards': numbered text cards with a small screenshot, click to enlarge
-		 *  - 'text':  text-only cards, click to reveal the screenshot
-		 *  - 'full':  full-width screenshot under each step's text */
-		stepsLayout?: 'strip' | 'cards' | 'text' | 'full';
+		 *  - 'full':  full-width screenshot under each step's text
+		 *  - 'none':  no step guide */
+		stepsLayout?: 'text' | 'cards' | 'full' | 'none';
+		/** Horizontal thumbnail strip under the video info (default true).
+		 *  Independent of stepsLayout; clicking a thumbnail opens the screenshot
+		 *  with its step's title + text. */
+		showStrip?: boolean;
 	};
 }
 

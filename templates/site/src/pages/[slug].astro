@@ -14,8 +14,10 @@ export function getStaticPaths() {
 const { video, index, allVideos } = Astro.props as any;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
-// 'strip' | 'cards' | 'text' | 'full' — see SiteConfig.tutorials.stepsLayout
-const layout = (siteConfig as any).stepsLayout || 'strip';
+// 'text' | 'cards' | 'full' | 'none' — see SiteConfig.tutorials.stepsLayout
+const layout = (siteConfig as any).stepsLayout || 'text';
+// The thumbnail strip is independent of the guide layout (SiteConfig.tutorials.showStrip)
+const showStrip = (siteConfig as any).showStrip !== false;
 
 type Step = { n?: number; title?: string; text?: string; image?: string; context?: boolean };
 const stepsDetail: Step[] = video.stepsDetail ?? [];
@@ -48,14 +50,21 @@ const next = index < allVideos.length - 1 ? allVideos[index + 1] : null;
 			</div>
 		</div>
 
-		{layout === 'strip' && shots.length > 0 && (
+		{showStrip && shots.length > 0 && (
 			<div class="steps-section">
 				<div class="step-strip">
 					{shots.map((s) => (
-						<div class="step-frame">
+						<button
+							class="step-frame"
+							data-full={`${base}/videos/${s.image}`}
+							data-num={s.num}
+							data-title={s.title || ''}
+							data-text={s.text || ''}
+							aria-label={`Step ${s.num}${s.title ? `: ${s.title}` : ''}`}
+						>
 							<img src={`${base}/videos/${s.image}`} alt={s.title || `Step ${s.num}`} loading={s.num === 1 ? 'eager' : 'lazy'} />
 							<span class="step-num">{s.num}</span>
-						</div>
+						</button>
 					))}
 				</div>
 			</div>
@@ -102,7 +111,14 @@ const next = index < allVideos.length - 1 ? allVideos[index + 1] : null;
 								{s.text && <p class="step-text">{s.text}</p>}
 							</div>
 							{s.image && (
-								<button class="step-thumb" data-full={`${base}/videos/${s.image}`} aria-label={`Enlarge screenshot of step ${s.num}`}>
+								<button
+									class="step-thumb"
+									data-full={`${base}/videos/${s.image}`}
+									data-num={s.num}
+									data-title={s.title || ''}
+									data-text={s.text || ''}
+									aria-label={`Enlarge screenshot of step ${s.num}`}
+								>
 									<img src={`${base}/videos/${s.image}`} alt={s.title || `Step ${s.num}`} loading="lazy" />
 									<span class="step-zoom">⤢</span>
 								</button>
@@ -159,25 +175,47 @@ const next = index < allVideos.length - 1 ? allVideos[index + 1] : null;
 		</nav>
 	</div>
 
-	{layout === 'cards' && (
+	{(showStrip || layout === 'cards') && (
 		<div class="lightbox" id="step-lightbox" hidden>
-			<img alt="" />
+			<figure class="lightbox-figure">
+				<img alt="" />
+				<figcaption class="lightbox-caption" hidden>
+					<span class="lightbox-num"></span>
+					<span class="lightbox-copy">
+						<strong class="lightbox-title"></strong>
+						<span class="lightbox-text"></span>
+					</span>
+				</figcaption>
+			</figure>
 		</div>
 	)}
 </Base>
 
 <script>
-	// Cards layout: click a thumbnail to enlarge in the lightbox
+	// Strip + cards thumbnails: click to enlarge in the lightbox, with the
+	// step's number, title and text as a caption.
 	const lightbox = document.getElementById('step-lightbox');
 	if (lightbox) {
 		const img = lightbox.querySelector('img')!;
-		document.querySelectorAll<HTMLElement>('.step-thumb').forEach((thumb) => {
-			thumb.addEventListener('click', () => {
-				img.src = thumb.dataset.full || '';
-				lightbox.hidden = false;
-				document.body.style.overflow = 'hidden';
-			});
+		const caption = lightbox.querySelector<HTMLElement>('.lightbox-caption')!;
+		const num = lightbox.querySelector<HTMLElement>('.lightbox-num')!;
+		const title = lightbox.querySelector<HTMLElement>('.lightbox-title')!;
+		const text = lightbox.querySelector<HTMLElement>('.lightbox-text')!;
+
+		const open = (source: HTMLElement) => {
+			img.src = source.dataset.full || '';
+			num.textContent = source.dataset.num || '';
+			title.textContent = source.dataset.title || '';
+			text.textContent = source.dataset.text || '';
+			caption.hidden = !(source.dataset.title || source.dataset.text);
+			lightbox.hidden = false;
+			document.body.style.overflow = 'hidden';
+		};
+
+		document.querySelectorAll<HTMLElement>('.step-thumb, .step-frame').forEach((thumb) => {
+			thumb.addEventListener('click', () => open(thumb));
 		});
+
 		const close = () => {
 			lightbox.hidden = true;
 			document.body.style.overflow = '';
@@ -345,6 +383,10 @@ const next = index < allVideos.length - 1 ? allVideos[index + 1] : null;
 		border-radius: 0.5rem;
 		overflow: hidden;
 		box-shadow: var(--shadow);
+		padding: 0;
+		border: 0;
+		background: none;
+		cursor: zoom-in;
 	}
 
 	.step-frame img {
@@ -352,6 +394,11 @@ const next = index < allVideos.length - 1 ? allVideos[index + 1] : null;
 		height: 113px;
 		object-fit: cover;
 		display: block;
+		transition: transform 0.2s;
+	}
+
+	.step-frame:hover img {
+		transform: scale(1.04);
 	}
 
 	.step-num {
@@ -534,11 +581,71 @@ const next = index < allVideos.length - 1 ? allVideos[index + 1] : null;
 		cursor: zoom-out;
 	}
 
+	.lightbox-figure {
+		max-width: min(1100px, 100%);
+		max-height: 100%;
+		margin: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.9rem;
+		align-items: center;
+	}
+
 	.lightbox img {
 		max-width: 100%;
-		max-height: 100%;
+		max-height: 75vh;
 		border-radius: 0.5rem;
 		box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+	}
+
+	.lightbox-caption {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.75rem;
+		max-width: 700px;
+		color: #e2e8f0;
+		cursor: default;
+	}
+
+	.lightbox-caption[hidden] {
+		display: none;
+	}
+
+	.lightbox-num {
+		flex-shrink: 0;
+		width: 1.7rem;
+		height: 1.7rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 50%;
+		background: var(--color-primary);
+		color: #fff;
+		font-weight: 700;
+		font-size: 0.85rem;
+	}
+
+	.lightbox-num:empty {
+		display: none;
+	}
+
+	.lightbox-copy {
+		display: flex;
+		flex-direction: column;
+		gap: 0.2rem;
+		text-align: start;
+	}
+
+	.lightbox-title {
+		font-size: 1rem;
+		line-height: 1.4;
+		color: #fff;
+	}
+
+	.lightbox-text {
+		font-size: 0.9rem;
+		line-height: 1.55;
+		color: #cbd5e1;
 	}
 
 	/* ── prev/next nav ────────────────────────────────────────────── */
