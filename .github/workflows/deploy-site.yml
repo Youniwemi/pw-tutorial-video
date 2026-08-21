@@ -1,7 +1,22 @@
-name: Deploy tutorial site
+name: Deploy site
+
+# Publishes the project site to GitHub Pages on every push to main:
+#   /          — marketing landing page (landing/index.html)
+#   /gallery/  — demo gallery built from this repo's own e2e tutorial videos
+#
+# The gallery videos are recorded here in CI: the e2e suite runs in
+# TUTORIAL_MODE with edge-tts (free Microsoft TTS, works on Linux) providing
+# real narration, then `build-site` turns the recordings into the static
+# gallery. GitHub Pages must be configured to serve from the gh-pages branch.
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
+
+concurrency:
+  group: deploy-site
+  cancel-in-progress: true
 
 permissions:
   contents: write
@@ -15,12 +30,44 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
 
       - run: npm ci
 
-      - run: node dist/init.js build-site -y
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      # No macOS `say` on Linux; TTSManager falls back to edge-tts when it is
+      # on the PATH, giving the public gallery real narration.
+      - name: Install edge-tts
+        run: pipx install edge-tts
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Record tutorial videos
+        run: npm run test:e2e:video
+
+      - name: Build gallery
+        run: node dist/init.js build-site -y
+
+      - name: Assemble site (landing + gallery)
+        run: |
+          mkdir -p _site/gallery
+          cp -r landing/. _site/
+          cp -r tutorial-site-dist/. _site/gallery/
+          touch _site/.nojekyll
 
       - uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./tutorial-site-dist
+          publish_dir: ./_site
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: deploy-site-debug
+          path: |
+            tutorials/output/
+            playwright-report/
+          retention-days: 7
