@@ -1,0 +1,24 @@
+{
+  "id": "overlay-tr",
+  "title": "Overlay TR",
+  "duration": "0:09",
+  "lang": "en",
+  "accent": "#6366f1",
+  "video": "videos/overlay-tr.webm",
+  "poster": "videos/overlay-tr-step-1.webp",
+  "page": "overlay-tr/",
+  "steps": [
+    {
+      "num": 1,
+      "title": "First step",
+      "text": "First step",
+      "image": "videos/overlay-tr-step-1.webp"
+    },
+    {
+      "num": 2,
+      "title": "Second step",
+      "text": "Second step",
+      "image": "videos/overlay-tr-step-2.webp"
+    }
+  ]
+}

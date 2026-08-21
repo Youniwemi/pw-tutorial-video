@@ -6,44 +6,44 @@
       "duration": "0:17"
     },
     {
-      "id": "tutorial_1787342422006",
-      "title": "Typing a secret without leaking it",
-      "duration": "0:15"
-    },
-    {
-      "id": "tutorial_1787342443951",
-      "title": "Two profiles, one video",
-      "duration": "0:23"
-    },
-    {
-      "id": "tutorial_1787342576582",
-      "title": "Overlay TL",
-      "duration": "0:09"
-    },
-    {
-      "id": "tutorial_1787342587183",
-      "title": "Overlay TR",
-      "duration": "0:09"
-    },
-    {
-      "id": "tutorial_1787342597066",
+      "id": "overlay-bl",
       "title": "Overlay BL",
       "duration": "0:09"
     },
     {
-      "id": "tutorial_1787342606981",
+      "id": "overlay-br",
       "title": "Overlay BR",
       "duration": "0:09"
     },
     {
-      "id": "tutorial_1787342616857",
+      "id": "overlay-position-override",
       "title": "Position override",
       "duration": "0:09"
     },
     {
-      "id": "tutorial_1787342629459",
+      "id": "overlay-tl",
+      "title": "Overlay TL",
+      "duration": "0:09"
+    },
+    {
+      "id": "overlay-tr",
+      "title": "Overlay TR",
+      "duration": "0:09"
+    },
+    {
+      "id": "split-screen-demo",
       "title": "Split screen demo",
       "duration": "0:22"
+    },
+    {
+      "id": "two-profiles-one-video",
+      "title": "Two profiles, one video",
+      "duration": "0:23"
+    },
+    {
+      "id": "type-blurred-demo",
+      "title": "Typing a secret without leaking it",
+      "duration": "0:15"
     }
   ]
 }

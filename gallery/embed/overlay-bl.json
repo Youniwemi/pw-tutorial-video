@@ -1,0 +1,24 @@
+{
+  "id": "overlay-bl",
+  "title": "Overlay BL",
+  "duration": "0:09",
+  "lang": "en",
+  "accent": "#6366f1",
+  "video": "videos/overlay-bl.webm",
+  "poster": "videos/overlay-bl-step-1.webp",
+  "page": "overlay-bl/",
+  "steps": [
+    {
+      "num": 1,
+      "title": "First step",
+      "text": "First step",
+      "image": "videos/overlay-bl-step-1.webp"
+    },
+    {
+      "num": 2,
+      "title": "Second step",
+      "text": "Second step",
+      "image": "videos/overlay-bl-step-2.webp"
+    }
+  ]
+}

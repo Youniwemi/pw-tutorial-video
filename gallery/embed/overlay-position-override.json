@@ -1,0 +1,24 @@
+{
+  "id": "overlay-position-override",
+  "title": "Position override",
+  "duration": "0:09",
+  "lang": "en",
+  "accent": "#6366f1",
+  "video": "videos/overlay-position-override.webm",
+  "poster": "videos/overlay-position-override-step-1.webp",
+  "page": "overlay-position-override/",
+  "steps": [
+    {
+      "num": 1,
+      "title": "Top-left step",
+      "text": "Top-left step",
+      "image": "videos/overlay-position-override-step-1.webp"
+    },
+    {
+      "num": 2,
+      "title": "Bottom-right step",
+      "text": "Bottom-right step",
+      "image": "videos/overlay-position-override-step-2.webp"
+    }
+  ]
+}
