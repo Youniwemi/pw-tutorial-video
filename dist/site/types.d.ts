@@ -17,6 +17,12 @@ export interface SiteConfig {
             heroTitle?: string;
             heroSubtitle?: string;
         };
+        /** Video page step guide layout:
+         *  - 'strip': horizontal thumbnail strip (default)
+         *  - 'cards': numbered text cards with a small screenshot, click to enlarge
+         *  - 'text':  text-only cards, click to reveal the screenshot
+         *  - 'full':  full-width screenshot under each step's text */
+        stepsLayout?: 'strip' | 'cards' | 'text' | 'full';
     };
 }
 /** One entry of a video page's step-by-step guide, built from the timeline

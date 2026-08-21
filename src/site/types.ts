@@ -11,6 +11,12 @@ export interface SiteConfig {
 	tutorials?: {
 		categories?: Record<string, { icon: string; label: string }>;
 		ui?: { heroTitle?: string; heroSubtitle?: string };
+		/** Video page step guide layout:
+		 *  - 'strip': horizontal thumbnail strip (default)
+		 *  - 'cards': numbered text cards with a small screenshot, click to enlarge
+		 *  - 'text':  text-only cards, click to reveal the screenshot
+		 *  - 'full':  full-width screenshot under each step's text */
+		stepsLayout?: 'strip' | 'cards' | 'text' | 'full';
 	};
 }
 

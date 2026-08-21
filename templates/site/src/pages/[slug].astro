@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import tutorials from '../data/tutorials.json';
+import siteConfig from '../data/site-config.json';
 
 export function getStaticPaths() {
 	const all = (tutorials as any).videos;
@@ -13,14 +14,18 @@ export function getStaticPaths() {
 const { video, index, allVideos } = Astro.props as any;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
+// 'strip' | 'cards' | 'text' | 'full' — see SiteConfig.tutorials.stepsLayout
+const layout = (siteConfig as any).stepsLayout || 'strip';
+
 type Step = { n?: number; title?: string; text?: string; image?: string; context?: boolean };
 const stepsDetail: Step[] = video.stepsDetail ?? [];
 
 // Sequential display numbers for numbered entries (contexts don't count)
 let counter = 0;
 const numbered = stepsDetail.map((s) => ({ ...s, num: s.context ? undefined : ++counter }));
+const shots = numbered.filter((s) => s.image);
 
-const poster = stepsDetail.find((s) => s.image)?.image;
+const poster = shots[0]?.image;
 const prev = index > 0 ? allVideos[index - 1] : null;
 const next = index < allVideos.length - 1 ? allVideos[index + 1] : null;
 ---
@@ -43,7 +48,20 @@ const next = index < allVideos.length - 1 ? allVideos[index + 1] : null;
 			</div>
 		</div>
 
-		{numbered.length > 0 && (
+		{layout === 'strip' && shots.length > 0 && (
+			<div class="steps-section">
+				<div class="step-strip">
+					{shots.map((s) => (
+						<div class="step-frame">
+							<img src={`${base}/videos/${s.image}`} alt={s.title || `Step ${s.num}`} loading={s.num === 1 ? 'eager' : 'lazy'} />
+							<span class="step-num">{s.num}</span>
+						</div>
+					))}
+				</div>
+			</div>
+		)}
+
+		{layout === 'full' && numbered.length > 0 && (
 			<section class="steps-guide">
 				{numbered.map((s) => (
 					s.context ? (
@@ -71,6 +89,56 @@ const next = index < allVideos.length - 1 ? allVideos[index + 1] : null;
 			</section>
 		)}
 
+		{layout === 'cards' && numbered.length > 0 && (
+			<section class="steps-cards">
+				{numbered.map((s) => (
+					s.context ? (
+						<p class="step-context">{s.text}</p>
+					) : (
+						<div class="step-card">
+							<span class="step-number">{s.num}</span>
+							<div class="step-copy">
+								{s.title && <h2 class="step-title">{s.title}</h2>}
+								{s.text && <p class="step-text">{s.text}</p>}
+							</div>
+							{s.image && (
+								<button class="step-thumb" data-full={`${base}/videos/${s.image}`} aria-label={`Enlarge screenshot of step ${s.num}`}>
+									<img src={`${base}/videos/${s.image}`} alt={s.title || `Step ${s.num}`} loading="lazy" />
+									<span class="step-zoom">⤢</span>
+								</button>
+							)}
+						</div>
+					)
+				))}
+			</section>
+		)}
+
+		{layout === 'text' && numbered.length > 0 && (
+			<section class="steps-text">
+				{numbered.map((s) => (
+					s.context ? (
+						<p class="step-context">{s.text}</p>
+					) : (
+						<div class:list={['step-row', { 'has-shot': !!s.image }]}>
+							<button class="step-row-head" aria-expanded="false" disabled={!s.image}>
+								<span class="step-number">{s.num}</span>
+								<span class="step-copy">
+									{s.title && <span class="step-title">{s.title}</span>}
+									{s.text && <span class="step-text">{s.text}</span>}
+								</span>
+								{s.image && <span class="step-chevron">▾</span>}
+							</button>
+							{s.image && (
+								<div class="step-reveal">
+									<img src={`${base}/videos/${s.image}`} alt={s.title || `Step ${s.num}`} loading="lazy" />
+								</div>
+							)}
+						</div>
+					)
+				))}
+			</section>
+		)}
+
 		<nav class="video-nav-row" aria-label="navigation">
 			<div class="nav-prev">
 				{prev && (
@@ -90,7 +158,45 @@ const next = index < allVideos.length - 1 ? allVideos[index + 1] : null;
 			</div>
 		</nav>
 	</div>
+
+	{layout === 'cards' && (
+		<div class="lightbox" id="step-lightbox" hidden>
+			<img alt="" />
+		</div>
+	)}
 </Base>
+
+<script>
+	// Cards layout: click a thumbnail to enlarge in the lightbox
+	const lightbox = document.getElementById('step-lightbox');
+	if (lightbox) {
+		const img = lightbox.querySelector('img')!;
+		document.querySelectorAll<HTMLElement>('.step-thumb').forEach((thumb) => {
+			thumb.addEventListener('click', () => {
+				img.src = thumb.dataset.full || '';
+				lightbox.hidden = false;
+				document.body.style.overflow = 'hidden';
+			});
+		});
+		const close = () => {
+			lightbox.hidden = true;
+			document.body.style.overflow = '';
+		};
+		lightbox.addEventListener('click', close);
+		document.addEventListener('keydown', (e) => {
+			if (e.key === 'Escape' && !lightbox.hidden) close();
+		});
+	}
+
+	// Text layout: click a step to reveal its screenshot
+	document.querySelectorAll<HTMLElement>('.step-row.has-shot .step-row-head').forEach((head) => {
+		head.addEventListener('click', () => {
+			const row = head.closest('.step-row')!;
+			const open = row.classList.toggle('open');
+			head.setAttribute('aria-expanded', String(open));
+		});
+	});
+</script>
 
 <style>
 	.video-page {
@@ -127,7 +233,7 @@ const next = index < allVideos.length - 1 ? allVideos[index + 1] : null;
 	}
 
 	.video-page-info {
-		margin-bottom: 2rem;
+		margin-bottom: 1.5rem;
 	}
 
 	.video-page-title {
@@ -158,33 +264,7 @@ const next = index < allVideos.length - 1 ? allVideos[index + 1] : null;
 		gap: 0.25rem;
 	}
 
-	.steps-guide {
-		display: flex;
-		flex-direction: column;
-		gap: 2.5rem;
-		margin-bottom: 3rem;
-	}
-
-	.step-context {
-		color: var(--color-text-muted);
-		font-style: italic;
-		line-height: 1.6;
-		border-inline-start: 3px solid var(--color-primary);
-		padding-inline-start: 1rem;
-		margin: 0;
-	}
-
-	.step-block {
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
-	}
-
-	.step-header {
-		display: flex;
-		align-items: flex-start;
-		gap: 1rem;
-	}
+	/* ── Shared step bits ─────────────────────────────────────────── */
 
 	.step-number {
 		flex-shrink: 0;
@@ -202,19 +282,109 @@ const next = index < allVideos.length - 1 ? allVideos[index + 1] : null;
 
 	.step-copy {
 		min-width: 0;
+		flex: 1;
 	}
 
 	.step-title {
-		font-size: 1.15rem;
+		display: block;
+		font-size: 1.1rem;
 		font-weight: 600;
 		line-height: 1.4;
 		margin: 0.2rem 0 0.35rem;
+		color: var(--color-text);
 	}
 
 	.step-text {
+		display: block;
 		color: var(--color-text-muted);
 		line-height: 1.6;
 		margin: 0;
+		font-size: 0.95rem;
+	}
+
+	.step-context {
+		color: var(--color-text-muted);
+		font-style: italic;
+		line-height: 1.6;
+		border-inline-start: 3px solid var(--color-primary);
+		padding-inline-start: 1rem;
+		margin: 0;
+	}
+
+	/* ── strip layout ─────────────────────────────────────────────── */
+
+	.steps-section {
+		margin-bottom: 2rem;
+	}
+
+	.step-strip {
+		display: flex;
+		gap: 0.75rem;
+		overflow-x: auto;
+		padding-bottom: 0.5rem;
+	}
+
+	.step-strip::-webkit-scrollbar {
+		height: 4px;
+	}
+
+	.step-strip::-webkit-scrollbar-track {
+		background: var(--color-border);
+		border-radius: 2px;
+	}
+
+	.step-strip::-webkit-scrollbar-thumb {
+		background: var(--color-text-muted);
+		border-radius: 2px;
+	}
+
+	.step-frame {
+		position: relative;
+		flex-shrink: 0;
+		width: 200px;
+		border-radius: 0.5rem;
+		overflow: hidden;
+		box-shadow: var(--shadow);
+	}
+
+	.step-frame img {
+		width: 100%;
+		height: 113px;
+		object-fit: cover;
+		display: block;
+	}
+
+	.step-num {
+		position: absolute;
+		top: 6px;
+		left: 6px;
+		background: rgba(0, 0, 0, 0.65);
+		color: white;
+		font-size: 0.7rem;
+		font-weight: 600;
+		padding: 0.1rem 0.4rem;
+		border-radius: 0.25rem;
+	}
+
+	/* ── full layout ──────────────────────────────────────────────── */
+
+	.steps-guide {
+		display: flex;
+		flex-direction: column;
+		gap: 2.5rem;
+		margin-bottom: 3rem;
+	}
+
+	.step-block {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	.step-header {
+		display: flex;
+		align-items: flex-start;
+		gap: 1rem;
 	}
 
 	.step-shot {
@@ -224,6 +394,154 @@ const next = index < allVideos.length - 1 ? allVideos[index + 1] : null;
 		border: 1px solid var(--color-border);
 		box-shadow: var(--shadow);
 	}
+
+	/* ── cards layout ─────────────────────────────────────────────── */
+
+	.steps-cards {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		margin-bottom: 3rem;
+	}
+
+	.step-card {
+		display: flex;
+		align-items: flex-start;
+		gap: 1rem;
+		padding: 1rem 1.25rem;
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius);
+		background: var(--color-bg-card);
+		box-shadow: var(--shadow);
+	}
+
+	.step-thumb {
+		position: relative;
+		flex-shrink: 0;
+		width: 180px;
+		padding: 0;
+		border: 1px solid var(--color-border);
+		border-radius: 0.5rem;
+		overflow: hidden;
+		cursor: zoom-in;
+		background: none;
+		display: block;
+	}
+
+	.step-thumb img {
+		width: 100%;
+		height: 102px;
+		object-fit: cover;
+		display: block;
+		transition: transform 0.2s;
+	}
+
+	.step-thumb:hover img {
+		transform: scale(1.04);
+	}
+
+	.step-zoom {
+		position: absolute;
+		right: 6px;
+		bottom: 6px;
+		background: rgba(0, 0, 0, 0.65);
+		color: #fff;
+		font-size: 0.8rem;
+		line-height: 1;
+		padding: 0.25rem 0.35rem;
+		border-radius: 0.3rem;
+	}
+
+	/* ── text layout ──────────────────────────────────────────────── */
+
+	.steps-text {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		margin-bottom: 3rem;
+	}
+
+	.step-row {
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius);
+		background: var(--color-bg-card);
+		overflow: hidden;
+	}
+
+	.step-row-head {
+		display: flex;
+		align-items: flex-start;
+		gap: 1rem;
+		width: 100%;
+		padding: 1rem 1.25rem;
+		border: 0;
+		background: none;
+		text-align: inherit;
+		font: inherit;
+		color: inherit;
+	}
+
+	.step-row.has-shot .step-row-head {
+		cursor: pointer;
+	}
+
+	.step-row.has-shot .step-row-head:hover {
+		background: color-mix(in srgb, var(--color-primary) 5%, transparent);
+	}
+
+	.step-chevron {
+		flex-shrink: 0;
+		align-self: center;
+		color: var(--color-text-muted);
+		transition: transform 0.2s;
+	}
+
+	.step-row.open .step-chevron {
+		transform: rotate(180deg);
+	}
+
+	.step-reveal {
+		display: none;
+		padding: 0 1.25rem 1.25rem;
+	}
+
+	.step-row.open .step-reveal {
+		display: block;
+	}
+
+	.step-reveal img {
+		width: 100%;
+		display: block;
+		border-radius: 0.5rem;
+		border: 1px solid var(--color-border);
+	}
+
+	/* ── lightbox ─────────────────────────────────────────────────── */
+
+	.lightbox[hidden] {
+		display: none;
+	}
+
+	.lightbox {
+		position: fixed;
+		inset: 0;
+		z-index: 100;
+		background: rgba(0, 0, 0, 0.85);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 2rem;
+		cursor: zoom-out;
+	}
+
+	.lightbox img {
+		max-width: 100%;
+		max-height: 100%;
+		border-radius: 0.5rem;
+		box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+	}
+
+	/* ── prev/next nav ────────────────────────────────────────────── */
 
 	.video-nav-row {
 		display: flex;
@@ -285,6 +603,26 @@ const next = index < allVideos.length - 1 ? allVideos[index + 1] : null;
 	@media (max-width: 600px) {
 		.video-page-title {
 			font-size: 1.25rem;
+		}
+
+		.step-frame {
+			width: 150px;
+		}
+
+		.step-frame img {
+			height: 85px;
+		}
+
+		.step-card {
+			flex-wrap: wrap;
+		}
+
+		.step-thumb {
+			width: 100%;
+		}
+
+		.step-thumb img {
+			height: auto;
 		}
 
 		.step-number {
