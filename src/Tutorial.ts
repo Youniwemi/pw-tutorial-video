@@ -1,5 +1,5 @@
 import type { Page, Locator, FrameLocator } from '@playwright/test';
-import { readFileSync, unlinkSync, existsSync, mkdirSync, writeFileSync } from 'fs';
+import { readFileSync, unlinkSync, existsSync, mkdirSync, writeFileSync, statSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import type {
@@ -682,7 +682,21 @@ export class Tutorial {
 		preloads.push(completionVoicePreload);
 		await Promise.all(preloads);
 
-		const videoTrimMs = Date.now() - this.videoStartTime;
+		// Recording starts when the page is created, not when this Tutorial is
+		// constructed — anything the test does before `new Tutorial()` (goto,
+		// login, waits) is on tape but not in `videoStartTime`, and would leave
+		// every frame lagging the audio clips by that gap. The video file is
+		// created when recording starts, so its birthtime is the true anchor.
+		let videoTrimMs = Date.now() - this.videoStartTime;
+		try {
+			const video = this.page.video();
+			if (video) {
+				const birthMs = statSync(await video.path()).birthtimeMs;
+				if (birthMs > 0) videoTrimMs = Date.now() - birthMs;
+			}
+		} catch {
+			// No video or no birthtime on this platform — keep the constructor anchor.
+		}
 		this.timeline.start(videoTrimMs);
 
 		await this.initialize();
