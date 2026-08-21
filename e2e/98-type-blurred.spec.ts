@@ -37,6 +37,7 @@ test.describe('typeBlurred', () => {
 
 		const tutorial = new Tutorial(page, {
 			title: 'Typing a secret without leaking it',
+			testName: 'type-blurred-demo',
 			testTitle,
 			testFile: '98-type-blurred.spec.ts',
 			projectName: 'chromium',

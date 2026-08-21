@@ -15,6 +15,7 @@ A feature or behavior change is **not done** until all of these ship together (s
 3. **`README.md`** updated — every user-facing option and workflow; site-visible changes get screenshots in `docs/images/` (~900px wide, referenced with relative paths like `docs/images/x.png` — GitHub renders them on any branch, and npm resolves them through package.json's `repository` field)
 4. **Unit tests** covering the new behavior (`npm test` green)
 5. **`npm run build`** run, so the committed `dist/` matches `src/`
+6. **The project site** (`landing/index.html`) updated when the change is meaningful to users — a new feature, capability, or workflow deserves a feature card, section, or hero mention (with a live demo where the deployed gallery makes one possible). Internal refactors, fixes, and minor option tweaks don't.
 
 Before declaring any task complete, walk this list and fix what's missing.
 

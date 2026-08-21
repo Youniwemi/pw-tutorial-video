@@ -12,6 +12,7 @@ test('split demo — tabs, ratios, back to tabs', { tag: '@tutorial' }, async ({
 
 	const tutorial = new Tutorial(page, {
 		title: 'Split screen demo',
+		testName: 'split-screen-demo',
 		testTitle: 'split demo — tabs, ratios, back to tabs',
 		lang: 'fr',
 		audioBaseUrl: ACCOUNTANT_ORIGIN,

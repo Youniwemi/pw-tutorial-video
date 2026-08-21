@@ -25,6 +25,8 @@ test.describe('video output', () => {
 
 		const tutorial = new Tutorial(page, {
 			title: 'Two profiles, one video',
+			// Stable slug: gallery page + widget embed URLs survive re-recordings
+			testName: 'two-profiles-one-video',
 			testTitle,
 			testFile: '99-video.spec.ts',
 			projectName: 'chromium',
